@@ -123,6 +123,11 @@ try:
     term_fixed_width_env = int(os.environ.get('term_width'))
 except:
     term_fixed_width_env = 0
+try:
+    # Setting the default for the cli - flag, i.e. this rules w/o the flag:
+    term_fixed_height_env = int(os.environ.get('term_height'))
+except:
+    term_fixed_height_env = 0
 
 
 def walk_dir(directory, crit=None):
@@ -220,9 +225,10 @@ class Pytest:
         FLG(sys.argv)  # parsing the flags
 
 
-def terminal_size():
-    import fcntl, termios, struct
+import fcntl, termios, struct
 
+
+def terminal_size():
     # try piped left and/or right, if both piped then return 80,25:
     # since we want to print we try first stdout:
     for fd in 1, 0:
@@ -237,45 +243,19 @@ def terminal_size():
     return 80, 25
 
 
-def termwidth(c=[-1, 0]):
-    """
-    somewhat expensive, we run max every 2 seconds, i.e. potentially
-    redraw delays when term resizing
-    Right now we have to foreground term app anyway but maybe dev log rearranging
-    """
+def termwidth():
+    return termsize()[0]
+
+
+def termsize():
     try:
-        # when called before flag parseing, e.g. at -hf
-        flg_fixed, flg_dt_recalc = (
-            FLG.term_fixed_width,
-            FLG.term_auto_width_recalc_every,
-        )
-    except Exception as ex:
-        flg_fixed, flg_dt_recalc = term_fixed_width_env or None, None
-    if flg_dt_recalc:
-        if c[0] > -1 and now() - c[1] < FLG.term_auto_width_recalc_every:
-            return c[0]
-
-    def _tw():
-        tfw = flg_fixed
-        if tfw is not None and tfw > 0:
-            return tfw
-        return terminal_size()[1]
-        # try:
-        # wtmfMF?!?
-        #     # This seems to be working in the most situations - i.e. with a shell
-        #     # better than os.popen('tput cols 2>/dev/null')
-        #     os.system('stty size > /tmp/sttysize 2>/dev/null')
-        #     with open('/tmp/sttysize') as fd:
-        #         s = fd.read()
-        #     i = int(s.strip().split(' ', 1)[1])
-        #     if not i:
-        #         raise Exception('x')
-        #     return i
-        # except:
-        #     return 80
-
-    c[0], c[1] = _tw(), now()
-    return c[0]
+        w, h = FLG.term_fixed_width, FLG.term_fixed_height
+    except:
+        # not yet parsed?
+        w, h = 0, 0
+    if w and h:
+        return w, h
+    return terminal_size()
 
 
 # -------------------------------------------------------------------------- data utils
@@ -1574,9 +1554,14 @@ class appflags:
         n = 'Sets terminal width to this. 0: auto.'
         d = term_fixed_width_env
 
-    class term_auto_width_recalc_every:
-        n = 'When term with is auto we run stty size maximum every so many millisecs'
-        d = 2000
+    class term_fixed_height:
+        n = 'Sets terminal size to this. 0: auto.'
+        d = term_fixed_height_env
+
+    # not needed to run os.system calls anymore:
+    # class term_auto_width_recalc_every:
+    #     n = 'When term with is auto we run stty size maximum every so many millisecs'
+    #     d = 2000
 
     class help_output_fmt:
         s = False  #  must be long form, checked in absl_color_help
