@@ -240,7 +240,7 @@ def run_app(
     # some callers, like plugins, pass over their flags classes, do not call define in mod
     if flags:
         tools.define_flags(flags)
-
+    tools.rm_absl_flags()
     # that's for flags: they only understand helpfull, we want -hf <match>
     argv = argv if argv else sys.argv
     exit_at_help_flag(main, argv)
@@ -352,7 +352,7 @@ def on_flag_parse_err_have_action_flag(key, af, parser):
     key = af['key']  # short to long
     args = list(sys.argv)
     args[p] = '--' + key
-    tools.define_flags(af['flg_cls'], sub=key)
+    tools.define_flags(af['flg_cls'], sub=key, parent_autoshort=af['autoshort'])
     for arg in args[p + 1 :]:
         p += 1
         if arg.startswith('--'):

@@ -30,7 +30,8 @@ include = [
 [project.urls]
 packagehome = "https://pypi.com/artifactory/pypi-ax-sources/devapps/_VERSION_/devapps-_VERSION_.tar.gz"
 discusshome = "https://join.skype.com/abc123"
-
+[tool.pyright]
+extraPaths = ["../docutools/src"]
 [tool.poetry.dependencies]
 python = "^3.6"
 toml = "^0.10.1"

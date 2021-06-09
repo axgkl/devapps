@@ -40,22 +40,36 @@ def make_cache():
 class Flags:
     autoshort = ''
 
-    class list:
-        n = 'Display parsed tree [default]'
-        s = 'x'
-        d = 'action'
+    class Action:
+        class list:
+            n = 'Display parsed tree [default]'
 
-        class short:
-            s = 's'
+            class verbose:
+                d = False
+
+        class clear_cache:
+            short = 'cc'
+
+        class enter:
+            n = 'Enter currently building image with terminal. Disables "run". To run another command than the shell use --cmd. When the cmd is not present we fallback to /bin/sh'
             d = False
+
+            class cmd:
+                n = 'Enter currently building image with given command'
+                d = '/bin/bash'
+
+        class delete:
+            a = True
+            n = 'Delete image, i.e. allows rebuild. Will also remove old versions and remove all running containers'
+
+            class parents:
+                n = 'Delete image and all parents within the namespace, incl. old versions'
+                s = 'D'
+                d = False
 
     class name:
         n = 'Which filesystem to build (definition from specdir)'
         d = ''
-
-    class clear_cache:
-        short = 'cc'
-        d = False
 
     class run:
         n = 'Run 0:remove existing image (only before commit), 1:build, 2:commit, 3:run shell'
@@ -65,27 +79,9 @@ class Flags:
         n = 'Repeat last build steps - even if they were succesful. 1: repeat all except first, -2: repeat last 2 successful'
         d = ''
 
-    class enter:
-        n = 'Enter currently building image with terminal. Disables "run". To run another command than the shell use --enter_cmd'
-        d = False
-
-    class enter_cmd:
-        n = 'Enter currently building image with given command'
-        d = ''
-
     class mount_home_dir:
         n = 'Mount user home directory at each buildah run'
         d = False
-
-    class delete:
-        a = True
-        n = 'Delete image, i.e. allows rebuild. Will also remove old versions and remove all running containers'
-        d = 'action'
-
-        class parents:
-            n = 'Delete image and all parents within the namespace, incl. old versions'
-            s = 'D'
-            d = False
 
     class yes:
         n = 'All questions: y'
@@ -393,7 +389,7 @@ class img:
                 return True
         return False
 
-    def enter(dir, cmd='/bin/bash'):
+    def enter(dir, cmd):
         m = S.spec(dir=dir)
         app.info('Entering container', json=m)
         app.warn('Your changes will NOT be recorded!')
@@ -583,16 +579,13 @@ def run():
     do(S.load_last_build_cache)
     S.set_matching(match=FLG.name)
     buildah.images()
+
     if FLG.list:
         return S.dict()
 
-    if FLG.enter_cmd:
-        verify_have_one()
-        return do(img.enter, dir=S.d_cur, cmd=FLG.enter_cmd)
-
     if FLG.enter:
         verify_have_one()
-        return do(img.enter, dir=S.d_cur)
+        return do(img.enter, dir=S.d_cur, cmd=FLG.cmd)
 
     if FLG.delete:
         verify_have_one()

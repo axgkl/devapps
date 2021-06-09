@@ -1140,15 +1140,17 @@ all_flag_shorts = {}
 
 def make_flag(c, module, autoshort, default, sub=False, **kw):
     g = getattr
-    key = c.__name__
-    if sub:
+    key = orig_key = c.__name__
+    # if key == 'verbose':
+    #     breakpoint()  # FIXME BREAKPOINT
+    if sub and not sub == 'Action':
         key = sub + '_' + key
     d = g(c, 'd', default)  # when d is not given, what to do. Dictates the flag type.
     ml = kw.get('short_maxlen', 5)
     s = g(c, 's', None)
     mkw = {'module_name': module, 'short_name': s}
     if s is None and autoshort is not False:
-        s = shorten(key, prefix=autoshort, maxlen=ml, all_shorts=all_flag_shorts)
+        s = shorten(orig_key, prefix=autoshort, maxlen=ml, all_shorts=all_flag_shorts)
     if s is False:
         s = None
     else:
@@ -1177,12 +1179,25 @@ have_flg_cls = set()
 action_flags = {}
 
 
-def define_flags(Class, sub=False):
+def have_subs(c):
+    for s in [getattr(c, s) for s in dir(c) if not s.startswith('_')]:
+        if isinstance(s, type):
+            return True
+
+
+def rm_absl_flags():
+    FLG.remove_flag_values(
+        ['v',]
+    )
+
+
+def define_flags(Class, sub=False, parent_autoshort=False):
     """
     Pretty classes to flag defs. See nrclient, devapp.app or structlogging.sl how to use
     All config in the top class
     2021/06: Subclassses allowed
     """
+
     if Class in have_flg_cls:
         from devapp.app import app
 
@@ -1193,27 +1208,33 @@ def define_flags(Class, sub=False):
     module = g(Class, 'module', Class.__module__)
     if module in skip_flag_defines:
         return
-    autoshort = g(Class, 'autoshort', sub[0] if sub else False)
     # passed to make_flag as default for default
     default = g(Class, 'default', '')
+    autoshort = parent_autoshort = g(Class, 'autoshort', parent_autoshort)
     l = dict(locals())
     cshrt, c_no_shrt = [], []
     for k in [i for i in dir(Class) if not i.startswith('_')]:
         c = g(Class, k)
+
         if not isinstance(c, type):
             continue
-
-        if g(c, 'd', None) == 'action':
+        if sub == 'Action':
             setattr(c, 'd', False)
-            action_flags[k] = {'flg_cls': c, 'class': Class, 'key': k}
+            action_flags[k] = {
+                'flg_cls': c,
+                'class': Class,
+                'key': k,
+                'autoshort': g(c, 'autoshort', autoshort),
+            }
 
         if not hasattr(c, 'n'):
             if not hasattr(c, 'd'):
+                a = g(c, 'autoshort', parent_autoshort)
+                if not a and not c.__name__ == 'Action':
+                    pref = c.__name__[0]
                 # prbably group but no n, no d is allowed as well
-                subs = [g(c, s) for s in dir(c) if not s.startswith('_')]
-                subs = [i for i in subs if isinstance(i, type)]
-                if subs:
-                    r = define_flags(c, sub=c.__name__)
+                if have_subs(c):
+                    r = define_flags(c, sub=c.__name__, parent_autoshort=a)
                     continue
             # alternative to stating n we allow a multline docstring, where first line
             # is n, rest is details:

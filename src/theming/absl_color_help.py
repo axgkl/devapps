@@ -135,13 +135,18 @@ def term_widths(have_match):
 
 
 def term_line(line_spec, widths, have_match):
-    """One line of output, """
+    """One line of output - have_match typically [main module name] """
     m = line_spec
+    is_action = m.get('action')
+    # if is_action:
+    #     breakpoint()  # FIXME BREAKPOINT
     r = []
     pos = 0
     for colmn in 'short_name', 'name', 'default', 'meaning':
         v = str(m.get(colmn)) or ''
-        v = "''" if v == 'None' else v
+        if v == 'None':
+            v = '' if colmn == 'short_name' else "''"
+
         if have_match:
             v += ' '
         w = widths[colmn]
@@ -159,22 +164,29 @@ def term_line(line_spec, widths, have_match):
                 det = '\n' + det
                 if have_match or len(v) + len(det) <= w:
                     v += col('details') + det
-
+        c = colmn
+        if is_action:
+            if m.get('action_flag'):
+                if colmn in ('short_name', 'meaning'):
+                    v = '   ' + v
+            elif colmn == 'default':
+                v = 'ACTION'
+                c = 'action'
         if have_match:
             if colmn == 'meaning':
                 r[-1] = r[-1].rstrip()
                 v = '\n%s' % v  # (' ' * widths['short_name']) + v
-            else:
-                if 0 and len(v) > w:
-                    dedented_text = textwrap.dedent(v).strip()
-                    v = textwrap.fill(
-                        dedented_text,
-                        initial_indent=' ' * oldpos,
-                        subsequent_indent=' ' * 4,
-                        width=widths['term'],
-                    )
-                    v += ' '
-                    pos = 0
+            # else:
+            #     if 0 and len(v) > w:
+            #         dedented_text = textwrap.dedent(v).strip()
+            #         v = textwrap.fill(
+            #             dedented_text,
+            #             initial_indent=' ' * oldpos,
+            #             subsequent_indent=' ' * 4,
+            #             width=widths['term'],
+            #         )
+            #         v += ' '
+            #         pos = 0
         else:
             # if colmn == 'default' and 'mini' in v:
             #    breakpoint()  # FIXME BREAKPOINT
@@ -187,7 +199,6 @@ def term_line(line_spec, widths, have_match):
                     except Exception as ex:
                         # when not even placeholder fits
                         v = v[:w]
-        c = 'action' if colmn == 'default' and v == 'ACTION' else colmn
         r.append(col(c) + v.ljust(w))
     return ''.join(r)
 
@@ -253,7 +264,6 @@ def parse_xml_help(xml_help, match, cli_actions=None):
         l.append(c)
         items[c['name']] = {'pos': len(l) - 1, 'mod': c['file']}
 
-    afp = []
     have = set()
     for f, af in action_flags.items():
         k = af['key']
@@ -261,30 +271,33 @@ def parse_xml_help(xml_help, match, cli_actions=None):
             continue
         have.add(k)
         item = items.get(k)
-        p = item['pos'] + 1
-        mod = item['mod']
-        afp.append([p - 1, mod, k, True])
+        p, mod = item['pos'] + 1, item['mod']
+        m[mod][p - 1]['action'] = True
+        # afp.append([p - 1, mod, k, True])
         if af in cli_actions:
-            while m[mod][p]['name'].startswith(k + '_'):
-                afp.append([p, mod, k, False])
-                p += 1
-    if afp:
-        fs = r['flags']
-        l = []
-        m = {}
-        for a in afp:
-            mod = a[1]
-            action = a[2]
-            main = a[3]
-            f = fs[mod].pop(a[0] + m.get(mod, 0))
-            m[mod] = m.setdefault(mod, 0) - 1
-            l.append(f)
-            if main:
+            f = m[mod][p]
+            while f['name'].startswith(k + '_'):
                 f['action'] = True
-                f['default'] = 'ACTION'
-            else:
-                f['name'] = f['name'].split(action + '_', 1)[1]
-        fs['actions'] = l
+                f['action_flag'] = True
+                f['name'] = f['name'].split(k + '_', 1)[1]
+                p += 1
+    # if afp:
+    #     fs = r['flags']
+    #     l = []
+    #     m = {}
+    #     for a in afp:
+    #         mod = a[1]
+    #         action = a[2]
+    #         main = a[3]
+    #         f = fs[mod].pop(a[0] + m.get(mod, 0))
+    #         m[mod] = m.setdefault(mod, 0) - 1
+    #         l.append(f)
+    #         if main:
+    #             f['action'] = True
+    #             f['default'] = 'ACTION'
+    #         else:
+    #             f['name'] = f['name'].split(action + '_', 1)[1]
+    #     fs['actions'] = l
     return r
 
 
@@ -342,7 +355,7 @@ def color_usage(*a, main_module, full=None, **kw):
     for k in sys.argv:
         af = action_flags.get(k)
         if af:
-            define_flags(af['flg_cls'], sub=af['key'])
+            define_flags(af['flg_cls'], sub=af['key'], parent_autoshort=af['autoshort'])
             afs.append(af)
 
     so = sys.stdout
