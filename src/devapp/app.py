@@ -350,6 +350,7 @@ def on_flag_parse_err_try_action_flags(args, err, parser):
 def on_flag_parse_err_have_action_flag(key, af, parser):
     p = sys.argv.index(key)
     key = af['key']  # short to long
+    action[0] = key
     args = list(sys.argv)
     args[p] = '--' + key
     tools.define_flags(af['flg_cls'], sub=key, parent_autoshort=af['autoshort'])
@@ -362,15 +363,17 @@ def on_flag_parse_err_have_action_flag(key, af, parser):
     return parser(args)
 
 
+action = ['']
+
+
 def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     # do we have leftover (unparsed) cli args? Could be an action then:
-    for k, v in zip(args[1:], sys.argv[1:]):
-        if k != v:
-            # a leftover. actionflag. Can only be last arg, otherwise we'd had a parse error?
-            af = tools.action_flags.get(k)
-            if not af:
-                break
-            setattr(FLG, af['key'], True)
+    k = args[-1]
+    # a leftover. actionflag. Can only be last arg, otherwise we'd had a parse error?
+    af = tools.action_flags.get(k)
+    if af:
+        setattr(FLG, af['key'], True)
+        action[0] = af['key']
 
     tools.set_flag_vals_from_env()  # 0.0001sec
 
@@ -408,6 +411,18 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         cmd = [w, ':'.join([d, str(os.getpid()), match, rec])]
         # print(' '.join(cmd))
         watcher_pid = subprocess.Popen(cmd).pid
+
+    # main might be an Action class - use it:
+    if isinstance(main, type):
+        if not action[0]:
+            for af in tools.action_flags.values():
+                if af['flg_cls'].d:
+                    action[0] = af['key']
+                    app.debug('Running default action', action=af['key'])
+                    break
+        main = getattr(main, action[0], None)
+        if not main:
+            app.die('Require action')
 
     res = None
     while True:

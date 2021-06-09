@@ -40,8 +40,9 @@ def make_cache():
 class Flags:
     autoshort = ''
 
-    class Action:
+    class Actions:
         class list:
+            d = True
             n = 'Display parsed tree [default]'
 
             class verbose:
@@ -86,6 +87,18 @@ class Flags:
     class yes:
         n = 'All questions: y'
         d = False
+
+
+class Action:
+    def list():
+        breakpoint()  # FIXME BREAKPOINT
+        pass
+
+    def enter():
+        pass
+
+    def delete():
+        pass
 
 
 # partial(app.die, example='./my_reg.com[:port]::library/base1/base2')
@@ -616,7 +629,7 @@ def run():
     return S.dict()
 
 
-main = lambda: run_app(run, flags=Flags, wrapper=cleanup)
+main = lambda: run_app(Action, flags=Flags, wrapper=cleanup)
 
 
 if __name__ == '__main__':

@@ -1143,7 +1143,7 @@ def make_flag(c, module, autoshort, default, sub=False, **kw):
     key = orig_key = c.__name__
     # if key == 'verbose':
     #     breakpoint()  # FIXME BREAKPOINT
-    if sub and not sub == 'Action':
+    if sub and not sub == 'Actions':
         key = sub + '_' + key
     d = g(c, 'd', default)  # when d is not given, what to do. Dictates the flag type.
     ml = kw.get('short_maxlen', 5)
@@ -1218,8 +1218,8 @@ def define_flags(Class, sub=False, parent_autoshort=False):
 
         if not isinstance(c, type):
             continue
-        if sub == 'Action':
-            setattr(c, 'd', False)
+        if sub == 'Actions':
+            setattr(c, 'd', False if not g(c, 'd', None) == True else True)
             action_flags[k] = {
                 'flg_cls': c,
                 'class': Class,
@@ -1230,7 +1230,7 @@ def define_flags(Class, sub=False, parent_autoshort=False):
         if not hasattr(c, 'n'):
             if not hasattr(c, 'd'):
                 a = g(c, 'autoshort', parent_autoshort)
-                if not a and not c.__name__ == 'Action':
+                if not a and not c.__name__ == 'Actions':
                     pref = c.__name__[0]
                 # prbably group but no n, no d is allowed as well
                 if have_subs(c):
