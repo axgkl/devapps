@@ -40,16 +40,21 @@ def make_cache():
 class Flags:
     autoshort = ''
 
+    class list:
+        n = 'Display parsed tree [default]'
+        s = 'x'
+        d = 'action'
+
+        class short:
+            s = 's'
+            d = False
+
     class name:
         n = 'Which filesystem to build (definition from specdir)'
         d = ''
 
     class clear_cache:
         short = 'cc'
-        d = False
-
-    class list:
-        n = 'Display parsed tree [default]'
         d = False
 
     class run:
@@ -73,13 +78,14 @@ class Flags:
         d = False
 
     class delete:
+        a = True
         n = 'Delete image, i.e. allows rebuild. Will also remove old versions and remove all running containers'
-        d = False
+        d = 'action'
 
-    class delete_with_parents:
-        n = 'Delete image and all parents within the namespace, incl. old versions'
-        s = 'D'
-        d = False
+        class parents:
+            n = 'Delete image and all parents within the namespace, incl. old versions'
+            s = 'D'
+            d = False
 
     class yes:
         n = 'All questions: y'
@@ -569,6 +575,7 @@ def verify_have_one():
 
 
 def run():
+    breakpoint()  # FIXME BREAKPOINT
     make_cache()
     verify_have_tools()
     if FLG.clear_cache:

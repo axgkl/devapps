@@ -237,7 +237,7 @@ def terminal_size():
                 'HHHH',
                 fcntl.ioctl(fd, termios.TIOCGWINSZ, struct.pack('HHHH', 0, 0, 0, 0)),
             )
-            return h, (w or 80)  # go really sure its no 0
+            return (w or 80), h  # go really sure its no 0
         except:
             pass
     return 80, 25
@@ -1090,7 +1090,6 @@ def shorten(key, prefix, maxlen, all_shorts=None, take=1):
     while True:
         s = autoshort(key, prefix, maxlen, take)
         if not s in all_shorts:
-            all_shorts.add(s)
             return s
         if s == sold:
             raise Exception('Unresolvable collision in autoshort names: %s' % key)
@@ -1136,7 +1135,7 @@ def flag_makers(t, m=_flag_makers):
         return _flag_makers[t]
 
 
-all_flag_shorts = set()
+all_flag_shorts = {}
 
 
 def make_flag(c, module, autoshort, default, sub=False, **kw):
@@ -1146,19 +1145,25 @@ def make_flag(c, module, autoshort, default, sub=False, **kw):
         key = sub + '_' + key
     d = g(c, 'd', default)  # when d is not given, what to do. Dictates the flag type.
     ml = kw.get('short_maxlen', 5)
-    mkw = {'module_name': module, 'short_name': g(c, 's', None)}
     s = g(c, 's', None)
+    mkw = {'module_name': module, 'short_name': s}
     if s is None and autoshort is not False:
         s = shorten(key, prefix=autoshort, maxlen=ml, all_shorts=all_flag_shorts)
     if s is False:
         s = None
+    else:
+        all_flag_shorts[s] = key
+        # when we parse the cli for action flags we also want to find shortened afs:
+        af = action_flags.get(key)
+        if af:
+            action_flags[s] = af
     mkw['short_name'] = s
-    m = flag_makers(g(c, 't', type(d)))
+    define_flag = flag_makers(g(c, 't', type(d)))
     txt = g(c, 'n', human(key))
     if c.__doc__:
         ls = c.__doc__.replace(c.n, '').splitlines()
         txt += ' Details: %s' % ('\n'.join([l.strip() for l in ls]).strip())
-    m(key, d, txt, **mkw)
+    define_flag(key, d, txt, **mkw)
 
 
 human = lambda key: ' '.join([k.capitalize() for k in key.split(' ')])
@@ -1169,12 +1174,14 @@ skip_flag_defines = []
 
 
 have_flg_cls = set()
+action_flags = {}
 
 
 def define_flags(Class, sub=False):
     """
     Pretty classes to flag defs. See nrclient, devapp.app or structlogging.sl how to use
     All config in the top class
+    2021/06: Subclassses allowed
     """
     if Class in have_flg_cls:
         from devapp.app import app
@@ -1190,13 +1197,16 @@ def define_flags(Class, sub=False):
     # passed to make_flag as default for default
     default = g(Class, 'default', '')
     l = dict(locals())
-    cs, cnos = [], []
-    for k in dir(Class):
-        if k.startswith('_'):
-            continue
+    cshrt, c_no_shrt = [], []
+    for k in [i for i in dir(Class) if not i.startswith('_')]:
         c = g(Class, k)
         if not isinstance(c, type):
             continue
+
+        if g(c, 'd', None) == 'action':
+            setattr(c, 'd', False)
+            action_flags[k] = {'flg_cls': c, 'class': Class, 'key': k}
+
         if not hasattr(c, 'n'):
             if not hasattr(c, 'd'):
                 # prbably group but no n, no d is allowed as well
@@ -1210,10 +1220,12 @@ def define_flags(Class, sub=False):
             doc = c.__doc__ or ''
             if doc.strip():
                 c.n = doc.strip().split('\n', 1)[0]
-
-        cs.append(c) if g(c, 's', None) else cnos.append(c)
+        # if g(c, 's', None) == 'x':
+        #     breakpoint()  # FIXME BREAKPOINT
+        cshrt.append(c) if g(c, 's', None) else c_no_shrt.append(c)
     # do the ones with shorts first, to collide only on autoshorts:
-    [make_flag(c, **l) for k in [cs, cnos] for c in k]
+    [make_flag(c, **l) for c in cshrt + c_no_shrt]
+    # [make_flag(c, **l) for k in [cshrt, c_no_shrt] for c in k]
 
 
 # define_flags(Flags)  # ours

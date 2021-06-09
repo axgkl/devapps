@@ -20,7 +20,7 @@ from inspect import signature
 from xml.etree import ElementTree as ET
 
 from absl import app, flags
-from devapp.tools import tabulate, termwidth
+from devapp.tools import tabulate, termwidth, action_flags, define_flags
 
 
 def func_from_partial(f):
@@ -187,7 +187,8 @@ def term_line(line_spec, widths, have_match):
                     except Exception as ex:
                         # when not even placeholder fits
                         v = v[:w]
-        r.append(col(colmn) + v.ljust(w))
+        c = 'action' if colmn == 'default' and v == 'ACTION' else colmn
+        r.append(col(c) + v.ljust(w))
     return ''.join(r)
 
 
@@ -196,7 +197,7 @@ def to_terminal(flags, widths, match=None):
     return '\n'.join(r)
 
 
-def parse_xml_help(xml_help, match):
+def parse_xml_help(xml_help, match, cli_actions=None):
     """parse --helpxml output of absl"""
 
     class types:
@@ -228,6 +229,7 @@ def parse_xml_help(xml_help, match):
     m = {}
     r = {'program': tree[0].text, 'usage': tree[0].text, 'flags': m}
     next_ = lambda els: els.pop(0)
+    items = {}
     for fs in tree[2:]:
         f = fs.getchildren()
         c = {}
@@ -244,11 +246,45 @@ def parse_xml_help(xml_help, match):
                 if 'Details: ' in mn:
                     c['meaning'], c['details'] = mn.split('Details: ', 1)
                 break
-
         if match and not any([m in str(c) for m in match]):
             continue
         c.pop('current', 0)
-        m.setdefault(c['file'], []).append(c)
+        l = m.setdefault(c['file'], [])
+        l.append(c)
+        items[c['name']] = {'pos': len(l) - 1, 'mod': c['file']}
+
+    afp = []
+    have = set()
+    for f, af in action_flags.items():
+        k = af['key']
+        if k in have:
+            continue
+        have.add(k)
+        item = items.get(k)
+        p = item['pos'] + 1
+        mod = item['mod']
+        afp.append([p - 1, mod, k, True])
+        if af in cli_actions:
+            while m[mod][p]['name'].startswith(k + '_'):
+                afp.append([p, mod, k, False])
+                p += 1
+    if afp:
+        fs = r['flags']
+        l = []
+        m = {}
+        for a in afp:
+            mod = a[1]
+            action = a[2]
+            main = a[3]
+            f = fs[mod].pop(a[0] + m.get(mod, 0))
+            m[mod] = m.setdefault(mod, 0) - 1
+            l.append(f)
+            if main:
+                f['action'] = True
+                f['default'] = 'ACTION'
+            else:
+                f['name'] = f['name'].split(action + '_', 1)[1]
+        fs['actions'] = l
     return r
 
 
@@ -278,6 +314,7 @@ col = lambda c: ansi_col(
         'choices': '0;38',
         'details': '0;38;5;241',
         'short_name': '0;32',
+        'action': '0;33',
     }.get(c)
 )
 
@@ -300,6 +337,14 @@ def color_usage(*a, main_module, full=None, **kw):
     if dmn:
         match.append(dmn)
 
+    # -h with an action flag? Then we detail its sub flags:
+    afs = []
+    for k in sys.argv:
+        af = action_flags.get(k)
+        if af:
+            define_flags(af['flg_cls'], sub=af['key'])
+            afs.append(af)
+
     so = sys.stdout
     s = io.StringIO()
     sys.stdout = s
@@ -307,7 +352,7 @@ def color_usage(*a, main_module, full=None, **kw):
     sys.stdout = so
     u = s.getvalue()
     s.close()
-    j = parse_xml_help(u, match=match)
+    j = parse_xml_help(u, match=match, cli_actions=afs)
     all_flgs = j['flags']
     if hof != 'terminal':
         r = []
@@ -340,9 +385,11 @@ def color_usage(*a, main_module, full=None, **kw):
     # show non main module flags on helpfull:
     n = main_module.__name__
     if full:
-        [do(fn_mod) for fn_mod in sorted(all_flgs) if not fn_mod == n]
+        [do(fn_mod) for fn_mod in sorted(all_flgs) if not fn_mod in (n, 'actions')]
     if n in all_flgs:
         do(n)
+    if all_flgs.get('actions'):
+        do('actions')
 
     # show main module's flags last - always:
     add('\033[0m')

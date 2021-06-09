@@ -256,6 +256,7 @@ def run_app(
     if not flags_parser:
         #     # setup_colorized_help(main, argv)
         flags_parser = abslapp.parse_flags_with_usage
+    flags_parser = wrap_flag_parser_with_action_detector(flags_parser)
 
     try:
         abslapp.run(
@@ -314,7 +315,63 @@ def reload_handler(signum, frame):
     raise Reloaded('signal')
 
 
+from io import StringIO
+
+
+def wrap_flag_parser_with_action_detector(flags_parser):
+    def parser(args, p=flags_parser):
+        try:
+            e = sys.stderr
+            sys.stderr = StringIO()
+            r = p(args)
+            sys.stderr = e
+            return r
+        except SystemExit as ex:
+            sys.stderr, e = e, sys.stderr.getvalue()
+            return on_flag_parse_err_try_action_flags(args, err=e, parser=p)
+
+    return parser
+
+
+def on_flag_parse_err_try_action_flags(args, err, parser):
+    afg = tools.action_flags.get
+
+    for k in sys.argv[1:]:
+        if k == '--':
+            break
+        af = afg(k)
+        if k[0] != '-' and af:
+            return on_flag_parse_err_have_action_flag(k, af, parser=parser)
+    # No AF. Let crash - or leave alone, e.g. a app -a1 -- foo -a1 construct
+    sys.stderr.write(err)
+    return sys.exit(1)
+
+
+def on_flag_parse_err_have_action_flag(key, af, parser):
+    p = sys.argv.index(key)
+    key = af['key']  # short to long
+    args = list(sys.argv)
+    args[p] = '--' + key
+    tools.define_flags(af['flg_cls'], sub=key)
+    for arg in args[p + 1 :]:
+        p += 1
+        if arg.startswith('--'):
+            if arg == '--':
+                break
+            args[p] = arg.replace('--', '--%s_' % key)
+    return parser(args)
+
+
 def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
+    # do we have leftover (unparsed) cli args? Could be an action then:
+    for k, v in zip(args[1:], sys.argv[1:]):
+        if k != v:
+            # a leftover. actionflag. Can only be last arg, otherwise we'd had a parse error?
+            af = tools.action_flags.get(k)
+            if not af:
+                break
+            setattr(FLG, af['key'], True)
+
     tools.set_flag_vals_from_env()  # 0.0001sec
 
     if FLG.help_call:
