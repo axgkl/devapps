@@ -170,8 +170,10 @@ def term_line(line_spec, widths, have_match):
                 if colmn in ('short_name', 'meaning'):
                     v = '   ' + v
             elif colmn == 'default':
-                v = 'ACTION'
-                c = 'action'
+                v, c = 'ACTION', 'action'
+                if m.get('is_default'):
+                    v += '*'
+                    c = 'default_action'
         if have_match:
             if colmn == 'meaning':
                 r[-1] = r[-1].rstrip()
@@ -273,6 +275,7 @@ def parse_xml_help(xml_help, match, cli_actions=None):
         item = items.get(k)
         p, mod = item['pos'] + 1, item['mod']
         m[mod][p - 1]['action'] = True
+        m[mod][p - 1]['is_default'] = af['is_default']
         # afp.append([p - 1, mod, k, True])
         if af in cli_actions:
             f = m[mod][p]
@@ -328,6 +331,7 @@ col = lambda c: ansi_col(
         'details': '0;38;5;241',
         'short_name': '0;32',
         'action': '0;33',
+        'default_action': '1;33',
     }.get(c)
 )
 

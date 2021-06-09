@@ -1225,6 +1225,7 @@ def define_flags(Class, sub=False, parent_autoshort=False):
                 'class': Class,
                 'key': k,
                 'autoshort': g(c, 'autoshort', autoshort),
+                'is_default': c.d,
             }
 
         if not hasattr(c, 'n'):

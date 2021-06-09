@@ -43,7 +43,7 @@ class Flags:
     class Actions:
         class list:
             d = True
-            n = 'Display parsed tree [default]'
+            n = 'Display parsed tree'
 
             class verbose:
                 d = False
