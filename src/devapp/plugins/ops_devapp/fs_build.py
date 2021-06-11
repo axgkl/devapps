@@ -3,6 +3,7 @@
 OCI Filesystem Creation
 """
 # Could be done far smaller.
+from datetime import datetime
 from devapp import gevent_patched
 from re import match
 import hashlib
@@ -16,6 +17,7 @@ import subprocess
 import requests
 from devapp.app import FLG, app, run_app, do, system
 from devapp import tools
+from operator import itemgetter
 from devapp.tools import (
     now,
     exists,
@@ -27,12 +29,34 @@ from devapp.tools import (
     write_file,
     walk_dir,
 )
+import json
+
+from tempfile import mkdtemp
+import fnmatch
+from hashlib import md5
+
 
 d_cache = os.path.abspath('.cache')
 fn_last_state = d_cache + '/' + 'last_state.json'
 
+FN_CONDA = 'Miniconda3-latest-Linux-x86_64.sh'
+cleanups = []
 
-def make_cache():
+hash_cmd = "fd . '%s' --type file --hidden %s -0 | sort -z | xargs -0 sha1sum"
+hash_cmd += ' | sha1sum'
+
+
+def hash_dir(d, depth=''):
+    """hashing all which is relevant incl. files dir, but no other subfolders"""
+    if depth:
+        depth = '-d %s' % depth
+    cmd = hash_cmd % (d, depth)
+    h0 = os.popen(cmd).read().split()[0]
+    h0 += ''.join([hash_dir(d + '/' + i) for i in os.listdir(d) if 'files' in i])
+    return md5(h0.encode('utf-8')).hexdigest()
+
+
+def make_cache_dir():
     if not exists(d_cache):
         os.makedirs(d_cache)
 
@@ -69,7 +93,11 @@ class Flags:
                 d = False
 
     class name:
-        n = 'Which filesystem to build (definition from specdir)'
+        n = 'Exactly match an image name, e.g. "arch_conda"'
+        d = ''
+
+    class match:
+        n = 'Fuzzy match images, e.g. "cond" (using fnmatch)'
         d = ''
 
     class run:
@@ -90,9 +118,19 @@ class Flags:
 
 
 class Action:
+    _post = cleanups
+
+    def _pre():
+        make_cache_dir()
+        verify_have_tools()
+        if not FLG.clear_cache:
+            do(S.load_last_build_cache)
+        S.filter_matching()
+        S.hash_spec_dirs()
+        buildah.images()
+
     def list():
-        breakpoint()  # FIXME BREAKPOINT
-        pass
+        return S.dict() if not FLG.list_verbose else S.verbose_dict()
 
     def enter():
         pass
@@ -100,12 +138,57 @@ class Action:
     def delete():
         pass
 
+    def clear_cache():
+        system('rm -f "%s"' % fn_last_state)
+
+
+# def run():
+#     breakpoint()  # FIXME BREAKPOINT
+#     make_cache()
+#     verify_have_tools()
+#     if FLG.clear_cache:
+#         os.system('rm -f "%s"' % fn_last_state)
+#     do(S.load_last_build_cache)
+#     S.set_matching(match=FLG.name)
+#     buildah.images()
+
+#     if FLG.list:
+#         return S.dict()
+
+#     if FLG.enter:
+#         verify_have_one()
+#         return do(img.enter, dir=S.d_cur, cmd=FLG.cmd)
+
+#     if FLG.delete:
+#         verify_have_one()
+#         do(img.delete_all, dir=S.d_cur)
+
+#     if FLG.run:
+#         verify_have_one()
+#         cleanups.extend([cleanup_write_state, clean_temp_dir])
+#         spec = img.spec(S.d_cur)
+#         if FLG.repeat_from:
+#             i = int(FLG.repeat_from)
+#             actions = spec.get('actions', [])
+#             spec['actions'] = actions[:i]
+
+#         if '0' in FLG.run:
+#             app.warn('Forgetting build container - rebuilding')
+#             spec['C'] = None
+
+#         m = {0: img.set_delete_before_commit, 1: img.build, 2: img.commit, 3: img.run}
+#         last = True
+#         app.info('Running steps: %s' % FLG.run)
+#         for i in [0, 1, 2, 3]:
+#             if i == 2 and last == False:
+#                 app.info('skipping commit, no build')
+#                 continue
+#             if str(i) in FLG.run:
+#                 last = do(m[i], dir=S.d_cur)
+#     return S.dict()
+
 
 # partial(app.die, example='./my_reg.com[:port]::library/base1/base2')
-import json
-
-from tempfile import mkdtemp
-import fnmatch
 
 
 class State:
@@ -115,10 +198,11 @@ class State:
     img_by_dir = None
     _d_tmp = None
     d_cur = None
-    directories_matching_name = None
+    _selected_spec_dirs = None
+    work_tree = None
 
     def __init__(s):
-        s.by_img, s.d_matching, s.img_by_dir = {}, [], {}
+        s.by_img, s.d_matching, s.img_by_dir, s.work_tree = {}, [], {}, {}
         s._d_tmp = mkdtemp()
 
     def load_last_build_cache(s):
@@ -127,23 +211,35 @@ class State:
             ls = json.loads(ls)
             [setattr(s, k, v) for k, v in ls.items()]
 
-    def set_matching(s, match):
+    def hash_spec_dirs(s):
+        for m in S.work_tree['specs']:
+            d = m['dir']
+            m['hash'] = hash_dir(m['dir'], depth=1)[:6]
+
+    def filter_matching(s):
         """Set to build directory, if match is unique"""
-        s.d_cur, s.directories_matching_name = False, []
+        s.d_cur, s._selected_spec_dirs = False, []
+
         cs = (
-            os.popen('fd -t d | grep -v "\.files" | grep "%s"' % match)
+            os.popen('fd -t d | grep -v "\.files" | grep -E "%s"' % FLG.match)
             .read()
             .splitlines()
         )
         r = []
+        w = S.work_tree
+        w['filters'] = {'match': FLG.match, 'name': FLG.name}
+        w['specs'] = []
         for c in cs:
+            # c like 'artifacts.axiros.com::devapps/arch/arch_conda'
             parts = c.split('/')
-            s.directories_matching_name.append(c)
-            if fnmatch.fnmatch(parts[-1], match or '*'):
+            s._selected_spec_dirs.append(c)
+            n = parts[-1]
+            if not FLG.name or n == FLG.name:
                 r.append(c)
+                w['specs'].append({'dir': c})
 
         if len(r) == 1:
-            app.info('setting image dir', dir=r[0])
+            app.info('Exact match -> setting image dir', dir=r[0])
             s.d_cur = r[0]
 
     def spec(s, dir=None):
@@ -158,6 +254,10 @@ class State:
     def dict(s):
         g, c = getattr, callable
         return {k: g(S, k) for k in dir(S) if not k.startswith('_') and not c(g(S, k))}
+
+    def verbose_dict(s):
+        d = s.dict()
+        breakpoint()  # FIXME BREAKPOINT
 
     __repr__ = lambda s: json.dumps(s.dict(), indent=2)
 
@@ -206,11 +306,33 @@ def remembered(func, maxms=60000, *args, **kw):
 
 B = 'buildah '
 
+strptime = datetime.strptime
+unix0 = datetime(1970, 1, 1)
+import time
+
 
 class buildah:
     def images():
+        now = time.time()
         p, j = os.popen, json.loads
-        S._commited_local_images = j(p(B + 'images --json').read().strip()) or []
+        l = S._commited_local_images = j(p(B + 'images --json').read().strip()) or []
+        s = S.work_tree['specs']
+        for i in l:
+            ns = i['names']
+            ns = [n.split(':') for n in ns if not ':latest' in n or len(ns) < 2]
+            ns = sorted(ns, key=itemgetter(1))[-1]
+            f = '%Y-%m-%dT%H:%M:%S'
+            utc_dt = datetime.strptime(i['createdatraw'].split('.', 1)[0], f)
+            ts = i['ts'] = (utc_dt - unix0).total_seconds()
+            n = i['name'] = ns[0].rsplit('/', 1)[-1]
+            t = i['tag'] = ns[1]
+            h = [k for k in s if k['dir'].endswith('/' + n)]
+            assert len(h) < 2
+            if h:
+                h = h[0]
+                h['age'] = '%sd' % int((now - ts) / 86400)
+                h['status'] = 'current' if h['hash'] in t else 'outdated'
+                h['size'] = i['size']
 
     def test_build_avail(C):
         if not C:
@@ -273,7 +395,7 @@ class buildah:
 
     @remembered
     def commit(img, build_img):
-        x = datetime.datetime.now()
+        x = datetime.now()
         tagged = '%s:latest %s:%s.%s.%s' % (img, img, x.year, x.month, x.day)
         if S._delete_before_commit:
             for k in img, tagged:
@@ -284,9 +406,6 @@ class buildah:
                 )
         do(system, 'buildah commit %s %s' % (build_img, img))
         do(system, 'buildah tag ' + tagged)
-
-
-import datetime
 
 
 def volmounts():
@@ -547,10 +666,6 @@ class modes:
     #     buildah.run(cmd=cmd)
 
 
-FN_CONDA = 'Miniconda3-latest-Linux-x86_64.sh'
-cleanups = []
-
-
 def cleanup_write_state():
     print('dumping state', fn_last_state)
     write_file(fn_last_state, json.dumps(S.dict(), indent=4), mkdir=True)
@@ -562,74 +677,18 @@ def clean_temp_dir():
         os.system('rm -rf "%s"' % d)
 
 
-def cleanup(main):
-    try:
-        return main()
-    finally:
-        if cleanups:
-            print('cleaning up')
-            [f() for f in cleanups]
-
-
 def verify_have_tools(required=['buildah', 'fd', 'curl']):
     miss = lambda t: os.system('command -v %s >/dev/null' % t)
     [app.die('Required tool missing', tool=t) for t in required if miss(t)]
 
 
 def verify_have_one():
-
     if not S.d_cur:
         m = 'Require exactly one matching image (d_cur)'
-        app.die(m, found=len(S.directories_matching_name))
+        app.die(m, found=len(S._selected_spec_dirs))
 
 
-def run():
-    breakpoint()  # FIXME BREAKPOINT
-    make_cache()
-    verify_have_tools()
-    if FLG.clear_cache:
-        os.system('rm -f "%s"' % fn_last_state)
-    do(S.load_last_build_cache)
-    S.set_matching(match=FLG.name)
-    buildah.images()
-
-    if FLG.list:
-        return S.dict()
-
-    if FLG.enter:
-        verify_have_one()
-        return do(img.enter, dir=S.d_cur, cmd=FLG.cmd)
-
-    if FLG.delete:
-        verify_have_one()
-        do(img.delete_all, dir=S.d_cur)
-
-    if FLG.run:
-        verify_have_one()
-        cleanups.extend([cleanup_write_state, clean_temp_dir])
-        spec = img.spec(S.d_cur)
-        if FLG.repeat_from:
-            i = int(FLG.repeat_from)
-            actions = spec.get('actions', [])
-            spec['actions'] = actions[:i]
-
-        if '0' in FLG.run:
-            app.warn('Forgetting build container - rebuilding')
-            spec['C'] = None
-
-        m = {0: img.set_delete_before_commit, 1: img.build, 2: img.commit, 3: img.run}
-        last = True
-        app.info('Running steps: %s' % FLG.run)
-        for i in [0, 1, 2, 3]:
-            if i == 2 and last == False:
-                app.info('skipping commit, no build')
-                continue
-            if str(i) in FLG.run:
-                last = do(m[i], dir=S.d_cur)
-    return S.dict()
-
-
-main = lambda: run_app(Action, flags=Flags, wrapper=cleanup)
+main = lambda: run_app(Action, flags=Flags)
 
 
 if __name__ == '__main__':

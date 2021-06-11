@@ -256,7 +256,8 @@ def run_app(
     if not flags_parser:
         #     # setup_colorized_help(main, argv)
         flags_parser = abslapp.parse_flags_with_usage
-    flags_parser = wrap_flag_parser_with_action_detector(flags_parser)
+    define_action_flags_in_cli()
+    # flags_parser = wrap_flag_parser_with_action_detector(flags_parser)
 
     try:
         abslapp.run(
@@ -273,6 +274,61 @@ def run_app(
         )
     except Exception as ex:
         sys.exit(1)
+
+
+def define_action_flags_in_cli():
+    args = sys.argv
+    afs = tools.action_flags
+    p = 0
+    have = set()
+    for a in args[1:]:
+        p += 1
+        if a == '--':
+            return
+        if not a in afs:
+            continue
+        if p > 1:
+            pa = args[p - 1]
+            pa = pa[2:] if pa.startswith('--') else pa[1:] if pa.startswith('-') else pa
+            pf = FLG.__flags.get(pa)
+            if pf.flag_type() != 'bool':
+                continue
+        f = afs.get(a)
+        key = f['key']
+        if key in have:
+            continue
+        have.add(key)
+        args[p] = '--' + f['key']
+        tools.define_flags(f['flg_cls'], sub=key, parent_autoshort=f['autoshort'])
+        action[0] = key
+
+
+action = [0]
+# def on_flag_parse_err_have_action_flag(key, af, parser):
+#     p = sys.argv.index(key)
+#     key = af['key']  # short to long
+#     action[0] = key
+#     args = list(sys.argv)
+#     args[p] = '--' + key
+#     tools.define_flags(af['flg_cls'], sub=key, parent_autoshort=af['autoshort'])
+#     for arg in args[p + 1 :]:
+#         p += 1
+#         if arg.startswith('--'):
+#             if arg == '--':
+#                 break
+#             args[p] = arg.replace('--', '--%s_' % key)
+#     return parser(args)
+
+
+#     for k in sys.argv[1:]:
+#         if k == '--':
+#             break
+#         af = afg(k)
+#         if k[0] != '-' and af:
+#             return on_flag_parse_err_have_action_flag(k, af, parser=parser)
+#     # No AF. Let crash - or leave alone, e.g. a app -a1 -- foo -a1 construct
+#     sys.stderr.write(err)
+#     return sys.exit(1)
 
 
 class DieNow(Exception):
@@ -318,62 +374,56 @@ def reload_handler(signum, frame):
 from io import StringIO
 
 
-def wrap_flag_parser_with_action_detector(flags_parser):
-    def parser(args, p=flags_parser):
-        try:
-            e = sys.stderr
-            sys.stderr = StringIO()
-            r = p(args)
-            sys.stderr = e
-            return r
-        except SystemExit as ex:
-            sys.stderr, e = e, sys.stderr.getvalue()
-            return on_flag_parse_err_try_action_flags(args, err=e, parser=p)
+# def wrap_flag_parser_with_action_detector(flags_parser):
+#     def parser(args, p=flags_parser):
+#         try:
+#             breakpoint()  # FIXME BREAKPOINT
+#             e = sys.stderr
+#             sys.stderr = StringIO()
+#             r = p(args)
+#             sys.stderr = e
+#             return r
+#         except SystemExit as ex:
+#             sys.stderr, e = e, sys.stderr.getvalue()
+#             return on_flag_parse_err_try_action_flags(args, err=e, parser=p)
 
-    return parser
-
-
-def on_flag_parse_err_try_action_flags(args, err, parser):
-    afg = tools.action_flags.get
-
-    for k in sys.argv[1:]:
-        if k == '--':
-            break
-        af = afg(k)
-        if k[0] != '-' and af:
-            return on_flag_parse_err_have_action_flag(k, af, parser=parser)
-    # No AF. Let crash - or leave alone, e.g. a app -a1 -- foo -a1 construct
-    sys.stderr.write(err)
-    return sys.exit(1)
+#     return parser
 
 
-def on_flag_parse_err_have_action_flag(key, af, parser):
-    p = sys.argv.index(key)
-    key = af['key']  # short to long
-    action[0] = key
-    args = list(sys.argv)
-    args[p] = '--' + key
-    tools.define_flags(af['flg_cls'], sub=key, parent_autoshort=af['autoshort'])
-    for arg in args[p + 1 :]:
-        p += 1
-        if arg.startswith('--'):
-            if arg == '--':
-                break
-            args[p] = arg.replace('--', '--%s_' % key)
-    return parser(args)
+# def on_flag_parse_err_try_action_flags(args, err, parser):
+#     afg = tools.action_flags.get
+
+#     for k in sys.argv[1:]:
+#         if k == '--':
+#             break
+#         af = afg(k)
+#         if k[0] != '-' and af:
+#             return on_flag_parse_err_have_action_flag(k, af, parser=parser)
+#     # No AF. Let crash - or leave alone, e.g. a app -a1 -- foo -a1 construct
+#     sys.stderr.write(err)
+#     return sys.exit(1)
 
 
-action = ['']
+# def on_flag_parse_err_have_action_flag(key, af, parser):
+#     p = sys.argv.index(key)
+#     key = af['key']  # short to long
+#     action[0] = key
+#     args = list(sys.argv)
+#     args[p] = '--' + key
+#     tools.define_flags(af['flg_cls'], sub=key, parent_autoshort=af['autoshort'])
+#     for arg in args[p + 1 :]:
+#         p += 1
+#         if arg.startswith('--'):
+#             if arg == '--':
+#                 break
+#             args[p] = arg.replace('--', '--%s_' % key)
+#     return parser(args)
+
+
+# action = ['']
 
 
 def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
-    # do we have leftover (unparsed) cli args? Could be an action then:
-    k = args[-1]
-    # a leftover. actionflag. Can only be last arg, otherwise we'd had a parse error?
-    af = tools.action_flags.get(k)
-    if af:
-        setattr(FLG, af['key'], True)
-        action[0] = af['key']
 
     tools.set_flag_vals_from_env()  # 0.0001sec
 
@@ -412,23 +462,32 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         # print(' '.join(cmd))
         watcher_pid = subprocess.Popen(cmd).pid
 
-    # main might be an Action class - use it:
+    # An Action class - use it:
+    post = None
     if isinstance(main, type):
+        action_cls = main
         if not action[0]:
             for af in tools.action_flags.values():
                 if af['flg_cls'].d:
                     action[0] = af['key']
                     app.debug('Running default action', action=af['key'])
                     break
-        main = getattr(main, action[0], None)
+        main = getattr(action_cls, action[0], None)
         if not main:
             app.die('Require action')
+        pre = getattr(action_cls, '_pre', 0)
+        if pre:
+            # app.debug('Prepare hook')
+            pre()
+            # app.debug(action[0])
+        post = getattr(action_cls, '_post', 0)
 
     res = None
     while True:
         try:
             # so that everybody knows what is running. informational
             app._app_func = main
+            # main = lambda: run_app(Action, flags=Flags, wrapper=cleanup)
             res = wrapper(main) if wrapper else main()
             if FLG.dirwatch:
                 app.info('Keep running, dirwatch is set')
@@ -445,6 +504,13 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
             print('Keyboard Interrupt - Bye.')
             sys.exit(1)
             return
+        finally:
+            if post:
+                # app.debug(
+                #     'Post app hook', running=[p.__name__ for p in tools.to_list(post)]
+                # )
+
+                [p() for p in post] if isinstance(post, list) else post()
         break
     if not isinstance(res, (list, dict, tuple)):
         if not res is None:

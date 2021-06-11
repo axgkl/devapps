@@ -174,6 +174,7 @@ def term_line(line_spec, widths, have_match):
                 if m.get('is_default'):
                     v += '*'
                     c = 'default_action'
+
         if have_match:
             if colmn == 'meaning':
                 r[-1] = r[-1].rstrip()
