@@ -291,7 +291,7 @@ def define_action_flags_in_cli():
             pa = args[p - 1]
             pa = pa[2:] if pa.startswith('--') else pa[1:] if pa.startswith('-') else pa
             pf = FLG.__flags.get(pa)
-            if pf.flag_type() != 'bool':
+            if pf and pf.flag_type() != 'bool':
                 continue
         f = afs.get(a)
         key = f['key']
