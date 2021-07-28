@@ -33,7 +33,8 @@ discusshome = "https://join.skype.com/abc123"
 [tool.pyright]
 extraPaths = ["../docutools/src"]
 [tool.poetry.dependencies]
-python = "^3.6"
+# gevent after monkeypatch and structlog clash with 3.6:
+python = "^3.7"
 toml = "^0.10.1"
 #python = "~3.8"
 absl-py = "^0.10.0"
