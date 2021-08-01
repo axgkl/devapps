@@ -1,6 +1,6 @@
 [[package]]
 name = "absl-py"
-version = "0.10.0"
+version = "0.13.0"
 description = "Abseil Python Common Libraries, see https://github.com/abseil/abseil-py."
 category = "main"
 optional = false
@@ -23,6 +23,14 @@ colorama = "*"
 [package.extras]
 devel = ["bumpversion (>=0.5.2)", "check-manifest (>=0.35)", "readme-renderer (>=16.0)", "flake8", "pep8-naming"]
 tests = ["tox (>=2.6.0)", "pytest (>=3.0.3)", "pytest-cov (>=2.3.1)"]
+
+[[package]]
+name = "anybadge"
+version = "1.7.0"
+description = "Simple, flexible badge generator for project badges."
+category = "dev"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "appdirs"
@@ -245,11 +253,40 @@ toml = ["toml"]
 
 [[package]]
 name = "decorator"
-version = "4.4.2"
+version = "5.0.9"
 description = "Decorators for Humans"
 category = "main"
 optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*"
+python-versions = ">=3.5"
+
+[[package]]
+name = "docutools"
+version = "2021.7.31"
+description = "Documentation Tools for the Devapp Framework"
+category = "dev"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+anybadge = ">=1.7.0,<2.0.0"
+devapps = ">=2021.5.10,<2022.0.0"
+git-changelog = ">=0.4.0,<0.5.0"
+httpx = ">=0.17.1,<0.18.0"
+markdown-include = ">=0.6.0,<0.7.0"
+mkdocs = ">=1.1.2,<2.0.0"
+mkdocs-exclude = ">=1.0.2,<2.0.0"
+mkdocs-macros-plugin = ">=0.5.12,<0.6.0"
+mkdocs-material = ">=6.1.0,<7.0.0"
+mkdocs-pymdownx-material-extras = ">=1.1.3,<2.0.0"
+mypy = ">=0.782,<0.783"
+plantuml-markdown = ">=3.4.2,<4.0.0"
+pycond = "*"
+pytest = ">=6.0.1,<7.0.0"
+pytest-cov = ">=2.10.1,<3.0.0"
+pytest-randomly = ">=3.4.1,<4.0.0"
+pytest-sugar = ">=0.9.4,<0.10.0"
+pytest-xdist = ">=2.1.0,<3.0.0"
+toml = ">=0.10.1,<0.11.0"
 
 [[package]]
 name = "duty"
@@ -405,7 +442,7 @@ dev = ["dlint", "flake8-2020", "flake8-aaa", "flake8-absolute-import", "flake8-a
 
 [[package]]
 name = "gevent"
-version = "20.12.1"
+version = "21.1.2"
 description = "Coroutine-based network library"
 category = "main"
 optional = false
@@ -419,7 +456,7 @@ greenlet = {version = ">=0.4.17,<2.0", markers = "platform_python_implementation
 
 [package.extras]
 dnspython = ["dnspython (>=1.16.0,<2.0)", "idna"]
-docs = ["repoze.sphinx.autointerface", "sphinxcontrib-programoutput"]
+docs = ["repoze.sphinx.autointerface", "sphinxcontrib-programoutput", "zope.schema"]
 monitor = ["psutil (>=5.7.0)"]
 recommended = ["dnspython (>=1.16.0,<2.0)", "idna", "cffi (>=1.12.2)", "selectors2", "backports.socketpair", "psutil (>=5.7.0)"]
 test = ["dnspython (>=1.16.0,<2.0)", "idna", "requests", "objgraph", "cffi (>=1.12.2)", "selectors2", "futures", "mock", "backports.socketpair", "contextvars (==2.4)", "coverage (>=5.0)", "coveralls (>=1.7.0)", "psutil (>=5.7.0)"]
@@ -780,6 +817,35 @@ watchdog = ">=2.0"
 i18n = ["babel (>=2.9.0)"]
 
 [[package]]
+name = "mkdocs-exclude"
+version = "1.0.2"
+description = "A mkdocs plugin that lets you exclude files or trees."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+mkdocs = "*"
+
+[[package]]
+name = "mkdocs-macros-plugin"
+version = "0.5.12"
+description = "Unleash the power of MkDocs with macros and variables"
+category = "dev"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+jinja2 = "*"
+mkdocs = ">=0.17"
+python-dateutil = "*"
+pyyaml = "*"
+termcolor = "*"
+
+[package.extras]
+test = ["mkdocs-macros-test", "mkdocs-material (>=6.2)", "mkdocs-include-markdown-plugin"]
+
+[[package]]
 name = "mkdocs-material"
 version = "6.2.8"
 description = "A Material Design theme for MkDocs"
@@ -804,6 +870,17 @@ python-versions = ">=3.5"
 
 [package.dependencies]
 mkdocs-material = ">=5.0.0"
+
+[[package]]
+name = "mkdocs-pymdownx-material-extras"
+version = "1.4"
+description = "Plugin to extend MkDocs Material theme."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+mkdocs-material = ">=5.0.2"
 
 [[package]]
 name = "mkdocstrings"
@@ -1021,16 +1098,17 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "pyjwt"
-version = "1.7.1"
+version = "2.1.0"
 description = "JSON Web Token implementation in Python"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [package.extras]
-crypto = ["cryptography (>=1.4)"]
-flake8 = ["flake8", "flake8-import-order", "pep8-naming"]
-test = ["pytest (>=4.0.1,<5.0.0)", "pytest-cov (>=2.6.0,<3.0.0)", "pytest-runner (>=4.2,<5.0.0)"]
+crypto = ["cryptography (>=3.3.1,<4.0.0)"]
+dev = ["sphinx", "sphinx-rtd-theme", "zope.interface", "cryptography (>=3.3.1,<4.0.0)", "pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)", "mypy", "pre-commit"]
+docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
+tests = ["pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)"]
 
 [[package]]
 name = "pylint"
@@ -1265,7 +1343,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "snoop"
-version = "0.2.5"
+version = "0.4.0"
 description = "Powerful debugging tools for Python"
 category = "main"
 optional = false
@@ -1279,7 +1357,7 @@ pygments = "*"
 six = "*"
 
 [package.extras]
-tests = ["pytest", "littleutils", "numpy (>=1.16.3)", "pandas (>=0.24.2)", "birdseye", "django"]
+tests = ["pytest", "littleutils", "prettyprinter", "pprintpp", "numpy (>=1.16.5)", "pandas (>=0.24.2)", "birdseye", "django"]
 
 [[package]]
 name = "soupsieve"
@@ -1291,7 +1369,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "structlog"
-version = "20.2.0"
+version = "21.1.0"
 description = "Structured Logging for Python"
 category = "main"
 optional = false
@@ -1450,16 +1528,20 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "de20e0eae651c2439b5d510d79e91561cd593f61cfad1f6184c3da01b6a4d047"
+content-hash = "480d08d9fcb04f07c8f9e7381d88e5fa5cb2336baf9a0272ff3b70f71c608236"
 
 [metadata.files]
 absl-py = [
-    {file = "absl-py-0.10.0.tar.gz", hash = "sha256:b20f504a7871a580be5268a18fbad48af4203df5d33dbc9272426cb806245a45"},
-    {file = "absl_py-0.10.0-py3-none-any.whl", hash = "sha256:ea07d7d437798bffc14f39fccec3909d251a1e76e233205ded72b71c267e0178"},
+    {file = "absl-py-0.13.0.tar.gz", hash = "sha256:6953272383486044699fd0e9f00aad167a27e08ce19aae66c6c4b10e7e767793"},
+    {file = "absl_py-0.13.0-py3-none-any.whl", hash = "sha256:62bd4e248ddb19d81aec8f9446b407ff37c8175c2ba88266a7afa9b4ce4a333b"},
 ]
 ansimarkup = [
     {file = "ansimarkup-1.5.0-py2.py3-none-any.whl", hash = "sha256:3146ca74af5f69e48a9c3d41b31085c0d6378f803edeb364856d37c11a684acf"},
     {file = "ansimarkup-1.5.0.tar.gz", hash = "sha256:96c65d75bbed07d3dcbda8dbede8c2252c984f90d0ca07434b88a6bbf345fad3"},
+]
+anybadge = [
+    {file = "anybadge-1.7.0-py2.py3-none-any.whl", hash = "sha256:91ab1cbbdc08ee2d04bcae7d061274193f04875036326c42c98bac9347a22a9d"},
+    {file = "anybadge-1.7.0.tar.gz", hash = "sha256:44f5d76926b6085cfcd1b8518a534d741bf25a0ae4a30e548fed26bf4ac8d887"},
 ]
 appdirs = [
     {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
@@ -1630,8 +1712,12 @@ coverage = [
     {file = "coverage-5.5.tar.gz", hash = "sha256:ebe78fe9a0e874362175b02371bdfbee64d8edc42a044253ddf4ee7d3c15212c"},
 ]
 decorator = [
-    {file = "decorator-4.4.2-py2.py3-none-any.whl", hash = "sha256:41fa54c2a0cc4ba648be4fd43cff00aedf5b9465c9bf18d64325bc225f08f760"},
-    {file = "decorator-4.4.2.tar.gz", hash = "sha256:e3a62f0520172440ca0dcc823749319382e377f37f140a0b99ef45fecb84bfe7"},
+    {file = "decorator-5.0.9-py3-none-any.whl", hash = "sha256:6e5c199c16f7a9f0e3a61a4a54b3d27e7dad0dbdde92b944426cb20914376323"},
+    {file = "decorator-5.0.9.tar.gz", hash = "sha256:72ecfba4320a893c53f9706bebb2d55c270c1e51a28789361aa93e4a21319ed5"},
+]
+docutools = [
+    {file = "docutools-2021.7.31-py3-none-any.whl", hash = "sha256:fad829e1c12149d0237b19d9cea012c9900489419bf0d21401dc395fe128fcad"},
+    {file = "docutools-2021.7.31.tar.gz", hash = "sha256:cc1cf4c234c2046e57dfd106df89097057ffe0e5fad8a0c12d2970aea7e17f38"},
 ]
 duty = [
     {file = "duty-0.5.0-py3-none-any.whl", hash = "sha256:3fee53a1469440d9e4aee5a9a53c0e63888f613b923b384e37c1198ae7bdc6b3"},
@@ -1685,30 +1771,34 @@ flakehell = [
     {file = "flakehell-0.6.1.tar.gz", hash = "sha256:053adceb02db01fc3807e727ce1985980c0792cb0ccbdcd321cebc0cc74d3c0d"},
 ]
 gevent = [
-    {file = "gevent-20.12.1-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:0f9fa230c5878704b9e286ad5038bac3b70d293bf10e9efa8b2ae1d7d80e7e08"},
-    {file = "gevent-20.12.1-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:f020bfb34d57caa10029111be776524c378a4aac8417bc6fb1154b05e00fc220"},
-    {file = "gevent-20.12.1-cp27-cp27m-win32.whl", hash = "sha256:e233ae153b586b61e492806d4cd1be2217de7441922c02053b67de14800bce96"},
-    {file = "gevent-20.12.1-cp27-cp27m-win_amd64.whl", hash = "sha256:2d05f38a5ef1ebb7ceb692897674b11ba603914524765b989c65c020c7b08360"},
-    {file = "gevent-20.12.1-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:ffa1be13963db6aa55c50d2fd4a656c82f53a03a47e37aaa69e79a488123538d"},
-    {file = "gevent-20.12.1-cp35-cp35m-win32.whl", hash = "sha256:caec00914e8f21b2c77a29bbc2ef3abfeadf7515656e5451dfb14c2064733998"},
-    {file = "gevent-20.12.1-cp35-cp35m-win_amd64.whl", hash = "sha256:19bd3fe60dec45fe6420b7772496950215f1b36701905876ba1644b6b2064163"},
-    {file = "gevent-20.12.1-cp36-cp36m-win32.whl", hash = "sha256:9d001fc899db6e140110ae7484e58cd74b0dfa5cee021a0347f00bb441ac78bd"},
-    {file = "gevent-20.12.1-cp36-cp36m-win_amd64.whl", hash = "sha256:b57586ad3fedf13d351d2559b70d6fe593c50400315d52bb3c072285da60fa37"},
-    {file = "gevent-20.12.1-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:69ddc1767a02f68e71d5e0d3215aa4d28872187715627f71ff0eadd7b7a5e7f4"},
-    {file = "gevent-20.12.1-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:89c583744f91052ae987356660f5ed0b8fc59a1230b051d6ccc10d37a155fe01"},
-    {file = "gevent-20.12.1-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:f3faf1834464f1b0731aa6346cd9f41029fa9e208d6ecbce4a736c19562c86aa"},
-    {file = "gevent-20.12.1-cp37-cp37m-win32.whl", hash = "sha256:4baecba0fd614e14dc1f3f8c35616cb248cdb893de576150ed1fc7fc66b8ba3d"},
-    {file = "gevent-20.12.1-cp37-cp37m-win_amd64.whl", hash = "sha256:4b0a5626c4e534d184cdf00d66f06de3885beafaaa5f7b98d47186ea175629a1"},
-    {file = "gevent-20.12.1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:81e38ed46e21e0b00b930efce1a1ff46c7722ad83d84052f71a757f23cbed1c0"},
-    {file = "gevent-20.12.1-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:895c76a89907d9d37fdfaf5321cb0fff0cba396f003bedb4f5fc13836da6f250"},
-    {file = "gevent-20.12.1-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:c3706a620e167c4bd007f16f113928324c4e07a7bae11d6d18d65f82abcd7a58"},
-    {file = "gevent-20.12.1-cp38-cp38-win32.whl", hash = "sha256:ba244028225ff8d3a58f344fcd16ab05b0e3642b34d81f51f7fa3c70761f6c34"},
-    {file = "gevent-20.12.1-cp38-cp38-win_amd64.whl", hash = "sha256:c570a2e3100f758a5c2f9b993ecf870ee784390e44e1a292c361d6b32fb3ad4c"},
-    {file = "gevent-20.12.1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:f857adbe1bf41e620d86173a53100f4ec328eba3089069a4815b3d9f4229dee8"},
-    {file = "gevent-20.12.1-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:bf946a99e364ebcc95b82c794d5d1a67f13115adbefab7b9e12791f13184cfd5"},
-    {file = "gevent-20.12.1-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:60799fd7dcbb622f8435eb12436d48a8d27f8e7b3d23631e32ccc04ddd2097c2"},
-    {file = "gevent-20.12.1-pp27-pypy_73-win32.whl", hash = "sha256:7a808c63f065a303bbbe87c5c0754e06abb1e23e18752f418dce1eb3189cb43d"},
-    {file = "gevent-20.12.1.tar.gz", hash = "sha256:99b68765767bb3e2244a66b012883899a6f17c23b6dc1cd80b793df341e15f08"},
+    {file = "gevent-21.1.2-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:2a9ae0a0fd956cbbc9c326b8f290dcad2b58acfb2e2732855fe1155fb110a04d"},
+    {file = "gevent-21.1.2-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:3694f393ab08372bd337b9bc8eebef3ccab3c1623ef94536762a1eee68821449"},
+    {file = "gevent-21.1.2-cp27-cp27m-win32.whl", hash = "sha256:7bdfee07be5eee4f687bf90c54c2a65c909bcf2b6c4878faee51218ffa5d5d3e"},
+    {file = "gevent-21.1.2-cp27-cp27m-win_amd64.whl", hash = "sha256:afaeda9a7e8e93d0d86bf1d65affe912366294913fe43f0d107145dc32cd9545"},
+    {file = "gevent-21.1.2-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:188c3c6da67e17ffa28f960fc80f8b7e4ba0f4efdc7519822c9d3a1784ca78ea"},
+    {file = "gevent-21.1.2-cp35-cp35m-win32.whl", hash = "sha256:e8a5d9fcf5d031f2e4c499f5f4b53262face416e22e8769078354f641255a663"},
+    {file = "gevent-21.1.2-cp35-cp35m-win_amd64.whl", hash = "sha256:ecff28416c99e0f73137f35849c3027cc3edde9dc13b7707825ebbf728623928"},
+    {file = "gevent-21.1.2-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:b6ffc1131e017aafa70d7ec19cc24010b19daa2f11d5dc2dc191a79c3c9ea147"},
+    {file = "gevent-21.1.2-cp36-cp36m-manylinux2014_aarch64.whl", hash = "sha256:ba0c6ad94614e9af4240affbe1b4839c54da5a0a7e60806c6f7f69c1a7f5426e"},
+    {file = "gevent-21.1.2-cp36-cp36m-win32.whl", hash = "sha256:f0498df97a303da77e180a9368c9228b0fc94d10dd2ce79fc5ebb63fec0d2fc9"},
+    {file = "gevent-21.1.2-cp36-cp36m-win_amd64.whl", hash = "sha256:f91fd07b9cf642f24e58ed381e19ec33e28b8eee8726c19b026ea24fcc9ff897"},
+    {file = "gevent-21.1.2-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:9f99c3ec61daed54dc074fbcf1a86bcf795b9dfac2f6d4cdae6dfdb8a9125692"},
+    {file = "gevent-21.1.2-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:ac98570649d9c276e39501a1d1cbf6c652b78f57a0eb1445c5ff25ff80336b63"},
+    {file = "gevent-21.1.2-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:cfb2878c2ecf27baea436bb9c4d8ab8c2fa7763c3916386d5602992b6a056ff3"},
+    {file = "gevent-21.1.2-cp37-cp37m-win32.whl", hash = "sha256:464ec84001ba5108a9022aded4c5e69ea4d13ef11a2386d3ec37c1d08f3074c9"},
+    {file = "gevent-21.1.2-cp37-cp37m-win_amd64.whl", hash = "sha256:1e5af63e452cc1758924528a2ba6d3e472f5338e1534b7233cd01d3429fc1082"},
+    {file = "gevent-21.1.2-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:a130a1885603eabd8cea11b3e1c3c7333d4341b537eca7f0c4794cb5c7120db1"},
+    {file = "gevent-21.1.2-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:96f704561a9dd9a817c67f2e279e23bfad6166cf95d63d35c501317e17f68bcf"},
+    {file = "gevent-21.1.2-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:77b65a68c83e1c680f52dc39d5e5406763dd10a18ce08420665504b6f047962e"},
+    {file = "gevent-21.1.2-cp38-cp38-win32.whl", hash = "sha256:16574e4aa902ebc7bad564e25aa9740a82620fdeb61e0bbf5cbc32e84c13cb6a"},
+    {file = "gevent-21.1.2-cp38-cp38-win_amd64.whl", hash = "sha256:c2c4326bb507754ef354635c05f560a217c171d80f26ca65bea81aa59b1ac179"},
+    {file = "gevent-21.1.2-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:969743debf89d6409423aaeae978437cc042247f91f5801e946a07a0a3b59148"},
+    {file = "gevent-21.1.2-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:bdb3677e77ab4ebf20c4752ac49f3b1e47445678dd69f82f9905362c68196456"},
+    {file = "gevent-21.1.2-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:33741e3cd51b90483b14f73b6a3b32b779acf965aeb91d22770c0c8e0c937b73"},
+    {file = "gevent-21.1.2-cp39-cp39-win32.whl", hash = "sha256:e370e0a861db6f63c75e74b6ee56a40f5cdac90212ec404621445afa12bfc94b"},
+    {file = "gevent-21.1.2-cp39-cp39-win_amd64.whl", hash = "sha256:242e32cc011ad7127525ca9181aef3379ce4ad9c733aefe311ecf90248ad9a6f"},
+    {file = "gevent-21.1.2-pp27-pypy_73-win32.whl", hash = "sha256:a54b9c7516c211045d7897a73a4ccdc116b3720c9ad3c591ef9592b735202a3b"},
+    {file = "gevent-21.1.2.tar.gz", hash = "sha256:520cc2a029a9eef436e4e56b007af7859315cafa21937d43c1d5269f12f2c981"},
 ]
 ghp-import = [
     {file = "ghp-import-2.0.1.tar.gz", hash = "sha256:753de2eace6e0f7d4edfb3cce5e3c3b98cd52aadb80163303d1d036bda7b4483"},
@@ -1947,6 +2037,13 @@ mkdocs = [
     {file = "mkdocs-1.2.2-py3-none-any.whl", hash = "sha256:d019ff8e17ec746afeb54eb9eb4112b5e959597aebc971da46a5c9486137f0ff"},
     {file = "mkdocs-1.2.2.tar.gz", hash = "sha256:a334f5bd98ec960638511366eb8c5abc9c99b9083a0ed2401d8791b112d6b078"},
 ]
+mkdocs-exclude = [
+    {file = "mkdocs-exclude-1.0.2.tar.gz", hash = "sha256:ba6fab3c80ddbe3fd31d3e579861fd3124513708271180a5f81846da8c7e2a51"},
+]
+mkdocs-macros-plugin = [
+    {file = "mkdocs-macros-plugin-0.5.12.tar.gz", hash = "sha256:106aeb1ff3ba580e4884aec225ec6891ed8c93d083056088f8e66f3309fcd579"},
+    {file = "mkdocs_macros_plugin-0.5.12-py3-none-any.whl", hash = "sha256:43b7ea0259e2e18a7fe52b73a548c5ea38bb99bc9ab37d026cbdd42e45769c65"},
+]
 mkdocs-material = [
     {file = "mkdocs-material-6.2.8.tar.gz", hash = "sha256:ce2f4a71e5db49540d71fd32f9afba7645765f7eca391e560d1d27f947eb344c"},
     {file = "mkdocs_material-6.2.8-py2.py3-none-any.whl", hash = "sha256:c9b63d709d29778aa3dafc7178b6a8c655b00937be2594aab016d1423696c792"},
@@ -1954,6 +2051,10 @@ mkdocs-material = [
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.1.tar.gz", hash = "sha256:6947fb7f5e4291e3c61405bad3539d81e0b3cd62ae0d66ced018128af509c68f"},
     {file = "mkdocs_material_extensions-1.0.1-py3-none-any.whl", hash = "sha256:d90c807a88348aa6d1805657ec5c0b2d8d609c110e62b9dce4daf7fa981fa338"},
+]
+mkdocs-pymdownx-material-extras = [
+    {file = "mkdocs_pymdownx_material_extras-1.4-py3-none-any.whl", hash = "sha256:393d6cddfd0797c2420e638e0515358ad754ad2d806392bf2ce1f7f91e93229b"},
+    {file = "mkdocs_pymdownx_material_extras-1.4.tar.gz", hash = "sha256:354ac82e718c8c80a9fdc76c41d0586363f77a5c911718f0b8f0aed502cd7040"},
 ]
 mkdocstrings = [
     {file = "mkdocstrings-0.13.6-py3-none-any.whl", hash = "sha256:79d2a16b8c86a467bdc84846dfb90552551d2d9fd35578df9f92de13fb3b4537"},
@@ -2102,8 +2203,8 @@ pygments = [
     {file = "Pygments-2.9.0.tar.gz", hash = "sha256:a18f47b506a429f6f4b9df81bb02beab9ca21d0a5fee38ed15aef65f0545519f"},
 ]
 pyjwt = [
-    {file = "PyJWT-1.7.1-py2.py3-none-any.whl", hash = "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e"},
-    {file = "PyJWT-1.7.1.tar.gz", hash = "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"},
+    {file = "PyJWT-2.1.0-py3-none-any.whl", hash = "sha256:934d73fbba91b0483d3857d1aff50e96b2a892384ee2c17417ed3203f173fca1"},
+    {file = "PyJWT-2.1.0.tar.gz", hash = "sha256:fba44e7898bbca160a2b2b501f492824fc8382485d3a6f11ba5d0c1937ce6130"},
 ]
 pylint = [
     {file = "pylint-2.9.6-py3-none-any.whl", hash = "sha256:2e1a0eb2e8ab41d6b5dbada87f066492bb1557b12b76c47c2ee8aa8a11186594"},
@@ -2247,15 +2348,15 @@ sniffio = [
     {file = "sniffio-1.2.0.tar.gz", hash = "sha256:c4666eecec1d3f50960c6bdf61ab7bc350648da6c126e3cf6898d8cd4ddcd3de"},
 ]
 snoop = [
-    {file = "snoop-0.2.5.tar.gz", hash = "sha256:20fb1fd672e8fe96fd78a91dd88b79329f5ebcb8dcc470dffb2fdff17cc00fdf"},
+    {file = "snoop-0.4.0.tar.gz", hash = "sha256:b3f0903c1d1970b3852226c1d056c0d60ccea3adbb187ab8488fe423d0d4172b"},
 ]
 soupsieve = [
     {file = "soupsieve-2.2.1-py3-none-any.whl", hash = "sha256:c2c1c2d44f158cdbddab7824a9af8c4f83c76b1e23e049479aa432feb6c4c23b"},
     {file = "soupsieve-2.2.1.tar.gz", hash = "sha256:052774848f448cf19c7e959adf5566904d525f33a3f8b6ba6f6f8f26ec7de0cc"},
 ]
 structlog = [
-    {file = "structlog-20.2.0-py2.py3-none-any.whl", hash = "sha256:33dd6bd5f49355e52c1c61bb6a4f20d0b48ce0328cc4a45fe872d38b97a05ccd"},
-    {file = "structlog-20.2.0.tar.gz", hash = "sha256:af79dfa547d104af8d60f86eac12fb54825f54a46bc998e4504ef66177103174"},
+    {file = "structlog-21.1.0-py2.py3-none-any.whl", hash = "sha256:62f06fc0ee32fb8580f0715eea66cb87271eb7efb0eaf9af6b639cba8981de47"},
+    {file = "structlog-21.1.0.tar.gz", hash = "sha256:d9d2d890532e8db83c6977a2a676fb1889922ff0c26ad4dc0ecac26f9fafbc57"},
 ]
 tabulate = [
     {file = "tabulate-0.8.9-py3-none-any.whl", hash = "sha256:d7c013fe7abbc5e491394e10fa845f8f32fe54f8dc60c6622c6cf482d25d47e4"},

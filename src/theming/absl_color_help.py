@@ -239,7 +239,7 @@ def parse_xml_help(xml_help, match, cli_actions=None):
             c['default'] = int(c['default'])
 
     tree = ET.fromstring(xml_help)
-    m = {}
+    m, items = {}, {}
     r = {'program': tree[0].text, 'usage': tree[0].text, 'flags': m}
     for fs in tree[2:]:
         f = fs
