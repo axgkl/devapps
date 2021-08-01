@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "devapps"
-version = "2021.5.10"
+version = "2021.8.1"
 description = "Apps - End to End."
 authors = ["Gunther Klessinger <gunther.klessinger@axiros.com>"]
 license = "BSD"

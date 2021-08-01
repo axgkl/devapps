@@ -1,7 +1,7 @@
 <!-- AUTOMATICALLY GENERATED FILE - DO NOT DIRECTLY EDIT!
 
 Direct edits will be gone after next CI build.
-By: gk@axgk (Sun Aug  1 19:55:14 2021)
+By: gk@axgk (Sun Aug  1 20:21:25 2021)
 Command Line (see duties.py):
 
     /home/gk/miniconda3/envs/devapps_py37/bin/doc pre_process \
