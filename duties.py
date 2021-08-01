@@ -136,6 +136,8 @@ def docs_regen(ctx):
     Arguments:
         ctx: The [context][duty.logic.Context] instance (passed automatically).
     """
+    # we run a poetry install in .lp tests:
+    assert 'POETRY_ACTIVE' in os.environ
     cmd = [
         'doc',
         'pre_process',
