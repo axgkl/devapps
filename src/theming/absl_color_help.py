@@ -238,17 +238,13 @@ def parse_xml_help(xml_help, match, cli_actions=None):
         def do_int(c, el):
             c['default'] = int(c['default'])
 
-    # open('/tmp/foo1', 'w').write(xml_help)
-    tree = ET.fromstring(xml_help).getchildren()
+    tree = ET.fromstring(xml_help)
     m = {}
     r = {'program': tree[0].text, 'usage': tree[0].text, 'flags': m}
-    next_ = lambda els: els.pop(0)
-    items = {}
     for fs in tree[2:]:
-        f = fs.getchildren()
+        f = fs
         c = {}
-        while f:
-            t = next_(f)
+        for t in f:
             tn = t.tag
             c[tn] = t.text
             if tn == 'type':
