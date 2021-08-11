@@ -11,8 +11,10 @@ define_flags = devapp.tools.define_flags
 FLG = devapp.tools.FLG
 
 # from lcdoc.py_test.auto_docs import gen_mod_doc
-import lcdoc.call_flow_logging as cfl
-from lcdoc.auto_docs import mod_doc
+
+import lcdoc.call_flows.call_flow_logging as cfl
+
+# from lcdoc.auto_docs import mod_doc
 
 
 def test_run_app_show_flags(we_are_in_app_process=False):
@@ -22,7 +24,10 @@ def test_run_app_show_flags(we_are_in_app_process=False):
     # we'll run the test app in a subprocess - there can only be one app:
     if we_are_in_app_process:
 
-        fn = mod_doc(app_module, dest='auto')
+        # fn = mod_doc(app_module, dest='auto')
+        fn = '/tmp/foo.md'
+        with open(fn, 'w') as fd:
+            fd.write('')
 
         @cfl.document(trace=(app_module, devapp.tools), dest=fn)
         def test_start_app():

@@ -519,8 +519,8 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     # exit phase. postprocessing, pretty to stdout, plain to | jq .:
     if FLG.flat:
         res = tools.flatten(res, sep='.')
-    jres = json.dumps(res, default=str)
     if not sys.stdout.isatty():
+        jres = json.dumps(res, default=str)
         print(jres)
     else:
         # return res
