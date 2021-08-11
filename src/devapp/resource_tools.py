@@ -47,7 +47,7 @@ WantedBy = default.target
 
 # _MATCH_ (auto created %(ctime)s) 
 '''
-unit_match = 'Axiros DevApp Unit'
+unit_match = 'DevApp Unit'
 T_unit = T_unit.replace('_MATCH_', unit_match)
 
 
@@ -352,9 +352,7 @@ class Install:
             img = rsc.pkg.split('layers:', 1)[1]
             system('ops container_pull --repo "%s" --dir "%s.img"' % (img, d))
             s = '--skip_filesystem_adaptions'
-            system(
-                'ops container_build --dirs "%s.img" --target_dir "%s" %s' % (d, d, s)
-            )
+            system('ops container_build --dirs "%s.img" --target_dir "%s" %s' % (d, d, s))
 
     def write_unit_file(name, fn, rsc):
         pn = project.root().rsplit('/', 1)[-1]

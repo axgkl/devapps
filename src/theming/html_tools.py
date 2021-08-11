@@ -46,8 +46,8 @@ RE_SCRIPT_END = re.compile(r'</script', re.IGNORECASE)
 
 
 def neutralize_script_tags(src):
-    res = re.sub(RE_SCRIPT_START, '<!-- SCRIPT NEUTRALIZED BY AXIROS', src)
-    res = re.sub(RE_SCRIPT_END, '-- END SCRIPT NEUTRALIZED BY AXIROS', res)
+    res = re.sub(RE_SCRIPT_START, '<!-- SCRIPT NEUTRALIZED BY DEVAPPS', src)
+    res = re.sub(RE_SCRIPT_END, '-- END SCRIPT NEUTRALIZED BY DEVAPPS', res)
     return res
 
 
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     assert '''<a src = "http://my.host/foo4.html">''' in res
 
     assert (
-        '''<!-- SCRIPT NEUTRALIZED BY AXIROS attrs>evil stuff-- END SCRIPT NEUTRALIZED BY AXIROS>'''
+        '''<!-- SCRIPT NEUTRALIZED BY DEVAPPS attrs>evil stuff-- END SCRIPT NEUTRALIZED BY DEVAPPS>'''
         in res
     )
 

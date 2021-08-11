@@ -248,7 +248,7 @@ class State:
         dirs = set()
         root_dirs = set(os.listdir())  # registry, not image spec on top level
         for c in cs:
-            # c like 'artifacts.axiros.com::devapps/arch/arch_conda'
+            # c like 'artifacts.foo.com::devapps/arch/arch_conda'
             parts = c.split('/')
             s._selected_spec_dirs.append(c)
             n = parts[-1]

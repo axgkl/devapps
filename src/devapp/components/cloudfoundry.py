@@ -21,7 +21,7 @@ exists = os.path.exists
 fn_cfg = lambda: env['DA_DIR'] + '/secure/python-CloudFoundry.cfg'
 
 
-def get_endpoint(example='//api.aida.appcloud.axpypi.com'):
+def get_endpoint(example='//api.aida.appcloud.my_company.com'):
     def vld(k, url):
         try:
             if requests.get(url).status_code in (200, 404):

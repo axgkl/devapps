@@ -4,7 +4,7 @@ def VimEnv(p):
         filesystem = {
             'name': 'vimblack',
             'type': 'conda_env',
-            'channel': 'https://axpypi.com/pub/conda_axchange/channel',
+            'channel': 'https://my_company.com/pub/conda_axchange/channel',
             'packages': ['vim', 'vimblackhome'],
         }
 

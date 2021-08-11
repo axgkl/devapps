@@ -1,6 +1,6 @@
 # CI/CD Setup
 
-All devapps repos are hosted on `axiros.com`, i.e. we use [gitlab-runners][glr] to run CI/CD jobs.
+devapps repos may be hosted on internal package servers, then we use [gitlab-runners][glr] to run CI/CD jobs.
 
 !!! note
     gitlab-runners are available for all major OS. `devapps` and derived packages builds are run on Linux only.
@@ -39,7 +39,7 @@ WantedBy=multi-user.target
 
 ```
 
-## Access to Axiros Artifactory
+## Access to Private Artifactory
 
 ```toml
 [gitlab-runner@doglr pypoetry]$ pwd
@@ -118,7 +118,7 @@ $ git config --global user.name "gitlab-runner"
       before_script:
         - env # print the environ
         - mkdir build
-        - git clone "https://gitlab-ci-token:${CI_JOB_TOKEN}@axiros.com/devapps/lc-doctools.git" "build/lc-doctools"
+        - git clone "https://gitlab-ci-token:${CI_JOB_TOKEN}@mycompany.com/devapps/lc-doctools.git" "build/lc-doctools"
         - poetry --version
         - poetry debug
         - poetry config virtualenvs.in-project true --local

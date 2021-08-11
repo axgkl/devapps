@@ -65,7 +65,7 @@ class GitlabRunner(Service):
     # shortcut for:
     # service_exec_start = [app, 'run'] + _cfg
     service_kill_mode = 'process'
-    url = 'https://gitlab.axpypi.com'
+    url = 'https://gitlab.my_company.com'
     java = '%(DA_DIR)s/envs/gitlab/x86_64-conda_cos6-linux-gnu/sysroot/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.131.x86_64/bin/java'
 
     # token = 'mFsHPcAsRKhpsnstXMVV'

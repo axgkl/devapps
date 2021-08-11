@@ -42,14 +42,14 @@ registries = {
 this_archi = 'amd64'
 
 registries['axc2'] = d = dict(registries['dockerio'])
-d['registryBase'] = 'https://axc2.axpypi.com'
+d['registryBase'] = 'https://axc2.mycompany.com'
 
 registries['axint'] = d = dict(registries['dockerio'])
-d['registryBase'] = 'https://artifacts-internal.axpypi.com/docker-internal'
+d['registryBase'] = 'https://artifacts-internal.mycompany.com/docker-internal'
 
 registries['ax'] = d = dict(registries['dockerio'])
-d['registryBase'] = 'https://artifacts.axpypi.com/docker-internal'
-d['authBase'] = 'https://artifacts.axpypi.com/docker-internal'
+d['registryBase'] = 'https://artifacts.mycompany.com/docker-internal'
+d['authBase'] = 'https://artifacts.mycompany.com/docker-internal'
 
 
 def set_registry_urls_global(reg='dockerio'):
@@ -244,9 +244,7 @@ def do_v1():
     # 'manifest.json' (thus any schemaVersion 2+ images will be imported in
     # the old way, and their 'docker history' will suffer)
     histories = M['history']
-    history = [
-        json.loads(histories[i]['v1Compatibility']) for i in range(len(histories))
-    ]
+    history = [json.loads(histories[i]['v1Compatibility']) for i in range(len(histories))]
     log('History', history=history)
     image_id = history[0]['id']
     log(

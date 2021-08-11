@@ -1,7 +1,7 @@
 <!-- AUTOMATICALLY GENERATED FILE - DO NOT DIRECTLY EDIT!
 
 Direct edits will be gone after next CI build.
-By: gk@axgk (Sun Aug  1 20:21:25 2021)
+By: gk@axgk (Wed Aug 11 17:33:48 2021)
 Command Line (see duties.py):
 
     /home/gk/miniconda3/envs/devapps_py37/bin/doc pre_process \
@@ -22,8 +22,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 This project adheres to [CalVer Versioning](http://calver.org) ![](https://img.shields.io/badge/calver-YYYY.M.D-22bfda.svg).
 
-## [2021.6.0](https://github.com/AXGKl/devapps/releases/tag/2021.6.0)
-<small>[Compare with 2021.5.10](https://github.com/AXGKl/devapps/compare/2021.5.10...2021.6.0)</small>
+## [2021.8.1](https://github.com/AXGKl/devapps/releases/tag/2021.8.1)
+<small>[Compare with 2021.5.10](https://github.com/AXGKl/devapps/compare/2021.5.10...2021.8.1)</small>
 
 ### Bug Fixes
 - Element tree in 3.9 no getchildren anymore. ([4cb2506](https://github.com/AXGKl/devapps/commit/4cb25067492f9094f004426142a5c2b6de02db45) by Gunther Klessinger).

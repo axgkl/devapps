@@ -161,7 +161,7 @@ class DCStatus(Service):
 class AXESS(
     SvcGroup, NBI, Callback, Portal, Debug, Phase0, Phase1, TR069, GUI, Configurator,
 ):
-    'Axiros HTTP App Server'
+    'HTTP App Server'
 
 
 class AXD(SvcGroup, AXD_A1, AXD_A2, AXD_System):

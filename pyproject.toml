@@ -6,11 +6,11 @@ build-backend = "poetry.masonry.api"
 name = "devapps"
 version = "2021.8.1"
 description = "Apps - End to End."
-authors = ["Gunther Klessinger <gunther.klessinger@axiros.com>"]
+authors = ["Gunther Klessinger <g_kle_ss_ing_er@gmx.de>"]
 license = "BSD"
 readme = "README.md"
 repository = "https://github.com/AXGKl/devapps"
-homepage = "http://github.com/AXGKl/devapps"
+homepage = "https://axgkl.github.io/devapps"
 keywords = []
 
 packages = [

@@ -1,13 +1,13 @@
 site_name: "devapps"
 site_description: "Documentation building tools"
-site_url: "http://devapps.pages.axpypi.com/devapps"
-repo_url: "https://gitlab.axpypi.com/devapps/devapps"
-repo_name: "devapps/devapps"
+site_url: "https://axgkl.github.io/devapps/"
+repo_url: "https://github.com/AXGKl/devapps"
+repo_name: "devapps"
 
 
 
 copyright: |
-  Copyright &copy; 2012 - 2021 <a href="https://www.axpypi.com/"  target="_blank" rel="noopener">axpypi Innovation </a>
+  Copyright &copy; 2012 - 2021 Gunther Klessinger
 
 #
 nav:
@@ -77,14 +77,14 @@ markdown_extensions:
    - pymdownx.snippets:
        base_path: theme/src/_snippets
    - plantuml_markdown:
-       server: https://axc2.axpypi.com/plantuml
+       server: https://axc2.my_company.com/plantuml
        base_dir: docs/lcd/assets/plantuml
        format: svg
 
 extra:
   social:
-    - icon: fontawesome/brands/gitlab
-      link: https://axiros.com/
+    - icon: fontawesome/brands/github
+      link: https://github.com/AXGKl/
     - icon: fontawesome/brands/skype
       link: https://join.skype.com/krSNYZqvEmJm
 extra_css:

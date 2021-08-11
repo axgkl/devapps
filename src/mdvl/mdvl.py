@@ -25,8 +25,7 @@
 
     export mdvl_debug=1
 
-See also https://github.com/axiros/mdvl
-
+See also https://www.bing.com/search?q=github+mdvl
 """
 __version__ = '2017.07.16.7'  # count up for new pip versions
 __author__ = 'Gunther Klessinger'
@@ -362,9 +361,7 @@ def _main(md, f):
     # INLINE MARKUP, *, **, backticks
     # Alternating replacements, e.g. code, emph. requires a first space char:
     altern = lambda s, c, r: re.sub(
-        r'([^{c}]+){c}([^{c}]+){c}?'.format(c=c),
-        r'\1%s\2%s' % (r, g[cur_colr]),
-        ' ' + s,
+        r'([^{c}]+){c}([^{c}]+){c}?'.format(c=c), r'\1%s\2%s' % (r, g[cur_colr]), ' ' + s,
     )[
         1:
     ]  # removing space again
@@ -388,9 +385,9 @@ def _main(md, f):
         out = out.replace('\n' + '>' * i, '\n' + m)
 
     # Insert back the stored code blocks:
-    code_fmt = lambda c: c.replace(
-        '\n', '\n%s%s %s' % (C.L, f.code_mark, C.CODE)
-    ).rsplit('\n', 1)[0]
+    code_fmt = lambda c: c.replace('\n', '\n%s%s %s' % (C.L, f.code_mark, C.CODE)).rsplit(
+        '\n', 1
+    )[0]
     for i in range(blocks):
         out = out.replace('\x02%s' % i, '%s%s%s' % (C.CODE, code_fmt(g[i]), C.O))
     out = out.replace(apos + '\n', '')  # before
@@ -467,11 +464,7 @@ def get_help(cols, PY2):
 def get_cols():
     try:
         return int(
-            (
-                env('term_width')
-                or os.popen('tput cols 2>/dev/null').read().strip()
-                or 80
-            )
+            (env('term_width') or os.popen('tput cols 2>/dev/null').read().strip() or 80)
         )
     except:
         return 80
