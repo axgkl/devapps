@@ -1,5 +1,5 @@
 site_name: "devapps"
-site_description: "Documentation building tools"
+site_description: "Application Building Tools"
 site_url: "https://axgkl.github.io/devapps/"
 repo_url: "https://github.com/AXGKl/devapps"
 repo_name: "devapps"
@@ -7,7 +7,7 @@ repo_name: "devapps"
 
 
 copyright: |
-  Copyright &copy; 2012 - 2021 Gunther Klessinger
+  Copyright &copy; 2012 - 2022 Gunther Klessinger
 
 #
 nav:
@@ -51,54 +51,59 @@ theme:
   features:
     - tabs
     #- toc.autohide
-
-
+    #
 markdown_extensions:
-   - admonition
-   - attr_list
-   - markdown_include.include
-   - pymdownx.emoji
-   - pymdownx.magiclink
-   - pymdownx.superfences
-   - pymdownx.tabbed
-   - pymdownx.tasklist
-   - pymdownx.details
-   - markdown.extensions.tables
-   - markdown.extensions.footnotes
-   - markdown.extensions.md_in_html:
-   - pymdownx.superfences:
-       preserve_tabs: true
-       custom_fences:
-         - name: mermaid
-           class: mermaid
-           format: !!python/name:pymdownx.superfences.fence_code_format
-   - toc:
-       permalink: "¤"
-   - pymdownx.snippets:
-       base_path: theme/src/_snippets
-   - plantuml_markdown:
-       server: https://axc2.my_company.com/plantuml
-       base_dir: docs/lcd/assets/plantuml
-       format: svg
+  - admonition
+  - attr_list # {: style="height: ..."}
+  - footnotes # foo[^1] is ...(start with ^)
+  - meta
+  - markdown_include.include
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.critic:
+      mode: view
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.keys
+  - pymdownx.tilde
+  - pymdownx.magiclink
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.details
+  - markdown.extensions.tables
+  - markdown.extensions.footnotes
+  - markdown.extensions.md_in_html:
+  - pymdownx.superfences:
+      preserve_tabs: true
+  - toc:
+      permalink: "¤"
+  - pymdownx.snippets:
+      base_path:
+        - docs
 
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/AXGKl/
-    - icon: fontawesome/brands/skype
-      link: https://join.skype.com/krSNYZqvEmJm
-extra_css:
-  - assets/css/xterm.min.css
-extra_javascript:
-  - javascript/tables.js
-  - assets/javascript/tablesort.min.js
-    # 4.9.0 -> TODO: rename
-  - assets/javascript/Rx.min.js
-  - assets/javascript/xterm.4.9.0.min.js
-  - assets/javascript/xterm-addon-fit.min.js
-  - assets/javascript/xterm-addon-search.min.js
-  - assets/javascript/lc.js
-  - assets/pymdownx-extras/extra-uml-30be4556.js
+      link: https://github.com/axiros
 
 plugins:
+  # in this order. e.g. md-replace before lp, so that lp can process its results
   - search
+  - lcd-blacklist
+  - lcd-md-replace
+  - lcd-lp
+  - lcd-find-pages:
+      find-pages:
+        - features/lp/:follow
+  - lcd-page-tree
+  - lcd-stats
+  - macros:
+      j2_block_start_string: "<%{"
+      j2_block_end_string: "}%>"
+      j2_variable_start_string: "<{"
+      j2_variable_end_string: "}>"
+
+
