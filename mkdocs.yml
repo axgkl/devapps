@@ -33,25 +33,29 @@ nav:
     - Changelog: about/changelog.md
     - Credits: about/credits.md
     - TODO: about/todo.md
-
 theme:
   features:
-      - navigation.instant
-  name: material
-  custom_dir: docs/lcd
+    - navigation.instant
+    - navigation.top
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+      #- navigation.expand
+  name:
+    material
+    #custom_dir: docs/lcd
   icon:
     logo: material/book-open-page-variant
   palette:
     scheme: preference
-    primary: orange
+    primary: blue grey
     accent: deep purple
   font:
     text: Roboto
     code: Roboto Mono
-  features:
-    - tabs
     #- toc.autohide
-    #
+
+
 markdown_extensions:
   - admonition
   - attr_list # {: style="height: ..."}
