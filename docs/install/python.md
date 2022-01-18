@@ -2,31 +2,39 @@
 
 Python is *the* base requirement for any devapp. 
 
-This base package requires minimum Python 3.6 but derived apps may require higher versions.
+This base package requires minimum Python 3.7 but derived apps may require higher versions.
 
 
 !!! summary "Python Environment"
-    We highly recommend to not use the Python of your host system but install within a dedicated environment.
 
-    To install Python versions, there are many options, incl. <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html"><code>miniconda</code></a>, <a href="https://github.com/pyenv/pyenv"><code>pyenv</code></a> or packages of your distribution.</summary>.
+    We highly recommend to not use the Python of your host system but install within a dedicated
+    environment.
+
+    To install Python versions, there are many options, incl. <a
+    href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html"><code>miniconda</code></a>,
+    <a href="https://github.com/pyenv/pyenv"><code>pyenv</code></a> or packages of your
+    distribution.</summary>.
 
 
-Subsequently we explain the two ways of installing and activating a specific Python version, which do not require root
-permissions and are contained within directories.
+Subsequently we explain the two ways of installing and activating a specific Python version, which
+do not require root permissions and are contained within directories.
 
 
 ## Conda
 
-> Installing conda based python environments is the *recommended* way to run
-devapps based apps, since this way normalizes the installation of non Python
-resources on your host.
+Conda or its lighther variant [Miniconda](https://docs.conda.io/projects/conda/en/latest/) is a
+binary package dependency management and deployment system.
 
-Conda or its lighther variant [Miniconda](https://docs.conda.io/projects/conda/en/latest/) is a binary package dependency management and deployment system.
+It allows to install not only Python in any version under one base environment but also other
+resources, e.g. redis, nodejs or other databases, w/o "spamming" your filesystem outside of the base
+directory.   This can be done conflict free, within prefixes
+([environments](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
 
-It allows to install not only Python in any version under one base environment but also other resources, e.g. redis, nodejs or other databases, w/o "spamming" your filesystem outside of the base directory.   
-This can be done conflict free, within prefixes ([environments](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
+> Conda is comparable to the homebrew packaging system but not dependent on a fixed directory within
+> `/usr/local`. A [localized][cl] homebrew is very similar to Conda (but restricted to OSX only,
+> i.e. no option for us).
 
-> Conda is comparable to the homebrew packaging system but not dependent on a fixed directory within `/usr/local`. A [localized](https://medium.com/macoclock/a-clean-approach-to-installing-homebrew-d17c797fb045) homebrew is very similar to Conda (but restricted to OSX only, i.e. no option for us).
+[cl]: https://medium.com/macoclock/a-clean-approach-to-installing-homebrew-d17c797fb045
 
 Installation is simple and described [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
