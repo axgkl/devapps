@@ -36,10 +36,10 @@ jobs:
     steps:
       - name: EnvironStuff
         shell: bash -l {0}
-        run: env
+        run: loginctl enable-linger runner
       - name: xdg
         shell: bash -l {0}
-        run: echo hi
+        run: env | sort
       - uses: actions/checkout@v2
       - name: Set up the Miniconda Root Cache
         uses: actions/cache@v2
