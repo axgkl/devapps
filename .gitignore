@@ -17,12 +17,5 @@ public/
 docs/autodocs
 .resources.json
 tmp/*
-docs/projects/usage.md
 
-docs/install/dev_inst.md
-docs/usage/flags.md
-docs/usage/images/
-docs/usage/proj_inst.md
-docs/dev/plugins.md
-docs/dev/flags.md
 *.ansi
