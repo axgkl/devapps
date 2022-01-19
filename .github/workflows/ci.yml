@@ -22,6 +22,7 @@ env:
   PATH: "$(MC)/bin:/home/runner/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"
   versioning: calver # for git-changelog
   async_framework: gevent
+  XDG_RUNTIME_DIR: "/run/user/1000"
 
 jobs:
   tests:
@@ -36,10 +37,10 @@ jobs:
     steps:
       - name: EnvironStuff
         shell: bash -l {0}
-        run: loginctl enable-linger runner
+        run: "loginctl enable-linger runner && echo done"
       - name: xdg
         shell: bash -l {0}
-        run: env | sort
+        run: "echo $UID"
       - uses: actions/checkout@v2
       - name: Set up the Miniconda Root Cache
         uses: actions/cache@v2
