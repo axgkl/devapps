@@ -19,5 +19,6 @@ docs/autodocs
 tmp/*
 
 *.ansi
-
-docs/projects/usage.md.lp.py
+# not works on github for the systemctl dbus commands at the end:
+# must check it in:
+# docs/projects/usage.md.lp.py

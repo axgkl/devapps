@@ -58,7 +58,6 @@ Here are the resources defined in `devapps`. They are required for running the t
 
 Via the `--init_at` flag you set up a new project, within the given directory, plus its resources:
 
-
 ```bash lp session=project timeout=100
 ['ops project --init_at . --port_offset 2000 --force', 'tree -L 2']
 ```
