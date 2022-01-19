@@ -109,7 +109,7 @@ The `--init_create_unit_files=<name of daemon resource>` will create a unit file
 
     You control the service using `systemctl --user`:
 
-    ```bash lp session=project 
+    ```bash lp session=project eval=on_change
     [
     {'cmd': 'systemctl --user --no-pager start  redis-server-myproject'},
     {'cmd': 'systemctl --user --no-pager status redis-server-myproject', 'assert': '(running)'},
