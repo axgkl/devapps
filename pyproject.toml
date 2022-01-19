@@ -85,7 +85,7 @@ PyYAML     = "*"
 
 
 [tool.poetry.dev-dependencies]
-docutools = "^2022.1.19"
+docutools = "^2022.1.21"
 ##docutools = "*"
 #autoflake = "^1.4"
 #axblack = "^20201010"

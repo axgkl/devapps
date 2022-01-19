@@ -161,7 +161,7 @@ jinja2 = ">=2.10,<3.0"
 
 [[package]]
 name = "docutools"
-version = "2022.1.20"
+version = "2022.1.21"
 description = "Documentation Tools for the Mkdocs Material Framework"
 category = "dev"
 optional = false
@@ -977,7 +977,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "c1fcd98b9e059e745a9042575b92284e3a9bcb1fcffc4f512205bb340d467957"
+content-hash = "97c172929b9ae5c464a172b98b2f24b2dbdb24a296cbc354fd703d8376acc81a"
 
 [metadata.files]
 absl-py = [
@@ -1134,8 +1134,8 @@ diagrams = [
     {file = "diagrams-0.20.0.tar.gz", hash = "sha256:a50743ed9274e194e7898820f69aa12868ae217003580ef9e7d0285132c9674a"},
 ]
 docutools = [
-    {file = "docutools-2022.1.20-py3-none-any.whl", hash = "sha256:98bc85e40004127890b4e1cc59ce23b62212618322fc609990c5bd8b6023b1fe"},
-    {file = "docutools-2022.1.20.tar.gz", hash = "sha256:33ca4ff187decf6ac1dc0191c741ff2271f9a824808b99c838523b679cd4b4d3"},
+    {file = "docutools-2022.1.21-py3-none-any.whl", hash = "sha256:1e2018b7f9a3bef09a2b82ce9b051ed4b43739c0802381a64b230bd8113f39cf"},
+    {file = "docutools-2022.1.21.tar.gz", hash = "sha256:7e2b7a5e22b51a97d5b6c12190612e3016c5802c8527195647a487ba5a1b09a5"},
 ]
 execnet = [
     {file = "execnet-1.9.0-py2.py3-none-any.whl", hash = "sha256:a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142"},
