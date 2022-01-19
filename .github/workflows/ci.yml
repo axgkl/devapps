@@ -22,7 +22,7 @@ env:
   PATH: "$(MC)/bin:/home/runner/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"
   versioning: calver # for git-changelog
   async_framework: gevent
-  XDG_RUNTIME_DIR: "/run/user/1000"
+  XDG_RUNTIME_DIR: "/run/user/1001"
 
 jobs:
   tests:
@@ -35,12 +35,12 @@ jobs:
         os: ["ubuntu-latest"]
         python-version: ["3.7", "3.8"]
     steps:
-      - name: EnvironStuff
+      - name: UserLinger
         shell: bash -l {0}
         run: "loginctl enable-linger runner && echo done"
-      - name: xdg
+      - name: EnvironShow
         shell: bash -l {0}
-        run: "echo $UID"
+        run: "env | sort; echo $UID"
       - uses: actions/checkout@v2
       - name: Set up the Miniconda Root Cache
         uses: actions/cache@v2
