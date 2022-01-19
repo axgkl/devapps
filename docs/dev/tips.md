@@ -4,44 +4,21 @@ Assorted Tips for Developing on DevApps packages.
 
 ## Documentation
 
-### Literate Programming
+Can be dynamic, with assertions. See [docutools][d] for more. 
 
-To debug search `lp.py` in lc-doctools and insert a breakpoint at `def run`, that's the API entry, called from the
-`doc pre_process` plugin.
-
-### lc.js
-
-This is the script which 
-
-- Renders the literal programming results via xterm.js
-- Renders the call flow svg charts (mouse overs)
-- Also contains a lot of code to render asciicasts
-
-It is linked into `docs/lcd` of any devapp with docu, from the installed(!) (not PYPATH added) lc-doctools package.
-
-```bash
-(devapps-KWnqi6Fe-py3.8) 2.devapps$ pwd
-/home/gk/repos/devapps
-(devapps-KWnqi6Fe-py3.8) 2.devapps$ ls -lta docs/lcd
-lrwxrwxrwx. 1 gk gk 113 Dec 18 13:48 docs/lcd -> /home/gk/.cache/pypoetry/virtualenvs/devapps-KWnqi6Fe-py3.8/lib/python3.8/site-packages/lcdoc/assets/mkdocs/lcd
-```
-
-
-#### Debugging
-
-- `mkdocs serve --livereload` in one terminal
-- Edit the **linked** `lc.js`, not the one from the lc-doctools repo, even when in use via PYPATH
-- On changes copy the result into the lc-doctools repo and commit.
+[d]: https://axiros.github.io/docutools/features/lp/parameters/
 
 
 ## CI/CD
 
 ### `Failed to connect to bus: No such file or directory`
 
-We are using the systemd **user** service to manage processes. This means there is a systemd process that runs as unprivileged user. 
-The systemd user service is not used as commonly as the normal systemd process manager.
-For example Red Hat disabled the systemd user service in RHEL 7 (and thereby all distros that come from RHEL, like CentOS, Oracle Linux 7, Amazon Linux 2).
-However, RedHat has assured that running the systemd user service is supported as long as the service is re-enabled.
+We are using the systemd **user** service to manage processes. This means there is a systemd process
+that runs as unprivileged user. The systemd user service is not used as commonly as the normal
+systemd process manager. For example Red Hat disabled the systemd user service in RHEL 7 (and
+thereby all distros that come from RHEL, like CentOS, Oracle Linux 7, Amazon Linux 2). However,
+RedHat has assured that running the systemd user service is supported as long as the service is
+re-enabled.
 
 This is how to start the `systemd --user service` for user with $UID=_UID_ (the current user):
 
@@ -49,7 +26,9 @@ As root create this unit file:
 
 ____________________________________________________________________________________________________
 
+```
 # cat /etc/systemd/system/user@_UID_.service
+
 [Unit]
 Description=User Manager for UID %i
 After=systemd-user-sessions.service
@@ -81,11 +60,13 @@ RestartSec=15
 [Install]
 WantedBy=default.target
 
+```
 
 ____________________________________________________________________________________________________
 
 Then enable and start the unit.
 
+```
 Run `ps -fww $(pgrep -f "systemd --user")` to verify success, then try re-init the project.
 '''
 
@@ -142,8 +123,10 @@ Then you can manually run CI/CD jobs:
 1. Then stop and check if started as service, i.e. at nspawn container boot.
 
 !!! note "Trouble Shooting"
+
     - To be able to login add console and pty/0 into etc/securetty 
-    - If you change the runner user away from gitlab-runner, the unit file has the be adapted manually (not done by install routine)
+    - If you change the runner user away from gitlab-runner, the unit file has the be adapted
+      manually (not done by install routine)
     - `Ctrl-]]]` powers the container off (immediate hard shutdown)
 
 

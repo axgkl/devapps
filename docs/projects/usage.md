@@ -63,7 +63,7 @@ Via the `--init_at` flag you set up a new project, within the given directory, p
 ```
 
 As you can see, we created start files in the `bin` subdirectory of the project directory, pointing to where the actual binaries
-had been installed.
+had been installed. We did set a global `port_offset`, which affects any port of listening resources started.
 
 
 !!! hint "Controlling Resources Installation"

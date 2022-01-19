@@ -4,8 +4,6 @@ site_url: "https://axgkl.github.io/devapps/"
 repo_url: "https://github.com/AXGKl/devapps"
 repo_name: "devapps"
 
-
-
 copyright: |
   Copyright &copy; 2012 - 2022 Gunther Klessinger
 
@@ -13,26 +11,27 @@ copyright: |
 nav:
   - Overview: index.md
   - Installation:
-    - Python: install/python.md
-    - DevApps Packages: install/prod_inst.md
-    - Installing A Development Version: install/dev_inst.md
-    - "Setting up CI/CI": install/cicd.md
+      - Python: install/python.md
+      - DevApps Packages: install/prod_inst.md
+      - Installing A Development Version: install/dev_inst.md
+      - "Setting up CI/CI": install/cicd.md
   - Projects:
-    - About: projects/index.md
-    - Resources: projects/resources.md
-    - Usage: projects/usage.md
+      - About: projects/index.md
+      - Resources: projects/resources.md
+      - Resource Definitions: projects/resource_definitions.md
+      - Usage: projects/usage.md
   - Developing:
-    - Flags: dev/flags.md
-    # :autodocs:
-    - "App": autodocs/src/devapp/devapp.app.md
-    # :autodocs:
-    - Plugins: dev/plugins.md 
-    - Tips: dev/tips.md 
+      - Flags: dev/flags.md
+      # :autodocs:
+      - "App": autodocs/src/devapp/devapp.app.md
+      # :autodocs:
+      - Plugins: dev/plugins.md
+      - Tips: dev/tips.md
   - About:
-    - Contributing: about/contributing.md
-    - Changelog: about/changelog.md
-    - Credits: about/credits.md
-    - TODO: about/todo.md
+      - Contributing: about/contributing.md
+      - Changelog: about/changelog.md
+      - Credits: about/credits.md
+      - TODO: about/todo.md
 theme:
   features:
     - navigation.instant
@@ -54,7 +53,6 @@ theme:
     text: Roboto
     code: Roboto Mono
     #- toc.autohide
-
 
 markdown_extensions:
   - admonition
@@ -99,9 +97,7 @@ plugins:
   - lcd-blacklist
   - lcd-md-replace
   - lcd-lp
-  - lcd-find-pages:
-      find-pages:
-        - features/lp/:follow
+  - lcd-find-pages
   - lcd-page-tree
   - lcd-stats
   - macros:
@@ -109,5 +105,3 @@ plugins:
       j2_block_end_string: "}%>"
       j2_variable_start_string: "<{"
       j2_variable_end_string: "}>"
-
-

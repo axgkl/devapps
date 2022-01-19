@@ -34,6 +34,11 @@ jobs:
         os: ["ubuntu-latest"]
         python-version: ["3.7", "3.8"]
     steps:
+      - name: EnvironStuff
+        shell: env
+      - name: xdg
+        shell: bash -l {0}
+        run: echo hi
       - uses: actions/checkout@v2
       - name: Set up the Miniconda Root Cache
         uses: actions/cache@v2
