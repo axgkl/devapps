@@ -19,3 +19,5 @@ docs/autodocs
 tmp/*
 
 *.ansi
+
+docs/projects/usage.md.lp.py
