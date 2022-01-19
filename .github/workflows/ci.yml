@@ -22,7 +22,7 @@ env:
   PATH: "$(MC)/bin:/home/runner/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"
   versioning: calver # for git-changelog
   async_framework: gevent
-  XDG_RUNTIME_DIR: "/run/user/1001"
+  #XDG_RUNTIME_DIR: "/run/user/1001"
 
 jobs:
   tests:
