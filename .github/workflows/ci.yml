@@ -35,7 +35,8 @@ jobs:
         python-version: ["3.7", "3.8"]
     steps:
       - name: EnvironStuff
-        shell: env
+        shell: bash -l {0}
+        run: env
       - name: xdg
         shell: bash -l {0}
         run: echo hi
