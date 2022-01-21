@@ -82,6 +82,7 @@ tabulate   = "*"
 requests   = "*"
 pycond     = "*"
 PyYAML     = "*"
+cffi = "^1.15.0"
 
 
 [tool.poetry.dev-dependencies]
