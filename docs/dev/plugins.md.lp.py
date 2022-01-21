@@ -104,7 +104,7 @@
                                               '\x1b[1mInstalling\x1b[0m\x1b[39m\x1b[49m '
                                               'the current project: '
                                               '\x1b[36mdevapps\x1b[39m '
-                                              '(\x1b[32m2022.1.21\x1b[39m)'},
+                                              '(\x1b[32m2021.1.22\x1b[39m)'},
                                       {'cmd': 'mytool -h',
                                        'res': '$ mytool -h   \n'
                                               '-bash: mytool: command not '
