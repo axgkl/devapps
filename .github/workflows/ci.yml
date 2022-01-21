@@ -65,19 +65,19 @@ jobs:
           pyver: "${{ matrix.python-version }}"
         run: "source ./make && make && make ci-conda-py-env"
 
-      - name: Run tests
-        shell: bash -l {0}
-        env:
-          pyver: "${{ matrix.python-version }}"
-        run: "pkill tmux; source ./make -a && make tests"
+      # - name: Run tests
+      #   shell: bash -l {0}
+      #   env:
+      #     pyver: "${{ matrix.python-version }}"
+      #   run: "pkill tmux; source ./make -a && make tests"
 
-      - name: Test Docs LiterateProgramming
-        shell: bash -l {0}
-        env:
-          pyver: "${{ matrix.python-version }}"
-        run: "source ./make -a && make docs"
-      - name: Deploy Docs
-        shell: bash -l {0}
-        env:
-          pyver: "${{ matrix.python-version }}"
-        run: "source ./make -a && ${{ env.pyver == '3.7' && 'mkdocs gh-deploy --force' || true }}"
+      # - name: Test Docs LiterateProgramming
+      #   shell: bash -l {0}
+      #   env:
+      #     pyver: "${{ matrix.python-version }}"
+      #   run: "source ./make -a && make docs"
+      # - name: Deploy Docs
+      #   shell: bash -l {0}
+      #   env:
+      #     pyver: "${{ matrix.python-version }}"
+      #   run: "source ./make -a && ${{ env.pyver == '3.7' && 'mkdocs gh-deploy --force' || true }}"
