@@ -15,11 +15,11 @@ defaults:
 env:
   LANG: "en_US.utf-8"
   LC_ALL: "en_US.utf-8"
-  POETRY_VIRTUALENVS_IN_PROJECT: "true"
-  PYTHONIOENCODING: "UTF-8"
-  PROJECT: "devapps"
   MC: "/home/runner/miniconda3"
   PATH: "$(MC)/bin:/home/runner/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"
+  POETRY_VIRTUALENVS_IN_PROJECT: "true"
+  PROJECT: "devapps"
+  PYTHONIOENCODING: "UTF-8"
   conda_project_tools: "tmux poetry graphviz imagemagick"
   versioning: calver # for git-changelog
 
@@ -36,6 +36,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: AllowSystemdUser
+        shell: bash -l {0}
+        run: loginctl enable-linger runner
 
       - name: Set up the Miniconda Root Cache
         uses: actions/cache@v2
