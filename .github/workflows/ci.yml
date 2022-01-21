@@ -17,7 +17,7 @@ env:
   LC_ALL: "en_US.utf-8"
   POETRY_VIRTUALENVS_IN_PROJECT: "true"
   PYTHONIOENCODING: "UTF-8"
-  PROJECT: "docutools"
+  PROJECT: "devapps"
   MC: "/home/runner/miniconda3"
   PATH: "$(MC)/bin:/home/runner/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"
   conda_project_tools: "tmux poetry graphviz imagemagick"
@@ -69,13 +69,13 @@ jobs:
         shell: bash -l {0}
         env:
           pyver: "${{ matrix.python-version }}"
-        run: "pkill tmux; source ./make -a && ( tmux ls || true ) && poetry debug && make tests"
+        run: "source ./make -a && make tests"
 
       - name: Test Docs LiterateProgramming
         shell: bash -l {0}
         env:
           pyver: "${{ matrix.python-version }}"
-        run: "source ./make -a && ( tmux ls || true ) && poetry debug && make docs"
+        run: "source ./make -a && make docs"
       - name: Deploy Docs
         shell: bash -l {0}
         env:
