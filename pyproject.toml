@@ -119,6 +119,7 @@ docutools = "^2022.1.21"
 #pytest-xdist = "^2.1.0"
 
 [tool.poetry.scripts]
+myapp = "devapp.plugin_tools:main"
 ops = "devapp.plugin_tools:main"
 app = "devapp.plugin_tools:main"
 
