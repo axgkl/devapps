@@ -17,12 +17,11 @@ env:
   LC_ALL: "en_US.utf-8"
   POETRY_VIRTUALENVS_IN_PROJECT: "true"
   PYTHONIOENCODING: "UTF-8"
-  PROJECT: "devapps"
+  PROJECT: "docutools"
   MC: "/home/runner/miniconda3"
   PATH: "$(MC)/bin:/home/runner/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"
+  conda_project_tools: "tmux poetry graphviz imagemagick"
   versioning: calver # for git-changelog
-  async_framework: gevent
-  #XDG_RUNTIME_DIR: "/run/user/1001"
 
 jobs:
   tests:
@@ -34,56 +33,51 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: ["3.7", "3.8"]
+
     steps:
-      - name: UserLinger
-        shell: bash -l {0}
-        run: "loginctl enable-linger runner && echo done"
-      - name: EnvironShow
-        shell: bash -l {0}
-        run: "env | sort; echo $UID"
       - uses: actions/checkout@v2
+
       - name: Set up the Miniconda Root Cache
         uses: actions/cache@v2
         env:
-          cache_name: cache-miniconda-root
+          cache_name: miniconda-root-2
         with:
           path: ~/miniconda3
           key: ${{ runner.os }}-build-${{ env.cache_name }}
       - name: Install Miniconda Root
         shell: bash -l {0}
-        run: "source ./make && make ci_conda_root_env"
+        run: "source ./make && make ci-conda-root-env"
       - name: Conda info
         shell: bash -l {0}
         run: conda info
+
       - name: Set up the Miniconda Envs Cache
         # they delete unused ones after 7 days.
         uses: actions/cache@v2
         env:
-          cache_name: cache-miniconda-envs-3-${{ env.PROJECT }}_py${{ matrix.python-version }}_${{ hashFiles('pyproject.toml', 'scripts/**') }}
+          cache_name: miniconda-envs-3-${{ env.PROJECT }}_py${{ matrix.python-version }}_${{ hashFiles('pyproject.toml', 'scripts/**') }}
         with:
           path: ~/miniconda3/envs/${{ env.PROJECT }}_py${{ matrix.python-version }}
           key: ${{ runner.os }}-build-${{ env.cache_name }}
-
       - name: Install Miniconda PyEnv
         shell: bash -l {0}
         env:
           pyver: "${{ matrix.python-version }}"
-        run: "source ./make && make && make ci_conda_py_env"
+        run: "source ./make && make && make ci-conda-py-env"
 
       - name: Run tests
         shell: bash -l {0}
         env:
           pyver: "${{ matrix.python-version }}"
-        run: "source ./make && activate_venv && make tests"
+        run: "source ./make -a && make tests"
 
       - name: Test Docs LiterateProgramming
         shell: bash -l {0}
         env:
           pyver: "${{ matrix.python-version }}"
-        run: "source ./make && activate_venv && make docs"
-
+        run: "source ./make -a && make docs"
       - name: Deploy Docs
         shell: bash -l {0}
         env:
           pyver: "${{ matrix.python-version }}"
-        run: "source ./make && activate_venv && ${{ env.pyver == '3.7' && 'mkdocs gh-deploy --force' || true }}"
+        run: "source ./make -a && ${{ env.pyver == '3.7' && 'mkdocs gh-deploy --force' || true }}"

@@ -1,15 +1,40 @@
 # vim: ft=bash
-# KEEP THIS FILE GENERIC - INDEPENDENT of PROJECT. THAT IS ALL IN ENVIRON FILE
+about='
+Development Shortcuts
+
+Purpose: Makefile like access to standard operations.
+
+KEEP THIS FILE GENERIC - INDEPENDENT of PROJECT.
+
+Add project specific kvs to an environ file, which you source (automatically?) when entering this directory.
+
+Known KVs for environ file - with examples:
+
+
+PROJECT                      = "docutools"
+blacklisted_words            = "$(pass show sensitive/axgkl)" # list of '::' seperated words to fail when occurring in committed files
+browser                      = "chromium-browser" # for browser screenshots
+conda_tools                  = "tmux poetry graphviz imagemagick" # will be installed when using ci-conda-py-env for venv
+google_analytics_key         = "$(pass show google/analytics_key_blog 2>/dev/null)"
+mkdocs_port                  = 2222
+nodejs                       = "source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate nodejs && node" # for browser screenshots
+pyver                        = "3.7" # min version
+versioning                   = calver  # for git changelog
+'
+
 set -a
 M="\x1b[1;32m"
 O="\x1b[0m"
 T1="\x1b[48;5;255;38;5;0m"
 T2="\x1b[48;5;124;38;5;255m"
-XDG_RUNTIME_DIR=/run/user/$UID
+XDG_RUNTIME_DIR=/run/user/$UID # for systemd --user mode
 TERMINAL="${TERMINAL:-st}"
+VERSION_MAKE="1"
+mkdocs_path="${mkdocs_path:-$PROJECT}"
 mkdocs_port="${mkdocs_port:-8000}"
 d_cover_html="${d_cover_html:-build/coverage/overall}"
 set +a
+
 
 nfo() { test -z "$2" && echo -e "${M}$*$O" >&2 || h1 "$@"; }
 h1()  { local a="$1" && shift && echo -e "$T1 $a $T2 $* $O" >&2; }
@@ -39,6 +64,8 @@ activate_venv() {
     test -e "$conda_env" || { nfo "No $conda_env"; return 1; }
     test -z "$CONDA_SHLVL" && conda_act
     test "$CONDA_PREFIX" = "${conda_env:-x}" && return 0
+    nfo 'Adding conda root env $PATH'
+    export PATH="$(conda_root)/bin:$PATH"
     nfo Activating "$conda_env"
     conda activate "$conda_env"
 }
@@ -61,13 +88,17 @@ conda_act () {
     conda config --add channels conda-forge
 }
 # ----------------------------------------------------------------------------------------- Make Functions:
-
-function ci_conda_root_env { # creates the root conda env if not present yet
-    source scripts/conda.sh && make_conda_root_env
+function self-update {
+    source scripts/self_update
+    run_self_update "$@"
 }
 
-function ci_conda_py_env { # creates the venv for the project and poetry installs
-    source scripts/conda.sh && make_conda_py_env
+function ci-conda-root-env { # creates the root conda env if not present yet
+    source scripts/conda.sh && make_conda_root_env "$@"
+}
+
+function ci-conda-py-env { # creates the venv for the project and poetry installs
+    source scripts/conda.sh && make_conda_py_env "$@"
 }
 
 function badges { # inserts badges into readme. defunct for now
@@ -93,9 +124,10 @@ function clean {
         sh rm -rf "$i"
     done
 }
-function clean_lp_caches {
+
+function clean-lp-caches {
     find . -print |grep '\.lp.py'
-    echo 'ok to delete all? (ctrl-c otherwise)'
+    echo 'ok to delete all cached lp eval results? (ctrl-c otherwise)'
     read -n ok
     find . -print |grep '\.lp.py' | xargs rm -f
 }
@@ -120,13 +152,13 @@ function docs {
     combine_coverage # so that at mkdocs gh-deploy the docu build can copy the files
 }
 
-function docs_checklinks {
+function docs-checklinks {
     type linkchecker || { echo "pip3 install git+https://github.com/linkchecker/linkchecker.git"; return 1; }
     # we ignore the x.json links of callflow svgs - they are rewritten in lc.js browser sided:
     linkchecker site --ignore-url '(.*).json' "$@"
 }
 
-function docs_serve {
+function docs-serve {
     export lp_eval="${lp_eval:-on_page_change}"
     echo $lp_eval
     ps ax| grep mkdocs | grep serve | grep $mkdocs_port | xargs | cut -d ' ' -f1 | xargs kill 2>/dev/null
@@ -166,8 +198,8 @@ function release {
 ## Function Aliases:
 
 d()   { docs               "$@" ; }
-ds()  { docs_serve         "$@" ; }
-clc() { clean_lp_caches    "$@" ; }
+ds()  { docs-serve         "$@" ; }
+clc() { clean-lp-caches    "$@" ; }
 rel() { release            "$@" ; }
 t()   { tests              "$@" ; }
 sm()  { source ./make;   } # after changes

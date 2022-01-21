@@ -2,20 +2,20 @@
                                                'expect': False,
                                                'timeout': 2},
                                        'res': '$ poetry shell      \n'
-                                              '/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/setuptools/command/install.py:37: '
-                                              'SetuptoolsDeprecationWarning: '
-                                              'setup.py install is deprecated. '
-                                              'Use build and pip and other '
-                                              'standards-based '
-                                              'tools.                           \n'
-                                              '  '
-                                              'setuptools.SetuptoolsDeprecationWarning,                                      \n'
-                                              'Virtual environment already '
-                                              'activated: '
-                                              '\x1b[34m/home/gk/miniconda3/envs/devapps_py3.7\x1b[39m   \n'
-                                              '$'},
+                                              'Spawning shell within '
+                                              '\x1b[34m/home/gk/miniconda3/envs/docutools_py3.7\x1b[39m                  \n'
+                                              '. '
+                                              '/home/gk/miniconda3/envs/docutools_py3.7/bin/activate                         \n'
+                                              '[gk@axgk devapps]$ . '
+                                              '/home/gk/miniconda3/envs/docutools_py3.7/bin/activate      \n'
+                                              'bash: '
+                                              '/home/gk/miniconda3/envs/docutools_py3.7/bin/activate: '
+                                              'No such file or '
+                                              'directory              \n'
+                                              '[gk@axgk devapps]$'},
                                       {'cmd': 'ops -h',
-                                       'res': '$ ops -h      \n'
+                                       'res': '[gk@axgk devapps]$ ops '
+                                              '-h                             \n'
                                               '\n'
                                               'Usage: ops ACTION '
                                               '[--flag[=value] ...]  \n'

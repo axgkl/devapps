@@ -12,7 +12,7 @@ environ activation in case of a pip(x) based install).
 
 Verification:
 
-```bash lp fmt=xt_flat new_session=project asserts=devapps_py3
+```bash lp fmt=xt_flat new_session=project asserts=devapps_py3 eval=always
 poetry debug
 ```
 

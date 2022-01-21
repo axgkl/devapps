@@ -12,7 +12,15 @@ FLG = devapp.tools.FLG
 
 # from lcdoc.py_test.auto_docs import gen_mod_doc
 
+# for CFL - this needs the docs_dir, which it picks from a project config
+# (*not* a devapps project, but mkdocs config)
 import lcdoc.call_flows.call_flow_logging as cfl
+from lcdoc.tools import project as docs_project, dirname as d
+
+# we nail this - in actual lp we have the mkdocs.yml, since then running under mkdocs:
+docs_project.root({'docs_dir': d(d(__file__)) + '/docs'})
+assert 'tests' in os.listdir(docs_project.root())
+
 
 # from lcdoc.auto_docs import mod_doc
 

@@ -1,17 +1,22 @@
-Name                                                                                                    Stmts   Miss Branch BrPart     Cover
---------------------------------------------------------------------------------------------------------------------------------------------
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/__init__.py                        2      0      0      0   100.00%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/const.py                           8      0      2      0   100.00%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/log.py                            90     32     45      4    62.22%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lp.py                            499    486    244      0     1.75%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lp_session.py                    204    204     72      0     0.00%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lprunner.py                      207    202     82      0     1.73%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/blacklist/__init__.py      27     21     14      0    19.51%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/lp/__init__.py            530    520    234      0     1.31%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/replace/__init__.py       141    112     70      0    17.54%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/tools.py                  244    182    111      4    23.10%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/tools.py                         234    191    116      3    13.71%
-tests/__init__.py                                                                                           4      4      0      0     0.00%
-tests/test_app.py                                                                                          43     43     10      0     0.00%
---------------------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                    2233   1997   1000     11     9.25%
+Name                                                                                                        Stmts   Miss Branch BrPart     Cover
+------------------------------------------------------------------------------------------------------------------------------------------------
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/__init__.py                            7      2      2      1    66.67%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/const.py                               8      0      2      0   100.00%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/log.py                                90     21     45      9    74.07%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lp.py                                499    173    244     56    60.83%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lp_session.py                        204     59     72     25    66.67%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lprunner.py                          207    153     82      3    24.57%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/blacklist/__init__.py          27      5     14      4    78.05%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/find_pages/__init__.py        111     82     57      2    22.02%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/lp/__init__.py                530    208    234     39    54.58%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/lp/plugs/bash/__init__.py      40     24     20      3    35.00%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/markdown.py                    58     38     44      7    28.43%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/page_tree/__init__.py          43      6     14      2    85.96%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/replace/__init__.py           141     95     70      6    28.44%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/stats/__init__.py             118     13     80     20    82.32%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/tools.py                      244     99    111     16    55.49%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/tools.py                             234    136    116     20    36.57%
+tests/__init__.py                                                                                               4      4      0      0     0.00%
+tests/test_app.py                                                                                              46     46     10      0     0.00%
+------------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                        2611   1164   1217    213    51.10%
