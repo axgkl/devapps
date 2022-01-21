@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "devapps"
-version = "2021.1.22"
+version = "2022.1.22"
 description = "Apps - End to End."
 authors = ["Gunther Klessinger <g_kle_ss_ing_er@gmx.de>"]
 license = "BSD"
@@ -119,7 +119,6 @@ docutools = "^2022.1.21"
 #pytest-xdist = "^2.1.0"
 
 [tool.poetry.scripts]
-myapp = "devapp.plugin_tools:main"
 ops = "devapp.plugin_tools:main"
 app = "devapp.plugin_tools:main"
 
