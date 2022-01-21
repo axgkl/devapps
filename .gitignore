@@ -22,3 +22,5 @@ tmp/*
 # not works on github for the systemctl dbus commands at the end:
 # must check it in:
 # docs/projects/usage.md.lp.py
+
+docs/index.md.lp.py
