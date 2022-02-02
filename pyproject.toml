@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "devapps"
-version = "2022.1.22"
+version = "2022.02.03"
 description = "Apps - End to End."
 authors = ["Gunther Klessinger <g_kle_ss_ing_er@gmx.de>"]
 license = "BSD"
@@ -76,7 +76,7 @@ humanize   = "*"
 inflection = "*"
 lz4        = "*"
 msgpack    = "*"
-Rx         = "*"
+Rx         = "3.1.1" # must be fixed, 3.2.0 breaks lc-python test_build (timing)
 snoop      = "*"
 tabulate   = "*"
 requests   = "*"
@@ -86,7 +86,7 @@ cffi = "^1.15.0"
 
 
 [tool.poetry.dev-dependencies]
-docutools = "^2022.1.21"
+docutools = "^2022.02.02"
 ##docutools = "*"
 #autoflake = "^1.4"
 #axblack = "^20201010"
@@ -119,6 +119,7 @@ docutools = "^2022.1.21"
 #pytest-xdist = "^2.1.0"
 
 [tool.poetry.scripts]
+myapp = "devapp.plugin_tools:main"
 ops = "devapp.plugin_tools:main"
 app = "devapp.plugin_tools:main"
 

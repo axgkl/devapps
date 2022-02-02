@@ -15,12 +15,6 @@ FLG = devapp.tools.FLG
 # for CFL - this needs the docs_dir, which it picks from a project config
 # (*not* a devapps project, but mkdocs config)
 import lcdoc.call_flows.call_flow_logging as cfl
-from lcdoc.tools import project as docs_project, dirname as d
-
-# we nail this - in actual lp we have the mkdocs.yml, since then running under mkdocs:
-docs_project.root({'docs_dir': d(d(__file__)) + '/docs'})
-assert 'tests' in os.listdir(docs_project.root())
-
 
 # from lcdoc.auto_docs import mod_doc
 
@@ -31,13 +25,9 @@ def test_run_app_show_flags(we_are_in_app_process=False):
     """
     # we'll run the test app in a subprocess - there can only be one app:
     if we_are_in_app_process:
+        fn_md, plot = cfl.init_mod_doc(__file__)
 
-        # fn = mod_doc(app_module, dest='auto')
-        fn = '/tmp/foo.md'
-        with open(fn, 'w') as fd:
-            fd.write('')
-
-        @cfl.document(trace=(app_module, devapp.tools), dest=fn)
+        @cfl.document(trace=(app_module, devapp.tools), dest=fn_md)
         def test_start_app():
             """A test function which starts an app
             """
