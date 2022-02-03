@@ -2,13 +2,13 @@ Name                                                                            
 -----------------------------------------------------------------------------------------------------------------------------------------
 /home/gk/repos/docutools/src/lcdoc/__init__.py                                                           7      2      2      1    66.67%
 /home/gk/repos/docutools/src/lcdoc/const.py                                                              8      0      2      0   100.00%
-/home/gk/repos/docutools/src/lcdoc/log.py                                                               90     21     45      8    74.81%
+/home/gk/repos/docutools/src/lcdoc/log.py                                                               90     21     45      9    74.07%
 /home/gk/repos/docutools/src/lcdoc/lp.py                                                               499    156    244     54    65.55%
 /home/gk/repos/docutools/src/lcdoc/lp_session.py                                                       204     50     72     18    73.19%
 /home/gk/repos/docutools/src/lcdoc/lprunner.py                                                         207    153     82      3    24.57%
 /home/gk/repos/docutools/src/lcdoc/mkdocs/blacklist/__init__.py                                         27      5     14      4    78.05%
 /home/gk/repos/docutools/src/lcdoc/mkdocs/find_pages/__init__.py                                       111     82     57      2    22.02%
-/home/gk/repos/docutools/src/lcdoc/mkdocs/lp/__init__.py                                               530    160    234     36    66.23%
+/home/gk/repos/docutools/src/lcdoc/mkdocs/lp/__init__.py                                               530    163    234     37    65.45%
 /home/gk/repos/docutools/src/lcdoc/mkdocs/lp/plugs/bash/__init__.py                                     40      4     20      5    85.00%
 /home/gk/repos/docutools/src/lcdoc/mkdocs/lp/plugs/lightbox/__init__.py                                 37     19     10      1    40.43%
 /home/gk/repos/docutools/src/lcdoc/mkdocs/lp/plugs/make_badges/__init__.py                              91      6     24      3    92.17%
@@ -35,4 +35,4 @@ Name                                                                            
 tests/__init__.py                                                                                        4      4      0      0     0.00%
 tests/test_app.py                                                                                       41     41     10      0     0.00%
 -----------------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                 3454   1406   1492    243    55.80%
+TOTAL                                                                                                 3454   1409   1492    245    55.66%
