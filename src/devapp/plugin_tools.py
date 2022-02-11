@@ -73,7 +73,7 @@ def main(argv=None):
     find_plugins(n_app)
     if not plugins():
         msg = (
-            'No plugins found. Create plugins/%s_<namespace>/ folder(s), '
+            'No plugins found. Create <namespace>/plugins/%s_<namespace>/ folder(s), '
             'containing importable python modules.'
         )
         print(msg % n_app)

@@ -3,6 +3,7 @@
 Here is how you create or extend tools with plugins, callable like `<toolname> <pluginname> [plugin flags]`.
 
 !!! note "Git Analogy"
+
     In this terminology, "git" would be the name of the tool, "checkout" would be the name of the plugin.
 
 
@@ -14,6 +15,7 @@ In your `pyproject.toml` add the name of the tool within the `scripts` section l
 
 ```python lp hide_cmd=True mode=python
 from devapp.tools import read_file, write_file
+
 fn, sect = 'pyproject.toml', '[tool.poetry.scripts]'
 app = '\nmyapp = "devapp.plugin_tools:main"'
 s = read_file(fn)
@@ -25,8 +27,8 @@ print(sect + app)
 
 This makes the tool available, with no plugins yet:
 
-```bash lp  fmt=xt_flat session=plugins
-[{"cmd": "poetry install", "timeout": 10}, "mytool -h"]
+```bash lp fmt=xt_flat
+[{"cmd": "poetry install", "timeout": 10}, "myapp -h || true"]
 ```
 
 We are ready to create plugins:
@@ -37,8 +39,8 @@ The package name at the end is to allow "higher order repos" to supply plugins w
 
 For the demo we pick the `devapp` package within this repo, `devapps`:
 
-```bash lp  fmt=xt_flat session=plugins
-mkdir -p "src/devapp/plugins/myapp_devapp"
+```bash lp fmt=xt_flat asserts="myapp_devapp"
+mkdir -p "src/devapp/plugins/myapp_devapp" && ls "src/devapp/plugins" && pwd
 ```
 
 Then we create a demo plugin:
@@ -47,7 +49,6 @@ Then we create a demo plugin:
 """
 Saying Hello
 """
-
 
 from functools import partial
 
@@ -68,7 +69,6 @@ class Flags:
 # --------------------------------------------------------------------------- app
 def greet(name):
     print('Hey, %s!' % name)
-    app.info('greeted', name=name)
 
 
 def run():
@@ -80,13 +80,23 @@ main = partial(run_app, run, flags=Flags)
  
 The plugin is now available:
 
-```bash lp  fmt=xt_flat session=plugins
-['myapp sh -h', 'myapp sh -gn Joe']
+```bash lp fmt=xt_flat asserts="Hey, Joe"
+['myapp -h', 'myapp sh -lf 2 -gn Joe']
 ```
 
 
 - Further plugins for our `myapp` tool are now simply added into this directory
-- Higher order repos can add their own plugins for `myapp`, following the directory convention given above
+
+## Extending a Given Tool
+
+Higher order repos (dependend/derived on devapp) can add their own plugins for `myapp`, following
+the directory convention given above.
+
+Means: A package "foo" depending on devapp may add a `/src(of_foo
+package)/bar/plugins/myapp_bar/bettergreeter.py`, so that myapp has now also a better greeter.
+
+Derived package foo may also *change* the behaviour of the "say_hello" plugin of "myapp" by
+providing this module as well.
 
 
 
@@ -97,6 +107,7 @@ fn = 'pyproject.toml'
 app = '\nmyapp = "devapp.plugin_tools:main"'
 write_file(fn, read_file(fn).replace(app, ''))
 ```
+
 
 ```bash lp  silent=True
 /bin/rm -rf "src/devapp/plugins/myapp_devapp"

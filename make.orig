@@ -35,9 +35,6 @@ mkdocs_port="${mkdocs_port:-8000}"
 d_cover_html="${d_cover_html:-build/coverage/overall}"
 set +a
 
-me="${BASH_SOURCE[0]:-${(%):-%x}}" # bash and zsh/ksh compliant
-here="$(builtin cd "$(dirname "$me")" && pwd)"
-
 
 nfo() { test -z "$2" && echo -e "${M}$*$O" >&2 || h1 "$@"; }
 h1()  { local a="$1" && shift && echo -e "$T1 $a $T2 $* $O" >&2; }
@@ -75,8 +72,12 @@ activate_venv() {
 
 set_version() {
     if [ "${versioning:-}" = "calver" ]; then
-            version="$(date "+%Y.%m.%d")"
+        local M="$(date "+%m" | sed -e 's/^0//g')"
+        local D="$(date "+%d" | sed -e 's/^0//g')"
+        test -z "${1:-}" && {
+            version="$(date "+%Y.$M.%D")"
             return 0
+        }
     fi
     nfo "Say ./make release <version>"
     return 1
@@ -221,13 +222,4 @@ make() {
     }
 }
 
-test -n "$sourcing_make" && return 0
-if [[ "${1:-}" == "-e" ]]; then
-    shift
-    sourcing_make=true
-    nfo "Sourcing ./environ"
-    set -a; source ./environ; set +a
-    unset sourcing_make
-fi
 if [[ "${1:-}" == "-a" ]]; then activate_venv; fi
-[[ -d "$here/bin" ]] && [[ "$PATH" != *"$here/bin:"* ]] && PATH="$here/bin:$PATH" || true # add bin folder if present to PATH

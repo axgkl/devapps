@@ -25,3 +25,4 @@ tmp/*
 
 docs/index.md.lp.py
 src/devapp/plugins/myapp_devapp/say_hello.py
+docs/dev/plugins.md.lp.py
