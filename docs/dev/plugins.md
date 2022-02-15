@@ -92,13 +92,35 @@ The plugin is now available:
 Higher order repos (dependend/derived on devapp) can add their own plugins for `myapp`, following
 the directory convention given above.
 
-Means: A package "foo" depending on devapp may add a `/src(of_foo
-package)/bar/plugins/myapp_bar/bettergreeter.py`, so that myapp has now also a better greeter.
+Means: A package "foo" depending on devapp may add a
+
+    /src(of_foo package)/bar/plugins/myapp_bar/bettergreeter.py
+
+so that the `myapp` tool has a better greeter plugin.
 
 Derived package foo may also *change* the behaviour of the "say_hello" plugin of "myapp" by
 providing this module as well.
 
 
+Here is how you "patch" a given module, e.g. the `project` plugin of the `ops` tool, from a devapps
+derived package (here `lc-python`):
+
+```python
+~/repos/lc-python/sr/o/p/ops_operators master !3 ?1 ❯ pwd
+/home/gk/repos/lc-python/src/operators/plugins/ops_operators
+~/repos/lc-python/sr/o/p/ops_operators master !3 ?1 ❯ cat project.py
+from devapp.plugins.ops_devapp.project import *
+
+
+class Flags(Flags):
+    'defined here, so that ops project -h works correctly'
+
+# (overwrite your stuff here)
+
+main = lambda: run_app(run, flags=Flags)
+```
+
+.
 
 ```python lp silent=True mode=python
 # cleaning up: 

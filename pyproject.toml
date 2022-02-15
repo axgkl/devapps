@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "devapps"
-version = "2022.02.04"
+version = "2022.02.15"
 description = "Apps - End to End."
 authors = ["Gunther Klessinger <g_kle_ss_ing_er@gmx.de>"]
 license = "BSD"
@@ -86,7 +86,7 @@ cffi = "^1.15.0"
 
 
 [tool.poetry.dev-dependencies]
-docutools = "^2022.02.11"
+docutools = "^2022.02.15"
 ##docutools = "*"
 #autoflake = "^1.4"
 #axblack = "^20201010"

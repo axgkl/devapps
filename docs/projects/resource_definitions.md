@@ -2,10 +2,19 @@
 
 Here the mechanics for defining resources.
 
+Those must be defined in `<namespace>/operations/resources.py` files.
 
 
 !!! hint
+
     Check existing resources.py files in other devapp repos for further examples.
+
+    ```bash
+    # find devapp's resources files:
+    l="$(python -c 'import devapp; print(devapp.__file__)')"
+    cd "$(dirname $l)"
+    find . -print |grep resources.py
+    ```
 
 ## Postinstall Functions
 
