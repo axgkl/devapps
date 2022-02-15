@@ -86,7 +86,7 @@ cffi = "^1.15.0"
 
 
 [tool.poetry.dev-dependencies]
-docutools = "^2022.02.15"
+docutools = "^2022.02.16"
 ##docutools = "*"
 #autoflake = "^1.4"
 #axblack = "^20201010"

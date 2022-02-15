@@ -161,7 +161,7 @@ jinja2 = ">=2.10,<3.0"
 
 [[package]]
 name = "docutools"
-version = "2022.2.15"
+version = "2022.2.16"
 description = "Documentation Tools for the Mkdocs Material Framework"
 category = "dev"
 optional = false
@@ -179,7 +179,7 @@ markdown-include = ">=0.6.0,<0.7.0"
 mkdocs = ">=1.1.2,<2.0.0"
 mkdocs-exclude = ">=1.0.2,<2.0.0"
 mkdocs-macros-plugin = ">=0.5.12,<0.6.0"
-mkdocs-material = ">=7,<8"
+mkdocs-material = ">=8,<9"
 mkdocs-pymdownx-material-extras = ">=1.1.3,<2.0.0"
 pycond = "*"
 pytest = ">=6.0.1,<7.0.0"
@@ -515,11 +515,11 @@ test = ["mkdocs-macros-test", "mkdocs-material (>=6.2)", "mkdocs-include-markdow
 
 [[package]]
 name = "mkdocs-material"
-version = "7.3.6"
+version = "8.1.11"
 description = "A Material Design theme for MkDocs"
 category = "dev"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [package.dependencies]
 jinja2 = ">=2.11.1"
@@ -981,7 +981,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "e0f5195fe883823c9670ce7db5f69970363afbaa0f3dbb23a3936a650c3abf80"
+content-hash = "9a4843baec64b0eeea8f999903696813cd43bcc0da01482d236fb1bd2264c82e"
 
 [metadata.files]
 absl-py = [
@@ -1132,8 +1132,8 @@ diagrams = [
     {file = "diagrams-0.20.0.tar.gz", hash = "sha256:a50743ed9274e194e7898820f69aa12868ae217003580ef9e7d0285132c9674a"},
 ]
 docutools = [
-    {file = "docutools-2022.2.15-py3-none-any.whl", hash = "sha256:bae0e790ed81a8cd7b494c2b67ebd73036d7ee3073247046996990bc70907f82"},
-    {file = "docutools-2022.2.15.tar.gz", hash = "sha256:1bd59ad2a53483608082cd0e4a703194ef6e9c7fd7b91883f569b9f9fa6b100c"},
+    {file = "docutools-2022.2.16-py3-none-any.whl", hash = "sha256:d0fe20127e748c6a9df75e7788433eeb436f666f81c845ac0877444704368e71"},
+    {file = "docutools-2022.2.16.tar.gz", hash = "sha256:f71e8298a0baf9810ef7b96ce5d4023f1bd102886b02ec6ea7c70c99d8f6a279"},
 ]
 execnet = [
     {file = "execnet-1.9.0-py2.py3-none-any.whl", hash = "sha256:a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142"},
@@ -1367,8 +1367,8 @@ mkdocs-macros-plugin = [
     {file = "mkdocs_macros_plugin-0.5.12-py3-none-any.whl", hash = "sha256:43b7ea0259e2e18a7fe52b73a548c5ea38bb99bc9ab37d026cbdd42e45769c65"},
 ]
 mkdocs-material = [
-    {file = "mkdocs-material-7.3.6.tar.gz", hash = "sha256:1b1dbd8ef2508b358d93af55a5c5db3f141c95667fad802301ec621c40c7c217"},
-    {file = "mkdocs_material-7.3.6-py2.py3-none-any.whl", hash = "sha256:1b6b3e9e09f922c2d7f1160fe15c8f43d4adc0d6fb81aa6ff0cbc7ef5b78ec75"},
+    {file = "mkdocs-material-8.1.11.tar.gz", hash = "sha256:091bafac6978db7eec5660cd5142cee24efdb6a2d8235a2b2cc84d527cffb414"},
+    {file = "mkdocs_material-8.1.11-py2.py3-none-any.whl", hash = "sha256:03c9b202ed579899bbc7730d0f37e871fbc3a711d70549ca04ecb23adbb8164f"},
 ]
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.3.tar.gz", hash = "sha256:bfd24dfdef7b41c312ede42648f9eb83476ea168ec163b613f9abd12bbfddba2"},
