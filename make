@@ -216,7 +216,7 @@ function release {
     sh tests
     #sh cover # cov reports created on ci
     # create a new changelog, this is committed, since on CI --depth=1:
-    sh rm docs/about/changelog.md.lp.py
+    sh rm -f docs/about/changelog.md.lp.py
     lp_eval=changelog docs
     sh docs
     sh poetry build
