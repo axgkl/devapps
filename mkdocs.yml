@@ -73,7 +73,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed
   - pymdownx.tasklist:
-      custom_checkbox: true
+      alternate_style: true
   - pymdownx.details
   - markdown.extensions.tables
   - markdown.extensions.footnotes

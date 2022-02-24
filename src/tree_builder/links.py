@@ -9,7 +9,7 @@ def port_from_preset(p):
 from urllib.parse import urlsplit, parse_qsl
 
 
-def parse_via(url, props=None, default_port=None, add_caps_str=False):
+def parse_via(url, props=None, default_port=None, add_caps_str=False, cast=False):
     """
     'mysql+pymysql://root@127.0.0.1:3306/diameap' to
     {'caps': ['mysql', 'pymysql'],
@@ -85,8 +85,13 @@ def parse_via(url, props=None, default_port=None, add_caps_str=False):
         m['caps'].extend([i[1] for i in s])
     if add_caps_str:
         m['caps_str'] = '+'.join(m['caps'])
+    if cast:
+        for k, v in m.items():
+            m[k] = cast_str(v) if isinstance(v, str) else v
     return m
 
+
+from devapp.tools import cast as cast_str
 
 isconn = lambda c: getattr(c, '__isconn__', False)
 
@@ -351,9 +356,7 @@ def add_link(ports=None):
         if not s(k, 'ext_') and not s(k, '_'):
             p = int(getattr(ports, k))
             if p + offs > 655535 or p + offs < 10:
-                raise Exception(
-                    'Port must be 10 < port < 655535. have  %s' % (p + port)
-                )
+                raise Exception('Port must be 10 < port < 655535. have  %s' % (p + port))
             setattr(ports, k, p + offs)
     return connect
 

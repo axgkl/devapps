@@ -123,7 +123,6 @@ def all_plugin_dirs(name):
     all = {}
 
     def scan_sys_pth(d, all=all, exists=os.path.exists, name=name):
-        breakpoint()  # FIXME BREAKPOINT
         for l in os.listdir(d):
             n = '%s/%s/plugins/%s_%s' % (d, l, name, l)
             if exists(n):

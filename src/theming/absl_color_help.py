@@ -382,8 +382,8 @@ def color_usage(*a, main_module, full=None, **kw):
     j['match'] = '[matching %s]' % match_hilite if match else ''
 
     if match:
-        n = 'All supported' if full else 'Main'
-        add('%s command line flags %s:' % (n, j['match']))
+        n, n1 = ('All supported', '') if full else ('Main', ' (-hf for all flags)')
+        add('%s command line flags %s%s:' % (n, j['match'], n1))
     if hof != 'terminal':
         r = tabulate()
 
@@ -430,11 +430,15 @@ def exit_at_help_flag(main, argv):
         return
 
     mod = find_module(main)
+    if argv[-1] == mod.__name__:
+        # plugin_tools overwrite -h with -hf <module name>:
+        full = None
     if not mod:
         print('No module for function found: %s' % main)
         sys.exit(1)
+    i = argv.index(a)
     if a != '--helpfull':
-        argv[argv.index(a)] = '--helpfull'
+        argv[i] = '--helpfull'
 
     h = color_usage(main_module=mod, full=full)
     print(''.join(h))

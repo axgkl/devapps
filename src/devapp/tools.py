@@ -103,7 +103,7 @@ def flatten(d, sep='_'):
     return obj
 
 
-def cast(v):
+def cast(v, bools={'true': True, 'True': True, 'false': False, 'False': False}):
     if v and v[0] in ('{', '['):
         return json.loads(v)
     try:
@@ -112,7 +112,7 @@ def cast(v):
         try:
             return float(v)
         except:
-            return {'true': True, 'false': False}.get(v, v)
+            return bools.get(v, v)
 
 
 # --------------------------------------------------------------------------------- tty
@@ -552,9 +552,7 @@ def wait_for_port(port, host='127.0.0.1', timeout=5.0, log_err=True):
                     print('timeout awaiting port %s' % port)
 
 
-def repl_dollar_var_with_env_val(
-    s, die_on_fail=True, ask_on_fail=False, get_vals=False
-):
+def repl_dollar_var_with_env_val(s, die_on_fail=True, ask_on_fail=False, get_vals=False):
     """
     s = foo_$bar.or${baz}  - the first form searched until first non Letter char
     Will be replaced by value of environ for $bar and $baz
@@ -894,9 +892,7 @@ class LazyDict(dict):
         return (
             self[key]
             if key in self
-            else dict.setdefault(
-                self, key, thunk(*a, **kw) if callable(thunk) else thunk
-            )
+            else dict.setdefault(self, key, thunk(*a, **kw) if callable(thunk) else thunk)
         )
 
 
@@ -1087,13 +1083,12 @@ def set_flag_vals_from_env():
 
 def shorten(key, prefix, maxlen, all_shorts=None, take=1):
     take, sold = 1, None
-    while True:
-        s = autoshort(key, prefix, maxlen, take)
+    for i in range(10):
+        s = autoshort(key, prefix, maxlen + i, take)
         if not s in all_shorts:
             return s
-        if s == sold:
-            raise Exception('Unresolvable collision in autoshort names: %s' % key)
-        sold, take, maxlen = s, take + 1, maxlen + 0
+    if s == sold:
+        raise Exception('Unresolvable collision in autoshort names: %s' % key)
 
 
 def autoshort(key, prefix, maxlen, take=1):
@@ -1141,8 +1136,6 @@ all_flag_shorts = {}
 def make_flag(c, module, autoshort, default, sub=False, **kw):
     g = getattr
     key = orig_key = c.__name__
-    # if key == 'verbose':
-    #     breakpoint()  # FIXME BREAKPOINT
     if sub and not sub == 'Actions':
         key = sub + '_' + key
     d = g(c, 'd', default)  # when d is not given, what to do. Dictates the flag type.
@@ -1242,8 +1235,6 @@ def define_flags(Class, sub=False, parent_autoshort=False):
             doc = c.__doc__ or ''
             if doc.strip():
                 c.n = doc.strip().split('\n', 1)[0]
-        # if g(c, 's', None) == 'x':
-        #     breakpoint()  # FIXME BREAKPOINT
         cshrt.append(c) if g(c, 's', None) else c_no_shrt.append(c)
     # do the ones with shorts first, to collide only on autoshorts:
     [make_flag(c, **l) for c in cshrt + c_no_shrt]
@@ -1386,9 +1377,6 @@ class project:
             c['project']['urls']['repository'] = c['project']['repository']
 
         t = cfg['tool']
-        # breakpoint()  # FIXME BREAKPOINT
-        # c['app'] = t['poetry']
-        # c['app'].update(t.get('lc', {}).get('app', {}))
         project.fn_cfg = fn
         # app.die('Did not find a pyproject.toml file with badges declared')
         return project.config
