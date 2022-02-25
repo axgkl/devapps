@@ -71,8 +71,7 @@ markdown_extensions:
   - pymdownx.tilde
   - pymdownx.magiclink
   - pymdownx.superfences
-  - pymdownx.tabbed
-  - pymdownx.tasklist:
+  - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
   - markdown.extensions.tables

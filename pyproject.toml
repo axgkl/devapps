@@ -86,8 +86,8 @@ cffi = "^1.15.0"
 
 
 [tool.poetry.dev-dependencies]
-docutools = "^2022.02.16"
-##docutools = "*"
+#docutools = { path = "../docutools/", develop = true }
+docutools = "*"
 #autoflake = "^1.4"
 #axblack = "^20201010"
 ## one of last versions with site-packages/black.py - overridden by axblack:
