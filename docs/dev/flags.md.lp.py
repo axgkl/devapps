@@ -336,7 +336,7 @@
                                               '-mf 42.1 -mi 42 -mms a -mms b '
                                               '-mo bar -mom b -mom c -x a,b '
                                               '-ms b -lf plain\n'
-                                              '02-25 07:29:45\x1b[0m [info     '
+                                              '02-25 07:56:04\x1b[0m [info     '
                                               '\x1b[0m] Flag values (CLI over '
                                               'defaults):\x1b[0m '
                                               '[flagtest\x1b[0m] '
