@@ -133,7 +133,12 @@ class AppLogLevel:
 
         self.app = app
         self.level = level
-        self.was_level = app.log._logger.level
+        try:
+            self.was_level = app.log._logger.level
+        except Exception as ex:
+
+            print('init_app_parse_flags not yet ran')
+            raise
 
     def __enter__(self):
         self.app.log._logger.level = self.level

@@ -220,9 +220,13 @@ class Pytest:
             if v:
                 env[k] = str(v)
 
-    def init():
-        Pytest.set_sys_argv()
-        FLG(sys.argv)  # parsing the flags
+    def init(c=[0]):
+        if not c[0]:
+            Pytest.set_sys_argv()
+            FLG(sys.argv)  # parsing the flags
+        c[0] += 1
+        # from devapp.app import init_app_parse_flags
+        # init_app_parse_flags('testmode')
 
 
 import fcntl, termios, struct
@@ -552,7 +556,9 @@ def wait_for_port(port, host='127.0.0.1', timeout=5.0, log_err=True):
                     print('timeout awaiting port %s' % port)
 
 
-def repl_dollar_var_with_env_val(s, die_on_fail=True, ask_on_fail=False, get_vals=False):
+def repl_dollar_var_with_env_val(
+    s, die_on_fail=True, ask_on_fail=False, get_vals=False
+):
     """
     s = foo_$bar.or${baz}  - the first form searched until first non Letter char
     Will be replaced by value of environ for $bar and $baz
@@ -892,7 +898,9 @@ class LazyDict(dict):
         return (
             self[key]
             if key in self
-            else dict.setdefault(self, key, thunk(*a, **kw) if callable(thunk) else thunk)
+            else dict.setdefault(
+                self, key, thunk(*a, **kw) if callable(thunk) else thunk
+            )
         )
 
 
