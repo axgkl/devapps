@@ -121,6 +121,7 @@ docutools = "*"
 [tool.poetry.scripts]
 ops = "devapp.plugin_tools:main"
 app = "devapp.plugin_tools:main"
+dev = "devapp.plugin_tools:main"
 
 [tool.black]
 line-length = 90
