@@ -33,6 +33,7 @@ from devapp.tools import (
     write_file,
 )
 import devapp.resource_tools as api
+from devapp.plugins.ops_devapp.devinstall import dev_install
 
 
 class Flags(api.CommonFlags):
@@ -52,6 +53,10 @@ class Flags(api.CommonFlags):
     class init_at:
         n = 'Set up project in given directory. env vars / relative dirs supported.'
         d = ''
+
+    class dev_install:
+        n = 'Set the project up in developer mode - incl. make and poetry file machinery'
+        d = False
 
     class init_create_all_units:
         n = 'If set we create unit files for ALL service type resources'
@@ -219,6 +224,7 @@ def get_matching_resources():
 
 
 def run():
+
     if FLG.list_resources_files:
         rscs = get_matching_resources()
         app.info('Listing Defined Resources')
@@ -234,8 +240,10 @@ def run():
     # the project directory:
     d = FLG.init_at
     if not d:
-        app.error('No project dir given')
-        return
+        if FLG.dev_install:
+            FLG.init_at = d = '.'
+        else:
+            return app.error('No project dir given')
 
     d = repl_dollar_var_with_env_val(d)
     d = os.path.abspath(d)
@@ -270,6 +278,8 @@ def run():
 
     do(create_project_dirs)
     do(os.chdir, d)
+    if FLG.dev_install:
+        do(dev_install)
 
     for r in rscs:
         do(api.Install.resource, r, ll=10)

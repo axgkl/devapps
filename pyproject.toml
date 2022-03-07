@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "devapps"
-version = "2022.03.03"
+version = "2022.03.08"
 description = "Apps - End to End."
 authors = ["Gunther Klessinger <g_kle_ss_ing_er@gmx.de>"]
 license = "BSD"
@@ -33,6 +33,8 @@ discusshome = "https://join.skype.com/abc123"
 [tool.pyright]
 # thats where my dev version for dt is - should not interfere w/o that:
 extraPaths = ["../docutools/src"]
+reportSelfClsParameterName = false
+
 [tool.poetry.dependencies]
 # gevent after monkeypatch and structlog clash with 3.6:
 python = "^3.7"

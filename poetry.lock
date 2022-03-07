@@ -11,7 +11,7 @@ six = "*"
 
 [[package]]
 name = "anybadge"
-version = "1.8.0"
+version = "1.9.0"
 description = "Simple, flexible badge generator for project badges."
 category = "dev"
 optional = false
@@ -516,7 +516,7 @@ test = ["mkdocs-macros-test", "mkdocs-material (>=6.2)", "mkdocs-include-markdow
 
 [[package]]
 name = "mkdocs-material"
-version = "8.2.4"
+version = "8.2.5"
 description = "A Material Design theme for MkDocs"
 category = "dev"
 optional = false
@@ -990,8 +990,8 @@ absl-py = [
     {file = "absl_py-1.0.0-py3-none-any.whl", hash = "sha256:84e6dcdc69c947d0c13e5457d056bd43cade4c2393dce00d684aedea77ddc2a3"},
 ]
 anybadge = [
-    {file = "anybadge-1.8.0-py2.py3-none-any.whl", hash = "sha256:32edfb2e973ffc3ea7a8128610dbce8eace934b906a695b881e2fc23bb534842"},
-    {file = "anybadge-1.8.0.tar.gz", hash = "sha256:736cc6f23c1f29f79f6dc434b7fdc131c7a28abe44810d428c6b63d7c504709e"},
+    {file = "anybadge-1.9.0-py2.py3-none-any.whl", hash = "sha256:5f4d9dc81d1b816b688ed937cb94276fcb2a2dee46fbc03bab0f25a8b9f59251"},
+    {file = "anybadge-1.9.0.tar.gz", hash = "sha256:98cf380d284946c5c48ae00a3fe52ce8723880b88eb30fc0808610845034db3c"},
 ]
 asttokens = [
     {file = "asttokens-2.0.5-py2.py3-none-any.whl", hash = "sha256:0844691e88552595a6f4a4281a9f7f79b8dd45ca4ccea82e5e05b4bbdb76705c"},
@@ -1368,8 +1368,8 @@ mkdocs-macros-plugin = [
     {file = "mkdocs_macros_plugin-0.5.12-py3-none-any.whl", hash = "sha256:43b7ea0259e2e18a7fe52b73a548c5ea38bb99bc9ab37d026cbdd42e45769c65"},
 ]
 mkdocs-material = [
-    {file = "mkdocs-material-8.2.4.tar.gz", hash = "sha256:3c350a03e2f7288874f0a9cf5aacfbbb8721cc7d4e389b53169180ee2187223e"},
-    {file = "mkdocs_material-8.2.4-py2.py3-none-any.whl", hash = "sha256:7aa9ed562f68c8592dad3f568378c98a2350398445dbf46de373585b3cd9080e"},
+    {file = "mkdocs-material-8.2.5.tar.gz", hash = "sha256:cdfb39edc77f5c2bbfca02b4fc3764de38b2093eff121aed37674204439901ce"},
+    {file = "mkdocs_material-8.2.5-py2.py3-none-any.whl", hash = "sha256:95283c6af633809f32ba688fcf9bce4604af320e188d3e26fcb40d0e5ab9b823"},
 ]
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.3.tar.gz", hash = "sha256:bfd24dfdef7b41c312ede42648f9eb83476ea168ec163b613f9abd12bbfddba2"},
