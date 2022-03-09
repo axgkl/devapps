@@ -12,26 +12,39 @@ Usage:
 """
 
 
+import json
 import os
 import sys
-import traceback
+import time
 
 import structlog
-from devapp.tools import FLG, define_flags
+
+# class F:
+#     log_fmt = 'plain'
+#     log_level = 10
+#     log_time_fmt = '%m-%d %H:%M:%S'
+#     log_add_thread_name = True
+#     log_dev_fmt_coljson = []
+#     log_dev_coljson_style = ('paraiso-dark',)
+import ujson
 from pygments.styles import get_all_styles
 from structlog import BoundLoggerBase, PrintLogger, wrap_logger
 from structlog.exceptions import DropEvent
+from structlogging import stacktrace
 
 # -- Setup for a stdlib logging free, getattr free use:
 from structlog.processors import JSONRenderer
 from structlogging import processors as ax_log_processors
-from structlogging import renderers
+
+from devapp.tools import FLG, define_flags
 
 pygm_styles = list(get_all_styles())
 pygm_styles.extend(['light', 'dark'])
 
+log_stack_filter = [0]
 
-class flags:
+
+class flags(stacktrace.flags):
     autoshort = ''
 
     class log_level:
@@ -112,7 +125,7 @@ class AXLogger(BoundLoggerBase):
         # the frame will allow *pretty* powerful parametrization options
         # todo: allow that for the user
         # the lambda below is also a frame:
-        kw['_frame_'] = sys._getframe().f_back.f_back
+        # kw['_frame_'] = sys._getframe().f_back.f_back
         try:
             args, kw = self._process_event(_meth_od, event, kw)
         except DropEvent:
@@ -208,55 +221,20 @@ def censor_passwords(_, __, ev, _censored=censored):
     return ev
 
 
-def frame(f):
-    m = {}
-    m['pos'] = [f.lineno, f.filename]
-    m['line'] = f.line
-    # if not f.name == '<lambda>':
-    m['name'] = f.name
-    return m
-
-
-def add_exception_stack(_, __, ev):
-    """This filters out huge rx stacks, which are not useful at all normally.
-    """
-    if 'exc' in ev:
-        E = ev['exc']
-        if isinstance(E, Exception):
-            r = traceback.extract_tb(sys.exc_info()[2])
-            ev['stack'] = [
-                'Traceback',
-                [frame(l) for l in r if not '/rx/' in l.filename],
-                [E.__class__.__name__, E.args],
-            ]
-    return ev
-
-
-def add_stack_info(_, __, ev):
-    # from structlog._frames import _find_first_app_frame_and_name as ffafan
-
-    si = ev.pop('stack_info', 0)
-    if si and not 'stack' in ev:
-        # TODO make the non raise stack_info tbs also better, like the exc ones
-        ev['stack'] = traceback.format_stack(ev['_frame_'][0])
-    return ev
-
-
-def add_logger_name_and_frame_infos(logger, _, ev):
+def add_logger_name(logger, _, ev):
     # TODO parametrizeable frame info extraction.
-    ev.pop('_frame_')
+    # ev.pop('_frame_')
     ev['logger'] = '%s' % (logger.name)
     return ev
 
 
-std_processors = [
+std_processors = lambda dest: [
     filter_by_level,
     # structlog.stdlib.add_logger_name,
     structlog.stdlib.add_log_level,
     censor_passwords,
-    add_exception_stack,
-    add_stack_info,  # allows to say stack_info=1 w/o exceptions
-    add_logger_name_and_frame_infos,
+    add_logger_name,
+    stacktrace.stack_info(dest),
 ]
 
 
@@ -271,16 +249,6 @@ def fmt_to_int(fmt):
 
 def log_dropper(*a):
     raise structlog.DropEvent
-
-
-# class F:
-#     log_fmt = 'plain'
-#     log_level = 10
-#     log_time_fmt = '%m-%d %H:%M:%S'
-#     log_add_thread_name = True
-#     log_dev_fmt_coljson = []
-#     log_dev_coljson_style = ('paraiso-dark',)
-import ujson, json, time
 
 
 def to_str(obj):
@@ -332,37 +300,44 @@ def setup_logging(
 
     # are we a real app, or just a test program:
     # fmt:off
-    log_fmt               = FLG.log_fmt
-    log_time_fmt          = FLG.log_time_fmt
-    log_add_thread_name   = FLG.log_add_thread_name
-    log_dev_coljson_style = FLG.log_dev_coljson_style
-    log_dev_fmt_coljson_flg  = FLG.log_dev_fmt_coljson
+    log_fmt                 = FLG.log_fmt
+    log_time_fmt            = FLG.log_time_fmt
+    log_add_thread_name     = FLG.log_add_thread_name
+    log_dev_coljson_style   = FLG.log_dev_coljson_style
+    log_dev_fmt_coljson_flg = FLG.log_dev_fmt_coljson
     # fmt:on
+
+    stacktrace.log_stack_filter[0] = FLG.log_stack_filter
 
     if censor:
         censor = [censor] if isinstance(censor, str) else censor
         [censored.append(c) for c in censor if not c in censored]
-    fmt_vals, val_formatters = {}, {}
-    # log.info('Response', json=... ) auto formats:
-    lc = log_dev_fmt_coljson_flg
-    if log_dev_fmt_coljson:
-        lc.extend(log_dev_fmt_coljson)
-    for k in lc:
-        fmt_vals[k] = 'f_coljson'
-    fmt_vals['stack'] = 'f_coljson'  # stack tracebacks always
-
-    val_formatters['f_coljson'] = {
-        'formatter': 'coljson',
-        'style': log_dev_coljson_style,
-    }
 
     fmt = fmt_to_int(log_fmt)
     tty = sys.stdout.isatty()
     if fmt == 4 or (fmt == 1 and not tty):
+        dest = 'json'
         rend = JSONRenderer(serializer=safe_dumps)
     else:
+        fmt_vals, val_formatters = {}, {}
+        # log.info('Response', json=... ) auto formats:
+        lc = log_dev_fmt_coljson_flg
+        if log_dev_fmt_coljson:
+            lc.extend(log_dev_fmt_coljson)
+        for k in lc:
+            fmt_vals[k] = 'f_coljson'
+        fmt_vals['stack'] = 'print_stack'
+
+        # fmt_vals['stack'] = 'f_coljson'  # stack tracebacks always
+        s = log_dev_coljson_style
+        val_formatters['f_coljson'] = {'formatter': 'coljson', 'style': s}
+        val_formatters['print_stack'] = {'formatter': 'stack'}
+
         # console renderer. colors?
         colors = fmt != 3
+        dest = 'term'
+        from structlogging import renderers
+
         rend = renderers.ThemeableConsoleRenderer(
             colors=colors, fmt_vals=fmt_vals, val_formatters=val_formatters
         )
@@ -370,7 +345,7 @@ def setup_logging(
     if get_renderer:
         return rend
 
-    p = processors or std_processors
+    p = processors or std_processors(dest)
     if log_add_thread_name:
         p.insert(1, ax_log_processors.add_thread_name)
     if log_time_fmt:

@@ -7,6 +7,8 @@ from theming.term import RESET, Cell, Theme, structlog_style
 
 # from theming.colorhilite import colyhighlight as colyaml
 
+from structlogging.stacktrace import rich_stack
+
 
 class formatters:
     coljson = partial(coljson, indent=2, no_indent_len=100, style=Theme.pygments_style)
@@ -16,6 +18,8 @@ class formatters:
 
     # its done anyway key val based to single line, so we indent:
     json = partial(dumps, indent=4, default=str)
+    stack = rich_stack(True)
+    stack_no_colors = rich_stack(False)
 
 
 def build_val_fmtter(key, cfg, CFG):
