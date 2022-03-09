@@ -2,19 +2,22 @@
 Taken from axc2 pretty much as is
 """
 import collections
+import fcntl
 import json
-
-import toml
 
 # colors from the os theme for python:
 import os
 import re
 import shutil
+import socket
 import string
+import struct
 import subprocess
 import sys
+import termios
 import time
 import types
+from contextlib import contextmanager
 from copy import deepcopy
 from fnmatch import fnmatch
 
@@ -22,8 +25,11 @@ from fnmatch import fnmatch
 from functools import partial
 from pprint import pformat
 from threading import current_thread
+
+import toml
 from absl import flags
-from theming.formatting.markdown import indent, deindent  # noqa
+from pycond import parse_cond
+from theming.formatting.markdown import deindent, indent  # noqa
 
 reverse_dict = lambda m: {v: k for k, v in m.items()}
 
@@ -139,9 +145,6 @@ def walk_dir(directory, crit=None):
     return files
 
 
-from contextlib import contextmanager
-
-
 class Pytest:
     """Helpers specifically for pytest"""
 
@@ -227,9 +230,6 @@ class Pytest:
         c[0] += 1
         # from devapp.app import init_app_parse_flags
         # init_app_parse_flags('testmode')
-
-
-import fcntl, termios, struct
 
 
 def terminal_size():
@@ -530,9 +530,6 @@ def offset_port(port, **kw):
     return int(port) + FLG.port_offset
 
 
-import socket
-
-
 def wait_for_port(port, host='127.0.0.1', timeout=5.0, log_err=True):
     """Wait until a port starts accepting TCP connections.
     Raises:
@@ -556,9 +553,7 @@ def wait_for_port(port, host='127.0.0.1', timeout=5.0, log_err=True):
                     print('timeout awaiting port %s' % port)
 
 
-def repl_dollar_var_with_env_val(
-    s, die_on_fail=True, ask_on_fail=False, get_vals=False
-):
+def repl_dollar_var_with_env_val(s, die_on_fail=True, ask_on_fail=False, get_vals=False):
     """
     s = foo_$bar.or${baz}  - the first form searched until first non Letter char
     Will be replaced by value of environ for $bar and $baz
@@ -898,9 +893,7 @@ class LazyDict(dict):
         return (
             self[key]
             if key in self
-            else dict.setdefault(
-                self, key, thunk(*a, **kw) if callable(thunk) else thunk
-            )
+            else dict.setdefault(self, key, thunk(*a, **kw) if callable(thunk) else thunk)
         )
 
 
@@ -1130,9 +1123,24 @@ def mk_enum(*a, vals, **kw):
     return f(*a, **kw)
 
 
+def build_pycond_flag_expr(val, key, done):
+    if done[0]:
+        return True
+    try:
+        # usage see structlogging sl.py
+        c = (lambda v, f=parse_cond(val)[0]: f(state=v)) if val else None
+        done[0] = 1
+        setattr(FLG, key, [c, val])
+        return True
+    except:
+        return False
+
+
 def flag_makers(t, m=_flag_makers):
     # the actual absl.flags.DEFINE_integer(..),... methods
-    if isinstance(t, (list, tuple)):
+    if t == 'pycond':
+        return _flag_makers[str]
+    elif isinstance(t, (list, tuple)):
         return partial(mk_enum, vals=t)
     else:
         return _flag_makers[t]
@@ -1161,12 +1169,19 @@ def make_flag(c, module, autoshort, default, sub=False, **kw):
         if af:
             action_flags[s] = af
     mkw['short_name'] = s
-    define_flag = flag_makers(g(c, 't', type(d)))
+    typ = g(c, 't', type(d))
+    define_flag = flag_makers(typ)
     txt = g(c, 'n', human(key))
     if c.__doc__:
         ls = c.__doc__.replace(c.n, '').splitlines()
         txt += ' Details: %s' % ('\n'.join([l.strip() for l in ls]).strip())
-    define_flag(key, d, txt, **mkw)
+    if typ == 'pycond':
+        m = 'Requires a parsable pycond expression. See https://github.com/axiros/pycond'
+        define_flag(key, d, txt + ' (axiros/pycond expression)', **mkw)
+        val = partial(build_pycond_flag_expr, key=key, done=[0])
+        flags.register_validator(key, val, message=m)
+    else:
+        define_flag(key, d, txt, **mkw)
 
 
 human = lambda key: ' '.join([k.capitalize() for k in key.split(' ')])
@@ -1469,9 +1484,6 @@ def parse_deps(deplist, seps='~<>!= '):
     return m
 
 
-import re
-
-
 is_sensitive = lambda key: re.match(FLG.sensitive_data_identifiers, key, re.IGNORECASE)
 filter_passwords = lambda dct: {k: v for k, v in dct.items() if not is_sensitive(k)}
 
@@ -1544,11 +1556,12 @@ class appflags:
     ]
 
     class dirwatch:
-        n = 'Spawning helper process, sending reload, on changes in given directory. '
+        n = 'Spawning helper process, sending reload, monitoring changes in given directory. '
         n += 'The app itself keeps running normally, with full access at stdin,out, err. '
-        n += 'You may deliver a match spec, colon seperated.'
+        n += 'You may deliver a match spec, colon seperated.\n'
         d = ''
-        h = 'Format: <dir>[:match[:r]]. r for recursive. match w/o * will be enclosed in *, left and right.'
+        n += 'Format: <dir>[:match[:r]]. r for recursive. match w/o * will be enclosed in *, left and right.\n'
+        n += 'Example: while true; do bin/client -dw .:.py:1; done'
         s = 'dw'
 
     class redir_stderr:
