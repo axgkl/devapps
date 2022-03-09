@@ -132,6 +132,3 @@ Then you can manually run CI/CD jobs:
 
 
 
-# RX Tips
-
-See [lc-python](http://pages.github.com/lc-python/) repo's dev tips for advice.

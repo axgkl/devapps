@@ -451,15 +451,12 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     watcher_pid = None
     if FLG.dirwatch:
         # test if tools present:
-        pass
-
         d, match, rec = (FLG.dirwatch + '::').split(':')[:3]
         d = os.path.abspath(d)
         if not os.path.isdir(d):
             app.die('No directory:', d=d, nfo='Use <dir>:<match>:[r]')
         w = os.path.dirname(os.path.abspath(__file__)) + '/utils/watch_dog.py'
         cmd = [w, ':'.join([d, str(os.getpid()), match, rec])]
-        # print(' '.join(cmd))
         watcher_pid = subprocess.Popen(cmd).pid
 
     # An Action class - use it:

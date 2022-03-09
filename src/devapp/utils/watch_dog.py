@@ -21,7 +21,6 @@ out = partial(print, file=sys.stderr)
 
 
 def start_dir_watch(dir_pid_match_rec):
-    # print(dir_pid_match_rec)
     dir, pid, match, recursive = dir_pid_match_rec.split(':')
     recursive = bool(recursive)
     pid = int(pid)

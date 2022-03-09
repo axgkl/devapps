@@ -15,13 +15,16 @@ nav:
       - DevApps Packages: install/prod_inst.md
       - Installing A Development Version: install/dev_inst.md
       - "Setting up CI/CI": install/cicd.md
-  - Projects:
-      - About: projects/index.md
-      - Resources: projects/resources.md
-      - Resource Definitions: projects/resource_definitions.md
-      - Usage: projects/usage.md
-  - Developing:
+  - Features:
+      - Projects:
+          - About: projects/index.md
+          - Resources: projects/resources.md
+          - Resource Definitions: projects/resource_definitions.md
+          - Usage: projects/usage.md
       - Flags: dev/flags.md
+      - "Standard Flags":
+          - dev/reload_on_change.md
+          - dev/logging.md
       # :autodocs:
       - "App": autodocs/src/devapp/devapp.app.md
       # :autodocs:
@@ -37,7 +40,7 @@ theme:
     - navigation.instant
     - navigation.top
     - navigation.tabs
-    - navigation.sections
+      #- navigation.sections
     - toc.integrate
       #- navigation.expand
   name:

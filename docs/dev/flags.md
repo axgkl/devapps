@@ -64,9 +64,12 @@ main = lambda: run_app(run, flags=Flags)
 ```
 
 !!! hint "Full Control"
-    module import does *not* cause flags already to be defined, the parent class is just a namespace without any magic.
 
-    Instead there is special call `devapp.tools.define_flags(my_flags_class)`, which calls `absl.define_<type>` for any of the inner classes.   
+    module import does *not* cause flags already to be defined, the parent class is just a namespace
+    without any magic.
+
+    Instead there is special call `devapp.tools.define_flags(my_flags_class)`, which calls
+    `absl.define_<type>` for any of the inner classes.   
 
     Handing the flags via the flags argument into `run_app` will issue that call.
 
@@ -175,8 +178,9 @@ Adding `--environ_flags` causes the app to check the process environ first(!), f
     ```
 
 !!! danger "Environ over CLI"
-    Please note again that the environ value does overwrite the CLI value, when `environ_flags` is explicitly set. On
-    the cli, you'd have to use the `unset` command first.
+
+    Please note again that the environ value does overwrite the CLI value, when `environ_flags` is
+    explicitly set. On the cli, you'd have to use the `unset` command first.
 
 
 ## Flagsets
