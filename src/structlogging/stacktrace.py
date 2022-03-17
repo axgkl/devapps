@@ -47,6 +47,8 @@ def walk(o, walker, pycnd, reverse, json):
     l = [i for i in walker(o)]
     l = reversed(l) if reverse else l
     fnr = len(l) + 1
+    # TODO: if frame eq 1 remains most sensible default, then check for it and do NOT
+    # convert all into frames, just to skip them, except the last:
     for f, line_nr in l:
         fnr += -1
         fd = frame(f, line_nr, fnr)
