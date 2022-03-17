@@ -18,6 +18,7 @@ from functools import partial
 WD = 'WATCHDOG: '
 
 out = partial(print, file=sys.stderr)
+die = [0]
 
 
 def start_dir_watch(dir_pid_match_rec):
@@ -41,7 +42,11 @@ def start_dir_watch(dir_pid_match_rec):
                 if not fnmatch(event.src_path, self.match):
                     return
             out(WD + 'match => Sending reload')
-            os.kill(int(pid), 1)
+            try:
+                os.kill(int(pid), 1)
+            except:
+                pass
+            die[0] = 1
 
     o, h = Observer(), H()
     if isinstance(match, str):
@@ -51,8 +56,8 @@ def start_dir_watch(dir_pid_match_rec):
 
     o.schedule(h, path=dir, recursive=recursive)
     o.start()
-    while 1:
-        time.sleep(100000)
+    while not die[0]:
+        time.sleep(0.2)
 
 
 if __name__ == '__main__':
