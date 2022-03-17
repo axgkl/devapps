@@ -41,8 +41,6 @@ from devapp.tools import FLG, define_flags
 pygm_styles = list(get_all_styles())
 pygm_styles.extend(['light', 'dark'])
 
-log_stack_filter = [0]
-
 
 class flags(stacktrace.flags):
     autoshort = ''
@@ -228,14 +226,24 @@ def add_logger_name(logger, _, ev):
     return ev
 
 
-std_processors = lambda dest: [
-    filter_by_level,
-    # structlog.stdlib.add_logger_name,
-    structlog.stdlib.add_log_level,
-    censor_passwords,
-    add_logger_name,
-    stacktrace.stack_info(dest),
-]
+# dest 'json' or term
+def std_processors(dest=None, c=[0]):
+    if c[0]:
+        return c[0]
+    if dest is None:
+        dest, l = 'term', stacktrace.log_stack_filter
+        if not l[0]:
+            l[0] = FLG.log_stack_filter
+
+    c[0] = [
+        filter_by_level,
+        # structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        censor_passwords,
+        add_logger_name,
+        stacktrace.stack_info(dest),
+    ]
+    return c[0]
 
 
 def fmt_to_int(fmt):
