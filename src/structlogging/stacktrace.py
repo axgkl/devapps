@@ -14,12 +14,22 @@ log_stack_filter = [0]
 
 class flags:
     class log_stack_filter:
-        n = 'When logging tracebacks this is an optional filter. Keywords: fn: filename'
+        """Example: fn contains project and frame lt 1"""
+
+        n = (
+            'When logging tracebacks this is an optional filter. Keywords:'
+            'fn: filename, frame: frame nr, line: line nr, name: name of callable'
+        )
         t = 'pycond'
-        d = 'fn contains project'
+        d = 'frame eq 1'
 
 
-frame = lambda f, nr: {'fn': f.f_code.co_filename, 'line': nr, 'name': f.f_code.co_name}
+frame = lambda f, nr, fnr: {
+    'frame': fnr,
+    'fn': f.f_code.co_filename,
+    'line': nr,
+    'name': f.f_code.co_name,
+}
 
 
 def tb_walk(pycnd, json=False):
@@ -34,11 +44,15 @@ def frame_walk(pycnd, json=False):
 
 def walk(o, walker, pycnd, reverse, json):
     r = []
-    for f, nr in walker(o):
-        fd = frame(f, nr)
+    l = [i for i in walker(o)]
+    l = reversed(l) if reverse else l
+    fnr = len(l) + 1
+    for f, line_nr in l:
+        fnr += -1
+        fd = frame(f, line_nr, fnr)
         if not pycnd or pycnd(fd):
-            r.append(fd if json else (f, nr))
-    return reversed(r) if reverse else r
+            r.append(fd if json else (f, line_nr))
+    return r
 
 
 # -------------------------------------------------------------------------- SL Pipeline
