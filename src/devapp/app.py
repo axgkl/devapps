@@ -450,6 +450,12 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     set_app(name, log)
     watcher_pid = None
     if FLG.dirwatch:
+        # TODO: simply do it with entr:
+        # cat conf/reload _py3.8
+        ##!/usr/bin/env bash
+
+        # ps wwwax |grep python |grep app | grep client | xargs kill
+
         # test if tools present:
         d, match, rec = (FLG.dirwatch + '::').split(':')[:3]
         d = os.path.abspath(d)

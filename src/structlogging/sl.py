@@ -229,11 +229,11 @@ def add_logger_name(logger, _, ev):
 # dest 'json' or term
 def std_processors(dest=None, c=[0]):
     if c[0]:
-        return c[0]
+        return c[0]  # once set up: fixed, in use
     if dest is None:
-        dest, l = 'term', stacktrace.log_stack_filter
+        dest, l = 'term', stacktrace.log_stack_cfg
         if not l[0]:
-            l[0] = FLG.log_stack_filter
+            stacktrace.set_log_stack_cfg(FLG)
 
     c[0] = [
         filter_by_level,
@@ -314,8 +314,7 @@ def setup_logging(
     log_dev_coljson_style   = FLG.log_dev_coljson_style
     log_dev_fmt_coljson_flg = FLG.log_dev_fmt_coljson
     # fmt:on
-
-    stacktrace.log_stack_filter[0] = FLG.log_stack_filter
+    stacktrace.set_log_stack_cfg(FLG)
 
     if censor:
         censor = [censor] if isinstance(censor, str) else censor
