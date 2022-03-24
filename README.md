@@ -8,7 +8,7 @@
 [docs pages_img]: https://axgkl.github.io/devapps/img/badge_docs.svg
 [gh-ci]: https://github.com/AXGKl/devapps/actions/workflows/ci.yml
 [gh-ci_img]: https://github.com/AXGKl/devapps/actions/workflows/ci.yml/badge.svg
-[pkg]: https://pypi.com/artifactory/pypi-ax-sources/devapps/2022.03.17/devapps-2022.03.17.tar.gz
+[pkg]: https://pypi.com/artifactory/pypi-ax-sources/devapps/2022.03.24/devapps-2022.03.24.tar.gz
 [pkg_img]: https://axgkl.github.io/devapps/img/badge_pypi.svg
 [code_style]: https://pypi.org/project/axblack/
 [code_style_img]: https://axgkl.github.io/devapps/img/badge_axblack.svg
