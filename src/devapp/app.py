@@ -506,7 +506,12 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
                 os.kill(watcher_pid, 9)
             print('Keyboard Interrupt - Bye.')
             sys.exit(1)
-            return
+        except Exception as ex:
+            try:
+                app.error(str(ex), exc=ex)
+            except Exception as ex:
+                pass
+            raise
         finally:
             if post:
                 # app.debug(
