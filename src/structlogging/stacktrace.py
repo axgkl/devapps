@@ -51,7 +51,7 @@ def frame_walk(pycnd, json=False):
 
 
 def walk(o, walker, pycnd, reverse, json):
-    max = log_stack_cfg[2]
+    max = log_stack_cfg[1]
     r, fnr = [], 0
     l = [i for i in walker(o)]
     if not reverse:
