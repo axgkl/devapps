@@ -740,7 +740,7 @@ def find_resource_defs(_have_mod={}):
             _have_mod[n_mod] = fn
             mod = importlib.import_module(n_mod)
         except Exception as ex:
-            return app.die('Cannot import', fn=fn, exc=ex)
+            return app.error('Cannot import', package=n_mod, fn=fn)
         mod.rsc._package = d
         mod.rsc._filename = fn
 
