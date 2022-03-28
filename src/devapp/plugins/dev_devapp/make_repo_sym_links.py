@@ -132,7 +132,14 @@ def link(spec):
 
 # ran these & return the output of the last one (links function):
 modes = inspect, report, links
-run = lambda: [do(mode, repo=r, ll=10) for mode in modes for r in FLG.repos][-1]
+
+
+def run():
+    r = [do(mode, repo=r, ll=10) for mode in modes for r in FLG.repos]
+    if r:
+        return r[-1]
+    else:
+        return app.warn('Please specify repos')
 
 
 main = lambda: run_app(run, flags=Flags)
