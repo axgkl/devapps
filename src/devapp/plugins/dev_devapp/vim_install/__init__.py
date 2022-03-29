@@ -26,7 +26,7 @@ url_nvim = 'https://github.com/neovim/neovim/releases/download/v0.6.1/nvim.appim
 d_share = H + '/.local/share/nvim'
 d_cfg = H + '/.config'
 d_cfg_nvim = d_cfg + '/nvim'
-d_cfg_nvim_p = d_cfg + '/nvim.personal'
+d_cfg_nvim_p = lambda: d_cfg + '/nvim.%s' % FLG.flavor
 nvim = H + '/.local/share/nvim.6.1.appimage'
 
 
@@ -44,6 +44,11 @@ class Flags:
 
     class flavor:
         d = 'gk'
+
+    class flavor_install_mode:
+        n = 'symlink (to devapps) will keep it updatable with git pulls or pip updates of devapps. copy decouples.'
+        t = ['symlink', 'copy']
+        d = 'symlink'
 
     class set_alias:
         n = 'Adds an alias to your .bashrc or .zshrc. Will check for presence of a $HOME/.aliases file. Set to empty string to not install an alias'
@@ -74,10 +79,14 @@ class inst:
             app.die('flavor ot found', dir=d)
         if check:
             return
-        ensure_d_avail(d_cfg_nvim_p)
-        cmd = 'cp -a "%s" "%s"' % (d, d_cfg_nvim_p)
+        ensure_d_avail(d_cfg_nvim_p())
+        cmd = ' "%s" "%s"' % (d, d_cfg_nvim_p())
+        if FLG.flavor_install_mode == 'copy':
+            cmd = 'copy -a ' + cmd
+        else:
+            cmd = 'ln -s ' + cmd
         do(system, cmd, store=True)
-        s = d_cfg_nvim_p + '/setup.sh'
+        s = d_cfg_nvim_p() + '/setup.sh'
         if exists(s):
             do(system, s, store=True)
 

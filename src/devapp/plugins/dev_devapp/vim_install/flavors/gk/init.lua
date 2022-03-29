@@ -1,3 +1,33 @@
+local user_plugins = {
+	"catppuccin/nvim",
+	"joshdick/onedark.vim",
+	"ThePrimeagen/refactoring.nvim",
+	"arcticicestudio/nord-vim",
+	"godlygeek/tabular",
+	"iamcco/markdown-preview.nvim",
+	"kdheepak/lazygit.nvim",
+	"matsuuu/pinkmare",
+	"rebelot/kanagawa.nvim",
+	"tpope/vim-repeat",
+	"tpope/vim-surround",
+	"easymotion/vim-easymotion",
+	"voldikss/vim-floaterm",
+	{
+		"uga-rosa/cmp-dictionary",
+		after = "nvim-cmp",
+		config = function()
+			local cmp = require("cmp")
+			local config = cmp.get_config()
+			table.insert(config.sources, { name = "dictionary", keyword_length = 2 })
+			cmp.setup(config)
+		end,
+	},
+}
+
+if os.getenv("setup_mode") then
+	return { plugins = { init = user_plugins } }
+end
+
 local config = {
 
 	-- Set colorscheme
@@ -71,62 +101,15 @@ local config = {
 			return table
 		end,
 
-		init = {
-			"catppuccin/nvim",
-			"joshdick/onedark.vim",
-			"ThePrimeagen/refactoring.nvim",
-			"arcticicestudio/nord-vim",
-			"godlygeek/tabular",
-			"iamcco/markdown-preview.nvim",
-			"kdheepak/lazygit.nvim",
-			"matsuuu/pinkmare",
-			"rebelot/kanagawa.nvim",
-			"tpope/vim-repeat",
-			"tpope/vim-surround",
-			"easymotion/vim-easymotion",
-			"voldikss/vim-floaterm",
-			{
-				"uga-rosa/cmp-dictionary",
-				after = "nvim-cmp",
-				config = function()
-					local cmp = require("cmp")
-					local config = cmp.get_config()
-					table.insert(config.sources, { name = "dictionary", keyword_length = 2 })
-					cmp.setup(config)
-				end,
-				require("cmp_dictionary").setup({
-					dic = {
-						["markdown"] = { "/home/gk/.config/nvim.personal/10k.txt" },
-						--["markdown"] = { "/usr/share/dict/words" },
-						-- ["lua"] = "path/to/lua.dic",
-						-- ["javascript,typescript"] = { "path/to/js.dic", "path/to/js2.dic" },
-						-- filename = {
-						-- 	["xmake.lua"] = { "path/to/xmake.dic", "path/to/lua.dic" },
-						-- },
-						-- filepath = {
-						-- 	["%.tmux.*%.conf"] = "path/to/tmux.dic",
-						-- },
-					},
-					-- The following are default values, so you don't need to write them if you don't want to change them
-					-- exact = 2,
-					-- first_case_insensitive = false,
-					-- document = false,
-					-- document_command = "wn %s -over",
-					async = false,
-					-- capacity = 5,
-					-- debug = false,
-				}),
-			},
-
-			-- { "andweeb/presence.nvim" },
-			-- {
-			--   "ray-x/lsp_signature.nvim",
-			--   event = "BufRead",
-			--   config = function()
-			--     require("lsp_signature").setup()
-			--   end,
-			-- },
-		},
+		init = user_plugins,
+		-- { "andweeb/presence.nvim" },
+		-- {
+		--   "ray-x/lsp_signature.nvim",
+		--   event = "BufRead",
+		--   config = function()
+		--     require("lsp_signature").setup()
+		--   end,
+		-- },
 		-- All other entries override the setup() call for default plugins
 		treesitter = { ensure_installed = { "lua" } },
 		packer = {
@@ -224,6 +207,26 @@ local config = {
 		-- Set options
 		local set = vim.opt
 		require("luasnip.loaders.from_snipmate").lazy_load()
+		local has_, p = pcall(require, "cmp_dictionary")
+		if has_ then
+			p.setup({
+				dic = {
+					["markdown"] = { "~/.config/nvim.gk/10k.txt" },
+					--["markdown"] = { "/usr/share/dict/words" },
+					-- ["lua"] = "path/to/lua.dic",
+				},
+				-- The following are default values, so you don't need to write them if you don't want to change them
+				-- exact = 2,
+				-- first_case_insensitive = false,
+				-- document = false,
+				-- document_command = "wn %s -over",
+				-- damn, that does not work with true, mpack missing in nvim:
+				async = false,
+				-- capacity = 5,
+				-- debug = false,
+			})
+		end
+
 		-- cmp.formatting.fields = {"kind"}
 		U = require("user.utils") -- allows :lua U.dump(vim.lsp)
 		--require("luasnip.loaders.from_vscode").lazy_load()
@@ -234,12 +237,12 @@ local config = {
 		set.foldlevel = 99 -- open all
 		set.relativenumber = true
 		--set.dict = "/usr/share/dict/words" -- much more
-		set.dict = "~/.config/nvim.personal/10k.txt"
+		set.dict = "~/.config/nvim.gk/10k.txt"
 		-- map("n", "<C-s>", ":w!<CR>", opts)
 		map("n", ",4", ":ToggleTerm size=100 <CR>", opts)
 		map("n", ",D", ":lua vim.diagnostic.config({virtual_text = false})<CR>", opts)
 		-- all viml:
-		vim.cmd("source $HOME/.config/nvim.personal/polish.vim")
+		vim.cmd("source ~/.config/nvim.gk/polish.vim")
 		-- do this only here so that require mpack works for async:
 	end,
 }
