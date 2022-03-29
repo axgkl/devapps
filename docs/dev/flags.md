@@ -1,17 +1,22 @@
 # The CLI Flag System
 
-`devapps` heavily uses [absl flags](https://abseil.io/docs/python/guides/flags) to get configured via the CLI or
+`devapps` uses [absl flags](https://abseil.io/docs/python/guides/flags) to get configured via the CLI or
 environ.
 
-Here application modules and packages define the flags they require or support within their source code themselves.
+Application modules and packages define the flags they require or support within their source code themselves.
 
 Dependent on which of these modules are **imported** at a certain time after startup (before the call to `app.run`),
 then these are the flags presented to the user when he calls `-h|--help|--helpful|-hf`. 
 
 Set flag values are then globals throughout the application.
 
-This makes a lot of sense when a package has many varying use cases, with certain libs sometimes needed or not.
+This makes a lot of sense when a package has a lot of varying use cases, with certain modules sometimes needed or not.
 
+!!! note
+
+    It is allowed to do `FLG.foo=bar` after startup - but considered bad practice.
+
+## Flag Definitions via Nested Class Trees
 
 In devapps, while fully supporting the standard absl mechanics (`flags.DEFINE_string`) we also allow to defined them in
 class name spaces:
@@ -100,7 +105,7 @@ A call to help then lists the flags on the CLI:
 from devapp.app import app, run_app, FLG
 
 class Flags:
-    autoshort = '' # enabling shot forms, prefixed with '', i.e. not prefixed
+    autoshort = '' # enabling short forms, prefixed with '', i.e. not prefixed
 
     class my_bool:
         d = False
@@ -139,6 +144,10 @@ class Flags:
         s = False # disable short
         d = 'opt1'
 
+    class my_condition:
+        # will be parsed into an axiros/pycond filter, incl. the condition (list).
+        t = 'pycond'
+        d = 'fn not contains frozen and fn not contains /rx/'
 
 
 # Print out all FLG vals.
@@ -155,12 +164,13 @@ if __name__ == '__main__':
 With this
 
 ```bash lp fmt=xt_flat xxx
-/tmp/flagtest.py -h
-/tmp/flagtest.py -mo baz || true
-/tmp/flagtest.py -ms a -mb -mf 42.1 -mi 42 -mms a -mms b -mo bar -mom b -mom c -x a,b -ms b -lf plain
+/tmp/flagtest.py -h # lp: asserts=my_condition
+/tmp/flagtest.py -mo baz || true # lp: asserts='should be one of'
+/tmp/flagtest.py -ms a -mb -mf 42.1 -mi 42 -mms a -mms b -mo bar -mom b -mom c -x a,b -ms b -lf plain # lp: asserts=my_int
 ```
 
 !!! hint
+
     Note `my_str` defined twice in the example - last wins (except when defined `multi_string`) -> you can preparametrize apps in wrappers
     and still overwrite flags when calling the wrapper.
 
@@ -196,6 +206,64 @@ values before starting pytest like so:
 ```console
 export my_flag=myval && pytest -xs test/test_my_test.py
 ```
+
+
+## Action Flags
+
+Example:
+
+```python lp fn=/tmp/action_flagtest.py mode=make_file chmod=755 xxx
+#!/usr/bin/env python
+from devapp.app import app, run_app, FLG
+
+
+class Flags:
+    autoshort=''
+
+    class force:
+        d = False
+
+    class Actions:
+        class install:
+            d = False
+
+            class verbose:
+                d = False
+
+        class run:
+            d = True # default
+
+
+class ActionNS:
+    def _pre():
+        print('pre')
+
+    def _post():
+        print('post')
+
+    def run():
+        print('running', FLG.force)
+
+    def install():
+        print('installing', FLG.force, FLG.install_verbose)
+
+if __name__ == '__main__':
+    run_app(ActionNS, flags=Flags)
+
+```
+
+Test it:
+
+```bash lp fmt=xt_flat xxx
+/tmp/action_flagtest.py -h
+/tmp/action_flagtest.py # lp: asserts="running False"
+/tmp/action_flagtest.py -f install --install_verbose # lp: asserts="installing True True"
+/tmp/action_flagtest.py run --install_verbose=True || true # lp: asserts="Unknown command line flag 'install_verbose'"
+```
+
+Note the concatenation of action and flag name for the nested property verbose within install
+action.
+
 
 
 
