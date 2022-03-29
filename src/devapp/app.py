@@ -560,7 +560,9 @@ def app_func(inner=False):
     return f
 
 
-def do(func, *a, _step=[0], titelize='', log_level=None, ll=None, fl=None, **kw):
+def do(
+    func, *a, _step=[0], titelize='', log_level=None, ll=None, fl=None, store=None, **kw
+):
     """When fl (full log level) is set to e.g. 10 we log only the message at higher levels"""
 
     if ll is not None:
@@ -576,16 +578,18 @@ def do(func, *a, _step=[0], titelize='', log_level=None, ll=None, fl=None, **kw)
     if func == system:
         cmd, args = (a[0] + ' ').split(' ', 1)
         kwl = {} if not args else {'args': args}
-        log('sh: ' + cmd, **kwl)
+        fn = 'sh: ' + cmd
+        log(fn, store_log=store, **kwl)
     else:
         if fl is not None and fl < app.log_level:
             log(fn)
         else:
             if a:
                 ar = a[0] if len(a) == 1 else a
-                log(fn, args=ar, **kw)
+                log(fn, args=ar, store_log=store, **kw)
             else:
-                log(fn, **kw)
+                log(fn, store_log=store, **kw)
+
     return func(*a, **kw)
 
 
