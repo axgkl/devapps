@@ -89,6 +89,35 @@ log_levels = {
     'debug'     : 10,
 }
 # fmt:on
+
+log_store = []
+_log_store_printer = [0]
+
+
+def enable_log_store():
+    p = structlog.get_config()['processors']
+    p.insert(-1, add_to_log_store)
+    _log_store_printer[0] = p[-1]
+
+
+def add_to_log_store(_, lev, ev):
+    keep = ev.pop('store_log', None)
+    if keep is None:
+        ll = log_levels.get(lev, None)
+        if ll is None:
+            return ev
+        if ll > 20:
+            keep = True
+    if keep:
+        log_store.append(dict(ev))
+    return ev
+
+
+def print_log_store(title='Stored Logs', p=_log_store_printer):
+    print(title, file=sys.stderr)
+    [print(p[0]('_', l.get('level'), l)) for l in log_store]
+
+
 def storing_testlogger(dub_to=None, store=None):
     """for tests - stores into array, optionally dubs to existing logger"""
     store = [] if store is None else store
