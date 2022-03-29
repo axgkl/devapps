@@ -33,7 +33,7 @@ from devapp.tools import (
     write_file,
 )
 import devapp.resource_tools as api
-from devapp.plugins.ops_devapp.devinstall import dev_install
+from .devinstall import dev_install
 
 
 class Flags(api.CommonFlags):

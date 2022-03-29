@@ -148,9 +148,14 @@ def add_plugins(dp, match, _have=[]):
         sys.path.insert(0, dir_of(dplugs))
     dpre = dplugs.rsplit('/', 1)[-1]
 
-    def c(fn, match=match):
+    def c(fn, match=match, dp=dp):
+        if fn.startswith('_'):
+            return
+        ffn = dp + '/' + fn
+        if os.path.isdir(ffn) and os.path.exists(ffn + '/__init__.py'):
+            return fn
         f = fn.split('.py')
-        if len(f) == 2 and not fn.startswith('_'):
+        if len(f) == 2:
             if fnmatch(f[0], match):
                 return f
 
