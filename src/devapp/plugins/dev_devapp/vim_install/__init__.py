@@ -10,24 +10,42 @@ import os
 # Could be done far smaller.
 from importlib import import_module
 
-import time
+import sys
+import time, json
 from devapp import gevent_patched, tools
 from devapp.app import FLG, app, do, run_app, system
 from devapp.tools import exists
 from devapp.tools_http import download
 from structlogging import sl
 import requests
+from . import utils
 
 here = os.path.dirname(__file__)
 
 H = os.environ['HOME']
+api_nvim = 'https://api.github.com/repos/neovim/neovim/releases'
+ver_nvim = 'v0.6.1'
 url_astro = 'https://github.com/kabinspace/AstroVim'
-url_nvim = 'https://github.com/neovim/neovim/releases/download/v0.6.1/nvim.appimage'
 d_share = H + '/.local/share/nvim'
 d_cfg = H + '/.config'
 d_cfg_nvim = d_cfg + '/nvim'
 d_cfg_nvim_p = lambda: d_cfg + '/nvim.%s' % FLG.flavor
-nvim = H + '/.local/share/nvim.6.1.appimage'
+nvim = H + '/.local/share/nvim.%s.appimage' % ver_nvim
+h = lambda s: s.replace(H, '~')
+
+
+def status():
+    r = {'nvim': {'installed': exists(nvim), 'exe': h(nvim)}}
+    r['astrovim'] = {'installed': exists(d_cfg_nvim), 'dir': h(d_cfg_nvim)}
+    r['flavor'] = {
+        'installed': exists(d_cfg_nvim_p()),
+        'name': FLG.flavor,
+        'dir': h(d_cfg_nvim_p()),
+    }
+    if not FLG.status_verbose:
+        return r
+    r['nvim']['versions'] = do(utils.vim_infos, api_nvim)
+    return r
 
 
 class Flags:
@@ -37,6 +55,9 @@ class Flags:
     """
 
     autoshort = ''
+
+    class nvim_version:
+        d = 'v0.6.1'
 
     class distri:
         t = ['astrovim']
@@ -58,13 +79,40 @@ class Flags:
         n = 'Backup all existing $HOME/.config/nvim'
         d = True
 
+    class Actions:
+        class install:
+            d = False
+
+        class status:
+            d = False
+
+            class verbose:
+                s = 'sv'
+                d = False
+
+        class run:
+            d = True
+
 
 def ensure_d_avail(d):
     app.die('Target exists. Use --backup', dir=d) if exists(d) else 0
 
 
 class inst:
+    def do():
+        inst.flavor(check=True)
+        cmds = ['neovim', FLG.distri, 'flavor']
+        do(backup)
+        [do(getattr(inst, k), store=True) for k in cmds]
+        do(inst.packer_sync)
+        sl.print_log_store()
+
     def neovim():
+        v = FLG.nvim_version
+        url_nvim = vim_infos().get(v)
+        if not url_nvim:
+            app.die('Not existing nvim release', rel=v)
+        url_nvim = url_nvim['appimg']['browser_download_url']
         do(download, url_nvim, to=nvim, chmod='u+x', store=True)
 
     def astrovim():
@@ -90,26 +138,48 @@ class inst:
         if exists(s):
             do(system, s, store=True)
 
+    def packer_sync():
+        """Non interactive install
+        (https://github.com/wbthomason/packer.nvim/issues/502)
+        setup_mode allows the init.lua to only install plugins, so that nothing requiring
+        them crashes.
+        """
+        cmd = 'export setup_mode=true; ' + nvim
+        cmd += " --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'"
+        do(system, cmd)
+
 
 def backup():
     if not FLG.backup:
         return app.warn('No backup')
-    for k in d_cfg_nvim, d_cfg_nvim_p, d_share:
+    for k in d_cfg_nvim, d_cfg_nvim_p(), d_share:
         if exists(k):
             do(os.rename, k, k + '.backup.%s' % time.time(), store=True)
 
 
-def run():
-    sl.enable_log_store()
-    inst.flavor(check=True)
-    cmds = ['neovim', FLG.distri, 'flavor']
-    do(backup)
-    [do(getattr(inst, k), store=True) for k in cmds]
-    do(system, '"%s" +PackerSync' % nvim)
-    sl.print_log_store()
+class S:
+    is_installed = []
 
 
-main = lambda: run_app(run, flags=Flags)
+class Action:
+    def _pre():
+        sl.enable_log_store()
+        return
+
+    install = inst.do
+
+    status = status
+
+    def run():
+        argv = sys.argv[2:]
+        if argv[0] == '--run':  # this is default
+            argv.pop(0)
+        cmd = nvim + ' ' + ' '.join(['"%s"' % a for a in argv])
+        sys.exit(os.system(cmd))
+
+
+main = lambda: run_app(Action, flags=Flags)
+# main = lambda: run_app(run, flags=Flags)
 
 
 if __name__ == '__main__':
