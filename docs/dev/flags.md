@@ -228,6 +228,7 @@ class Flags:
             d = False
 
             class verbose:
+                s = 'iv' # no auto for nested flags
                 d = False
 
         class run:
@@ -257,6 +258,7 @@ Test it:
 ```bash lp fmt=xt_flat xxx
 /tmp/action_flagtest.py -h
 /tmp/action_flagtest.py # lp: asserts="running False"
+/tmp/action_flagtest.py install -iv # lp: asserts="installing False True"
 /tmp/action_flagtest.py -f install --install_verbose # lp: asserts="installing True True"
 /tmp/action_flagtest.py run --install_verbose=True || true # lp: asserts="Unknown command line flag 'install_verbose'"
 ```
