@@ -37,8 +37,8 @@ nav:
       - TODO: about/todo.md
 theme:
   features:
-    - navigation.instant
     - navigation.top
+    - navigation.instant
     - navigation.tabs
       #- navigation.sections
     - toc.integrate
