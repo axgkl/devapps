@@ -270,6 +270,8 @@ def parse_xml_help(xml_help, match, cli_actions=None):
             continue
         have.add(k)
         item = items.get(k)
+        if not item:
+            continue  # not match
         p, mod = item['pos'] + 1, item['mod']
         m[mod][p - 1]['action'] = True
         m[mod][p - 1]['is_default'] = af['is_default']
