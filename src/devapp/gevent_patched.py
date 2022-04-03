@@ -3,11 +3,14 @@ Just a way to have clean import sequences at app module inits
 """
 import os
 
-from gevent import monkey
+try:
+    from gevent import monkey
 
-if not os.environ.get('gevent_no_patch'):
-    monkey.patch_all()
-
+    if not os.environ.get('gevent_no_patch'):
+        monkey.patch_all()
+except:
+    # no gevent. That's ok for many apps.
+    pass
 fn_backd = lambda: os.environ['var_dir'] + '/proc_enter.sock'
 
 

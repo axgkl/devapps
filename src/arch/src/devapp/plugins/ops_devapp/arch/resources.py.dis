@@ -1,0 +1,291 @@
+#!/usr/bin/env python
+"""
+Managing Resources
+
+Creates and updates the .resources file
+
+Allows to install resources on the host, via its packaging system (which must have an install command)
+
+API:
+    - python: E.g. pytest can run: get_redis_exe = lambda: project.get_present_resource_location('redis-server')
+    - shell: 
+"""
+
+
+import os
+from functools import partial
+
+from devapp.app import app, do, run_app, system
+from devapp.tools import FLG, project, exists, jsondiff
+from devapp.operations.bin.plugins import resources_list
+
+inst_modes = ['', 'host', 'conda']
+
+conda_installer_url = (
+    'https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh'
+)
+# resources = ['miniconda', 'redis-server', 'graph-easy']
+
+
+class Flags(resources_list.flags):
+    autoshort = ''
+
+    class write_resources:
+        n = 'write back resources situation found on the system after all actions'
+        d = False
+
+    class resources_file:
+        n = 'resources file. default: ' + project.fn_resources()
+        d = 'default'
+
+    class force:
+        n = '-y on all questions at install/uninstall'
+        d = False
+
+    if 1:  # actions
+
+        class check:
+            n = 'Compare given resources file with system state and error out if expected situation deviates for the resources listed in the file'
+            d = False
+
+        class install:
+            n = 'Install comma seperated list of resources'
+            d = []
+
+        class uninstall:
+            n = 'Uninstall comma seperated list of resources.'
+            e = 'ops resources --uninstall=graph_easy'
+            d = []
+
+        class install_mode:
+            n = 'conda does not require elevated permissions'
+            t = ['host', 'conda', '']
+            d = ''
+
+        class sync:
+            """
+            When a resource is present but at another place (e.g. on the host but not in conda) we will skip install. You have to install from the old place first to get the resources intended place."""
+
+            n = 'sync resources install state with a given resources file.'
+            n += '- Say "default" if you want the default file.'
+            n += '- We will only write if the sync/install/uninstall was succesfull'
+            n += '- We will write into the resources_file not into this one, except when ident'
+            d = ''
+
+        class sync_no_uninstall:
+            n = 'At --sync do not uninstall, only install when required'
+            d = True
+
+
+# --------------------------------------------------------------------- tools/  actions
+class S:
+    """state"""
+
+    rsc_loaded = None
+    rsc_facts = None
+    pkg_cmd = None
+
+
+n = lambda rsc: rsc.__name__
+flag_rsc = lambda name_rsc: getattr(Flags.rsc, name_rsc, None)
+all_rsc_names = lambda: [i for i in dir(Flags.rsc) if i[0] != '_']
+
+
+present = lambda cmd: bool(os.popen('type "%s" 2>/dev/null' % cmd).read())
+pkg_cmds = ['apt-get', 'dnf', 'yum']
+
+
+def pkgcmd():
+    c = S.pkg_cmd
+    if not c:
+        c = [k for k in pkg_cmds if present(k)]
+        c = c[0] if c else app.die('no package command', tried=pkg_cmds)
+    if c == 'dnf':
+        c += ' --color=false '
+    return c
+
+
+home_to_var = lambda d: d.replace(os.environ['HOME'], '$HOME')
+dir_on_fs = lambda d: os.popen('echo "%s"' % d).read().strip()
+
+
+def check_rsc(name_rsc):
+    """gather facts"""
+    D = '%s/envs/%s/bin/%s' % (conda.dir(), name_rsc, flag_rsc(name_rsc).cmd)
+    if exists(D):
+        m = {'location': home_to_var(D), 'present': True}
+    else:
+        # we don't know where it is necessarily, can be an alias:
+        m = {'present': present(flag_rsc(name_rsc).cmd), 'location': 'host'}
+    S.rsc_facts[name_rsc] = c = m
+    return c
+
+
+def pkg(rsc):
+    return rsc.pkg
+
+
+interactive = lambda: '-y' if FLG.force else ''
+
+
+def download(url, dest):
+    # TODO
+    cmd = 'curl "%s" -o "%s"' % (url, dest)
+    do(system, cmd)
+    app.info('downloaded', dest=dest)
+
+
+class conda:
+    dir = lambda: dir_on_fs(FLG.conda_prefix)
+
+    def get_miniconda(location):
+        app.warn('conda dir not found', dir=location)
+        fn = '/tmp/miniconda_install.sh'
+        url = conda_installer_url
+        if not exists(fn):
+            download(url, fn)
+        if not exists(fn):
+            app.die('download failed', fn=fn)
+        os.system('chmod +x "%s"' % fn)
+        os.makedirs(os.path.dirname(location), exist_ok=True)
+        do(system, '%s -b -p "%s"' % (fn, location))
+
+    def install(rsc, name_rsc):
+        D = conda.dir()
+        if not exists(D):
+            do(conda.get_miniconda, location=D)
+        i = interactive()
+        cmd = 'source "%s/etc/profile.d/conda.sh" && conda create %s -n "%s" && '
+        cmd += 'conda activate "%s" && '
+        cmd = cmd % (D, i, name_rsc, name_rsc)
+        icmd = getattr(rsc, 'conda_inst', '')
+        if not icmd:
+            p = getattr(rsc, 'conda_pkg', rsc.pkg)
+            chan = getattr(rsc, 'conda_chan', '')
+            if chan:
+                chan = '-c ' + chan
+            icmd = 'conda install %s %s %s' % (i, chan, p)
+        cmd += icmd
+        do(system, cmd)
+
+
+class install_modes:
+    def host(rsc, name_rsc):
+        cmd = 'sudo %s install %s "%s" ' % (pkgcmd(), interactive(), pkg(rsc))
+        do(system, cmd)
+
+    conda = conda.install
+
+
+def install(name_rsc, location='', **kw):
+    rsc = flag_rsc(name_rsc) or app.die('not defined', resource=name_rsc)
+    fact = check_rsc(name_rsc)
+    if fact['present']:
+        return app.info('already present', rsc=name_rsc)
+
+    mode = FLG.install_mode or location  # location e.g. host, or a conda file path
+    if location:
+        if '/envs/' in location:
+            mode = 'conda'
+    f = getattr(install_modes, mode, '')
+    if not f:
+        msg = 'Specify install mode'
+        app.die(msg, name_rsc=name_rsc, hint='--install_mode', have=mode)
+    f(rsc, name_rsc)
+    if not do(check_rsc, name_rsc)['present']:
+        app.die('install failed', rsc=name_rsc)
+    app.info('installed successfully', rsc=name_rsc)
+
+
+def uninstall(name_rsc, location=None, **kw):
+    rsc = flag_rsc(name_rsc) or app.die('not defined', resource=name_rsc)
+    fact = check_rsc(name_rsc)
+    if not fact['present']:
+        return app.info('not present - nothing to do', rsc=name_rsc)
+    mode = (
+        FLG.install_mode or location or fact.get('location')
+    )  # location e.g. host, or a conda file path
+    if mode:
+        if '/envs/' in mode:
+            mode = 'conda'
+    if mode == 'host':
+        cmd = 'sudo %s remove %s "%s"' % (pkgcmd(), interactive(), pkg(rsc))
+        do(system, cmd)
+    elif mode == 'conda':
+        p = os.path.dirname
+        d = p(p(dir_on_fs(fact['location'])))
+        h = os.environ['HOME']
+        if not exists(d) or d == h or len(d) < 10 or not '/envs/' in d:
+            app.die('security: refusing to remove', dir=d)
+        do(system, '/bin/rm -rf "%s"' % d, log_level='warn')
+    else:
+        app.die('unsupported uninstall mode', derived_mode=mode)
+
+    if do(check_rsc, name_rsc)['present']:
+        app.die('failed - still present', rsc=name_rsc)
+    return app.info('uninstalled successfully', rsc=name_rsc)
+
+
+def fn_resources(fn=None):
+    fn = FLG.resources_file if fn is None else fn
+    return project.fn_resources() if fn == 'default' else fn
+
+
+def sync():
+    breakpoint()  # FIXME BREAKPOINT
+    fn = fn_resources(FLG.sync)
+    if not exists(fn):
+        app.die('sync file not found', fn=sync)
+    f = S.rsc_facts
+    r = project.read_resources(filename=fn)
+    for k, v in r.items():
+        fact = f.get(k, {})
+        vp = v.get('present')
+        if vp != fact.get('present'):
+            if not vp:
+                if FLG.sync_no_uninstall and not vp:
+                    app.info('skipping uninstall', rsc=k)
+                    continue
+                do(uninstall, name_rsc=k, **v)
+            else:
+                do(install, name_rsc=k, **v)
+
+
+def check():
+    r = project.read_resources(filename=fn_resources())
+    f = S.rsc_facts
+    j = jsondiff(r, f)
+    if j:
+        app.warn('diff', **j)
+    for k, v in r.items():
+        fact = f.get(k)
+        if not fact:
+            app.warn('resource unknown', rsc=k)
+            continue
+        vp, fp = v['present'], fact['present']
+        if vp != fp:
+            app.die(k + ': presence diff', expected=vp, is_=fp, hint='--sync')
+    app.info('check passed')
+
+
+# ------------------------------------------------------------------------- end actions
+def run():
+    S.rsc_facts = {}
+    S.all_rsc_names = all_rsc_names()
+    [do(check_rsc, name_rsc=k) for k in S.all_rsc_names]
+    if FLG.sync:
+        do(sync)
+    if FLG.check:
+        do(check)
+    else:
+        # if FLG.mode == 'check':
+        #    return S.rsc_facts
+        [do(install, name_rsc=n) for n in FLG.install]
+        [do(uninstall, name_rsc=n) for n in FLG.uninstall]
+
+    if FLG.write_resources:
+        project.write_resources(S.rsc_facts, filename=fn_resources(FLG.resources_file))
+    return S.rsc_facts
+
+
+main = partial(run_app, run, flags=Flags)

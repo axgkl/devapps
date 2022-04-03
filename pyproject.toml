@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "devapps"
-version = "2022.03.25"
+version = "2022.04.04"
 description = "Apps - End to End."
 authors = ["Gunther Klessinger <g_kle_ss_ing_er@gmx.de>"]
 license = "BSD"
@@ -22,10 +22,7 @@ packages = [
     { include = "theming",       from = "src" },
     { include = "tree_builder",  from = "src" } 
 ]
-include = [
-    "README.md",
-    "pyproject.toml"
-]
+
 
 [project.urls]
 packagehome = "https://pypi.com/artifactory/pypi-ax-sources/devapps/_VERSION_/devapps-_VERSION_.tar.gz"
@@ -64,27 +61,12 @@ python = "^3.7"
 toml       = "*"
 #python    = "*"
 absl-py    = "*"
-decorator  = "*"
 jsondiff   = "*"
-psutil     = "*"
-bpytop     = "*"
-Pygments   = "*"
-httpx      = "*"
-PyJWT      = "*"
+rich       = "*"
 structlog  = "*"
-ujson      = "*"
-gevent     = "*"
-humanize   = "*"
 inflection = "*"
-lz4        = "*"
-msgpack    = "*"
-Rx         = "3.1.1" # must be fixed, 3.2.0 breaks lc-python test_build (timing)
-snoop      = "*"
-tabulate   = "*"
 requests   = "*"
 pycond     = "*"
-PyYAML     = "*"
-cffi = "^1.15.0"
 
 
 [tool.poetry.dev-dependencies]

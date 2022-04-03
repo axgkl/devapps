@@ -1,11 +1,6 @@
 i = 'asdfa'
+from rich import print
+from rich.panel import Panel
 
-
-
-class Foo:
-    def foo(self):
-        i = 23
-        j = 23
-
-
-foo = 'bar'
+p1 = Panel('Hello, [red]World!', title='Welcome', subtitle='Thank you')
+print(Panel(p1 + p1, title='Welcome', subtitle='Thank you'))

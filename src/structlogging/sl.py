@@ -26,7 +26,10 @@ import structlog
 #     log_add_thread_name = True
 #     log_dev_fmt_coljson = []
 #     log_dev_coljson_style = ('paraiso-dark',)
-import ujson
+try:
+    import ujson
+except Exception as ex:
+    pass  # that's ok - app to the app to depend on it
 from pygments.styles import get_all_styles
 from structlog import BoundLoggerBase, PrintLogger, wrap_logger
 from structlog.exceptions import DropEvent
