@@ -998,6 +998,15 @@ def read_file(fn, dflt=None, bytes=-1, strip_comments=False):
         return res
 
 
+def unlink(fn, not_exist_ok=False, log=None):
+    if os.path.exists(fn) or os.path.islink(fn):  # dangling
+        log('Unlinking', fn=fn) if log else 0
+        return os.unlink(fn) or True
+    if not_exist_ok:
+        return False
+    os.unlink(fn)  # raise original exception (File not found)
+
+
 def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
     'API: Write a file. chmod e.g. 0o755 (as octal integer)'
     from devapp.app import app
@@ -1037,6 +1046,24 @@ def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
         except Exception as ex:
             e = ex
         raise Exception('Could not write file: %s %s' % (fn, e))
+
+
+def sys_args(*args):
+    """sometimes we want sys args already before the flags are parsed - in order to set
+    their defaults, e.g. from a config file"""
+    argv = list(sys.argv[1:])
+    r = [a[2] for a in args]  # the defaults
+    while argv:
+        a = argv.pop(0)
+        i = -1
+        for c in args:
+            i += 1
+            if a.startswith(c[1]) or a.startswith(c[2]):
+                if '=' in a:
+                    r[i] = a.split('=', 1)[1]
+                elif argv:
+                    r[i] = argv.pop(0)
+    return tuple(r)
 
 
 def failsafe(meth, *a, **kw):
