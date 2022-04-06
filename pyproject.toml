@@ -29,7 +29,7 @@ packagehome = "https://pypi.com/artifactory/pypi-ax-sources/devapps/_VERSION_/de
 discusshome = "https://join.skype.com/abc123"
 [tool.pyright]
 # thats where my dev version for dt is - should not interfere w/o that:
-extraPaths = ["../docutools/src"]
+extraPaths = ["../docutools/src", "./src/devapp/plugins/"]
 reportSelfClsParameterName = false
 
 [tool.poetry.dependencies]

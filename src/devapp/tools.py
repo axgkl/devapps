@@ -998,10 +998,17 @@ def read_file(fn, dflt=None, bytes=-1, strip_comments=False):
         return res
 
 
-def unlink(fn, not_exist_ok=False, log=None):
+def unlink(fn, not_exist_ok=False, log=None, err_hint=None):
     if os.path.exists(fn) or os.path.islink(fn):  # dangling
         log('Unlinking', fn=fn) if log else 0
-        return os.unlink(fn) or True
+        try:
+            return os.unlink(fn) or True
+        except Exception as ex:
+            from devapp.app import app
+
+            kw = {'fn': fn, 'problem': str(ex)}
+            kw.update({'hint': err_hint} if err_hint else {})
+            app.die('Cannot unlink', **kw)
     if not_exist_ok:
         return False
     os.unlink(fn)  # raise original exception (File not found)

@@ -21,7 +21,7 @@ from devapp.tools import exists, dirname, read_file, write_file, sys_args, unlin
 from devapp.tools_http import download
 from structlogging import sl
 import requests
-from .globals import S, set_defaults, write_settings, H, Dir
+from .globals import S, set_defaults, write_settings, H, Dir, have_term
 
 
 distris = {'astrovim': None}
@@ -100,6 +100,20 @@ class Flags:
     #     d = 'vi'
 
     class Actions:
+        class legacy_install_stash:
+            n = 'Clears the existing unmanaged installation by moving folders away. '
+            n += 'Destination is `<workdir>/legacy_installs/backups.<name>/`. '
+            n += 'You can restore them later.'
+            d = False
+
+            class delete:
+                n = 'Delete instead of moving it away'
+                d = False
+
+        class legacy_install_restore:
+            n = 'Restores backup with given <name>'
+            d = False
+
         class install:
             d = False
 
@@ -154,7 +168,7 @@ def link(s, t):
     os.makedirs(dirname(t), exist_ok=True)
     if exists(t):
         if not os.path.islink(t):
-            app.die('Expected symlink', path=t)
+            app.die('Expected symlink', path=t, hint='Run action: stash_legacy_install')
         if os.readlink(t) == s:
             return
         os.unlink(t)
@@ -173,9 +187,8 @@ class Rsc:
         # fmt:off
         r.version     = version
         r.typ         = r.__class__.__name__
-        r.name        = r.typ
         r.url         = g(FLG, r.typ + '_url')
-        r.name        = r._name() + ':' + r.version
+        r.name        = r.repo_pth() + ':' + r.version
         r.workdir     = Dir.work() + '/' + r.typ + '.all'
         r.pth         = r.workdir + '/' + r.name
         r.downloaded  = exists(r.pth) or not r.url
@@ -187,7 +200,7 @@ class Rsc:
     symlink_src = lambda r: r.pth
     all_present = lambda r: os.listdir(r.workdir)
 
-    def _name(r):
+    def repo_pth(r):
         """built from url (path_reponame)"""
         s = r.url
         s = s.rsplit('.git', 1)[0] if s.endswith('.git') else s
@@ -216,20 +229,21 @@ class Rsc:
             url += '.git'
         D = r.pth
         while True:
-            cmd = f'git clone --depth=1 "{url}" "{D}"'
+            dpth = '--depth=1' if r.version == 'latest' else ''
+            cmd = f'git clone {dpth} "{url}" "{D}"'
             err = do(system, cmd, no_fail=True)
             if not err:
-                return
+                break
             if url.startswith('git@'):
                 a, b = url[4:].split(':', 1)
                 url = f'https://{a}/{b}'
                 app.info('Trying https...', url=url)
                 continue
             app.die('Could not git clone', url=url)
-        # TODO: checkout version if not latest
-
-    def status(r):
-        pass
+        if not r.version == 'latest':
+            v = r.version
+            cmd = f'cd "{D}" && git checkout "{v}"'
+            exec_(cmd, 'setting version')
 
     def ensure_linked(r):
         t, s = r.symlink(), r.symlink_src()
@@ -248,7 +262,7 @@ class Rsc:
 
 class nvim(Rsc):
     symlink = lambda _: Dir.work() + '/nvim'
-    _name = lambda _: 'nvim'
+    repo_pth = lambda _: 'nvim'
 
     def download(self):
         V = self.version
@@ -331,6 +345,18 @@ class Action:
         S.nvim = nvim(FLG.nvim_version)
         S.distri = distri(FLG.distri_version)
         S.settings = settings(FLG.settings_version)
+        S.d_backups = FLG.workdir + '/legacy_installs'
+        app.die = lambda *a, **kw: (app.error(*a, **kw), sys.exit(1))
+
+    def legacy_install_stash(dirs=('.config/nvim', '.local/share/nvim')):
+        from .legacy_installs import stash
+
+        return stash(dirs)
+
+    def legacy_install_restore():
+        from .legacy_installs import unstash
+
+        return unstash()
 
     def install():
         S.nvim.ensure_installed()

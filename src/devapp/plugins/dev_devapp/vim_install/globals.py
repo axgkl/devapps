@@ -1,6 +1,9 @@
 from devapp.tools import sys_args, read_file, write_file, FLG, os
 from time import ctime, time as now
-import json
+import json, sys
+
+have_term = sys.stdout.isatty() and sys.stdin.isatty()
+
 
 H = os.environ['HOME']
 
@@ -17,7 +20,7 @@ class Dir:
         work = lambda: Dir.share() + '/nvim_manager'
 
 
-fn_settings = lambda w=None: (FLG.workdir if w is None else w) + '/settings.json'
+fn_settings = lambda w=None: (FLG.workdir if w is None else w) + '/configs.json'
 
 
 def settings(workdir=None, name=None):

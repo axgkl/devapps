@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os, sys
 from devapp.app import do, system, app
-from dev_devapp import vim_install  # by devapp plugin system
+from dev_devapp import vim_install  # done by devapp plugin system
 from subprocess import call, check_output, STDOUT
 from devapp.tools import write_file, unlink
 from functools import partial
