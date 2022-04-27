@@ -8,7 +8,9 @@ class tool:
 
 
 def redis_server(**kw):
-    return 'redis-server --port %s' % offset_port(6379)
+    m = {'cmd': 'redis-server --port %s' % offset_port(kw['rsc'].port)}
+    m['cmd_pre'] = 'test -n "$1" && { redis-server "$@"; exit $?; }\n'
+    return m
 
 
 def verify_tools(path, rsc, **kw):
