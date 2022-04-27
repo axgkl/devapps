@@ -17,13 +17,15 @@ import sys
 import time, json
 from devapp import tools
 from devapp.app import FLG, app, do, run_app, system
-from devapp.tools import exists, dirname, read_file, write_file, sys_args, unlink
+from devapp.tools import exists, dirname, read_file, write_file, sys_args, unlink, confirm
+from devapp.tools import has_tty
 from devapp.tools_http import download
 from structlogging import sl
 import requests
-from .globals import S, set_defaults, write_settings, H, Dir, have_term
+from .globals import S, set_defaults, write_named_config, H, Dir, all_flags, configs
+from .git import clone
 
-
+confirm = lambda *a, c=confirm, **kw: '' if FLG.yes else c(*a, **kw)
 distris = {'astrovim': None}
 
 here = os.path.dirname(__file__)
@@ -70,6 +72,15 @@ class Flags:
         n = 'Name of this setup'
         d = 'default'
 
+    class description:
+        n = 'Describe this setup, so you can find it later'
+        d = ''
+
+    class yes:
+        s = 'y'
+        n = 'Autoconfirm all questions'
+        d = False
+
     class workdir:
         s = 'w'
         n = 'Here we store all downloaded configs and backups. Clean up manually from time to time.'
@@ -112,6 +123,10 @@ class Flags:
 
         class legacy_install_restore:
             n = 'Restores backup with given <name>'
+            d = False
+
+        class select:
+            n = 'Select an install via fzf'
             d = False
 
         class install:
@@ -219,31 +234,7 @@ class Rsc:
         do(self.download)
         self.downloaded = True
 
-    def download(r):
-        url = g(FLG, r.typ + '_url')
-        if not url:
-            return
-        if url.startswith('gh:'):
-            url = 'git@github.com:' + url[3:]
-        if not url.endswith('.git'):
-            url += '.git'
-        D = r.pth
-        while True:
-            dpth = '--depth=1' if r.version == 'latest' else ''
-            cmd = f'git clone {dpth} "{url}" "{D}"'
-            err = do(system, cmd, no_fail=True)
-            if not err:
-                break
-            if url.startswith('git@'):
-                a, b = url[4:].split(':', 1)
-                url = f'https://{a}/{b}'
-                app.info('Trying https...', url=url)
-                continue
-            app.die('Could not git clone', url=url)
-        if not r.version == 'latest':
-            v = r.version
-            cmd = f'cd "{D}" && git checkout "{v}"'
-            exec_(cmd, 'setting version')
+    download = clone
 
     def ensure_linked(r):
         t, s = r.symlink(), r.symlink_src()
@@ -314,8 +305,11 @@ class settings(Rsc):
 
     def ensure_assets_inst(r):
         link(r.symlink(), S.distri.symlink() + '/lua/user')
+        nvi = vi_headless()
+        sync_cmd = nvi + "-c 'autocmd User PackerComplete quitall' -c 'PackerSync'"
         if exists(r.d_assets):
             link_assets(r)
+            return app.info('assets present - not syncing', on_demand=sync_cmd)
         else:
             # We have not yet the assets.
             # We save a lot of time when we re-use the already existing nvim assets
@@ -332,11 +326,13 @@ class settings(Rsc):
                 cmd = f'cd "{wd}" && tar xf "{fnb}"'
                 exec_(cmd, 'restoring distri packages')
             link_assets(r)
-        nvi = vi_headless()
-        sync_cmd = nvi + "-c 'autocmd User PackerComplete quitall' -c 'PackerSync'"
         # give user configs the chance to exit early after pkg install:
         sync_cmd = 'export setup_mode=true && ' + sync_cmd
         exec_(sync_cmd, 'Packer Sync - Please stand by...')
+
+
+def show_one(one=23):
+    print('have', one)
 
 
 class Action:
@@ -358,11 +354,20 @@ class Action:
 
         return unstash()
 
+    def select():
+        from .doctl import App
+        res = App.run()
+
     def install():
+        dl = [k.downloaded for k in (S.nvim, S.distri, S.settings)]
+        if not dl == [True] * 3 or FLG.name not in configs:
+            s = {k: g(FLG, k) for k in all_flags}
+            app.info('install settings', json=s)
+            confirm('', dflt='y')
         S.nvim.ensure_installed()
         S.distri.ensure_installed()
         S.settings.ensure_installed()
-        write_settings()
+        write_named_config()
 
     status = status
 

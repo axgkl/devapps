@@ -4,7 +4,7 @@ Name                                                                            
 /home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/const.py                                                              8      0      2      0   100.00%
 /home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/log.py                                                               90     21     45      8    74.81%
 /home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lp.py                                                               502    157    246     53    65.78%
-/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lp_session.py                                                       204     50     72     18    73.19%
+/home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lp_session.py                                                       204     48     72     17    74.28%
 /home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/lprunner.py                                                         207    153     82      3    24.57%
 /home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/blacklist/__init__.py                                         27      5     14      4    78.05%
 /home/gk/miniconda3/envs/devapps_py3.7/lib/python3.7/site-packages/lcdoc/mkdocs/find_pages/__init__.py                                       127    101     73      2    15.00%
@@ -37,4 +37,4 @@ Name                                                                            
 tests/__init__.py                                                                                                                              4      4      0      0     0.00%
 tests/test_app.py                                                                                                                             41     41     10      0     0.00%
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                                                       3736   1629   1643    246    52.69%
+TOTAL                                                                                                                                       3736   1627   1643    245    52.74%

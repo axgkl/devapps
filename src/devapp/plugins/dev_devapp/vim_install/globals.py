@@ -1,8 +1,6 @@
-from devapp.tools import sys_args, read_file, write_file, FLG, os
+from devapp.tools import sys_args, read_file, write_file, has_tty, FLG, os
 from time import ctime, time as now
 import json, sys
-
-have_term = sys.stdout.isatty() and sys.stdin.isatty()
 
 
 H = os.environ['HOME']
@@ -21,10 +19,13 @@ class Dir:
 
 
 fn_settings = lambda w=None: (FLG.workdir if w is None else w) + '/configs.json'
+configs = {}  # content of configs file
 
 
-def settings(workdir=None, name=None):
+def load_configs(workdir=None, name=None):
+    workdir = workdir or FLG.workdir
     d = json.loads(read_file(fn_settings(workdir), '{}'))
+    configs.update(d)
     return d.get(name, {}) if name is not None else d
 
 
@@ -35,17 +36,19 @@ t0 = now()
 
 def set_defaults(Flags):
     n, wd = sys_args(['--name', '-n', 'default'], ['--workdir', '-w', Dir.dflt.work()])
-    d = settings(wd, name=n).get('flags', {})
+    d = load_configs(wd, name=n).get('flags', {})
     for k in dir(Flags):
         if k == 'Actions' or k[0] == '_':
             continue
         v = getattr(Flags, k)
-        all_flags.append(k)  # so that we can create a new settings entry after install
-        setattr(v, 'd', d.get(k, v.d)) if hasattr(v, 'd') else 0
+        if hasattr(v, 'd') and k != 'yes':
+            # so that we can create a new settings entry after install
+            all_flags.append(k)
+            setattr(v, 'd', d.get(k, v.d))
 
 
-def write_settings():
-    d = settings(FLG.workdir)
+def write_named_config():
+    d = load_configs()
     f = {k: getattr(FLG, k, '') for k in all_flags}
     m = {}
     m['dt'] = round(now() - t0, 2)
