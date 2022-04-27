@@ -475,11 +475,15 @@ def in_gevent():
 has_tty = lambda: sys.stdin.isatty() and sys.stdout.isatty()
 
 
-def confirm(msg):
+def confirm(msg, dflt='n'):
     if not has_tty():
         raise Exception('Require confirmation for: %s' % msg)
+
     print(msg)
-    r = input('Confirmed [y|N]? ')
+    opts = ['y|N'] if dflt.lower() == 'n' else 'Y|n'
+    r = input(f'Confirmed [{opts}]? ')
+    if not r:
+        r = dflt
     if r.lower() != 'y':
         from devapp.app import app
 

@@ -21,9 +21,10 @@ Since you installed the package version, lcdoc is installed e.g. in
 
 Saying:
 
-    dev mrsl -r devapps,docutool
+    dev rsl -r devapps,docutool link
 
-- will move all importable(!) package folders from devapps and docutools to backup dirs (.orig)
+- will move all importable(!) package folders from devapps and docutools to a backup
+  dir (in site-packages/repo_sym_link_backup)
 - symlink the repo versions into your site-packages dir 
 
 Result:
@@ -43,17 +44,45 @@ from devapp import gevent_patched, tools
 from devapp.app import FLG, app, do, run_app, system
 from devapp.tools import exists
 
+# ran these & return the output of the last one (links function):
+from json import dumps, loads
+import devapp
+
+d_sitep = None
+d_backup = lambda: d_sitep + '/backup_repo_symlinks'
+
+
 path = os.path
 dirs = os.listdir
 here = os.getcwd()
+
+H = os.environ['HOME']
+
+repl_home = lambda r: loads(dumps(r).replace(H, '~'))
 
 
 class Flags:
     autoshort = ''
 
     class repos:
-        n = 'Comma sep. repo sibling to this one where we should look for packages'
+        s = 'r'
+        n = 'Comma sep. repo sibling to this one where we should look for packages. Those repos must have their sources within a "/src" dir - (devapp convention)'
         t = list
+
+    class force:
+        d = False
+
+    class Actions:
+        class list:
+            d = True
+
+        class link:
+            d = False
+
+        class restore:
+            s = 'rest'
+            n = 'removes links and restores original folders from backup dir'
+            d = False
 
 
 todos = {}
@@ -68,7 +97,7 @@ def inspect(repo):
     if dr == here:
         app.info('Ignoring our own repo', dir=dr)
         return
-    todos[repo] = mods = {}
+    todos[repo] = mods = []
     if not (exists(dr + '/.git') and exists(dr + '/src')):
         app.die('No repo to link', dir=dr)
     dr += '/src'
@@ -77,28 +106,27 @@ def inspect(repo):
         if not path.isdir(ddr):
             continue
         try:
-            mods[ddr] = {'mod': import_module(k)}
+            D = {'mod': import_module(k), 'd_src': ddr, 'name': k}
+            if '(namespace)' in str(D):
+                mods.append(D)
+            else:
+                mods.insert(0, D)
         except:
-            app.debug('Ignoring (not importable)', dir=k, within=dr)
-    rms = []
+            app.warning('Ignoring (not importable)', dir=k, within=dr)
+    for mod in mods:
+        f = getattr(mod['mod'], '__file__', None)
+        if f:
+            mod['file'] = f
+        else:
+            mod['file'] = d_sitep + '/%(name)s/<namespace>' % mod
 
-    for ddr in mods:
-        m = mods[ddr].pop('mod')
-        d = m.__file__.rsplit('/', 1)[0]
-        if path.islink(d):
-            rms.append(ddr)
-            app.info('already linked', dir=d, to=os.readlink(d))
-            continue
-        mods[ddr]['target_dir'] = d
-        mods[ddr]['src'] = ddr
-        mods[ddr]['backup'] = dcp = d + '.orig'
-        if path.exists(dcp):
-            app.warn('will delete existing backup', backup=dcp)
-            mods[ddr][msg_deb] = True
-        app.info('todo', **mods[ddr])
-    [mods.pop(d) for d in rms]
-    if not mods:
-        todos.pop(repo)
+    for mod in mods:
+        ddr = mod['d_src']
+        mod.pop('mod')
+        d = mod['d_target'] = mod.pop('file').rsplit('/', 1)[0]
+        mod['link_present'] = path.islink(d)
+        mod['d_backup'] = dcp = d_backup() + '/%(name)s' % mod
+        mod['backup_present'] = path.exists(dcp)
     return mods
 
 
@@ -115,14 +143,15 @@ def report(repo, c=[0]):
         app.die('Unconfirmed...')
 
 
-links = lambda repo: [do(link, spec=v) for v in todos[repo].values()]
+links = lambda repo: [do(link, spec=v) for v in todos[repo]]
 
 
 def link(spec):
-    s, t, db, b = spec['src'], spec['target_dir'], spec.get(msg_deb), spec['backup']
+    s, t, b = spec['d_src'], spec['d_target'], spec['d_backup']
     if b:
         app.warn('unlinking existing', backup=b)
         os.system('/bin/rm -rf "%s"' % b)
+    os.makedirs(os.path.dirname(b), exist_ok=True)
     app.info('moving to backup', frm=t, to=b)
     os.rename(t, b)
     app.info('symlinking', frm=s, to=t)
@@ -130,8 +159,71 @@ def link(spec):
     return {'Linked': '%s->%s' % (s, t)}
 
 
-# ran these & return the output of the last one (links function):
-modes = inspect, report, links
+def status():
+    links = [l for l in os.listdir(d_sitep) if os.path.islink(d_sitep + '/' + l)]
+    d = d_backup()
+    backups = os.listdir(d) if os.path.exists(d) else []
+    # if not FLG.repos: app.die('No repo matches given')
+    r = {r: do(inspect, repo=r, ll=10) for r in FLG.repos}
+    st = 'clean'
+    if links:
+        st = 'tainted'
+        app.warn('There are symlinks present -> your installation is tainted')
+    r = {
+        'present': {'symlinks': links, 'backups': backups, 'site_packages': d_sitep},
+        'repos': r,
+        'status': st,
+    }
+    return r
+
+
+class ActionNS:
+    def _pre():
+
+        global d_sitep
+        d_sitep = devapp.__file__.rsplit('/', 2)[0]
+
+    def list():
+        return repl_home(status())
+
+    def link():
+        st = status()
+        jobs = []
+        if not st['repos']:
+            app.die('No repos give to link')
+        for _, R in st['repos'].items():
+            for mod in R:
+                if mod.get('link_present'):
+                    app.info('Already linked', d=mod['d_target'])
+                    continue
+                jobs.append(mod)
+        if not jobs:
+            return app.info('Nothing to do')
+        app.info('Confirm links', json=jobs)
+
+        if not FLG.force:
+            if not 'y' in input('Confirm todos [y|Q] ').lower():
+                app.die('Unconfirmed...')
+        [link(j) for j in jobs]
+        return ActionNS.list()
+
+    def restore():
+        st = status()['present']
+        jobs = []
+        for d in st['backups']:
+            if d in st['symlinks']:
+                jobs.append(d)
+
+        if not jobs:
+            app.die('Nothing to do')
+        if not FLG.force:
+            app.info('Confirm restore', json=jobs)
+            if not 'y' in input('Confirm todos [y|Q] ').lower():
+                app.die('Unconfirmed...')
+        for d in jobs:
+            os.unlink(d_sitep + '/' + d)
+            os.rename(d_backup() + '/' + d, d_sitep + '/' + d)
+        return ActionNS.list()
 
 
 def run():
@@ -142,7 +234,7 @@ def run():
         return app.warn('Please specify repos')
 
 
-main = lambda: run_app(run, flags=Flags)
+main = lambda: run_app(ActionNS, flags=Flags)
 
 
 if __name__ == '__main__':

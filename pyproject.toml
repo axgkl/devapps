@@ -25,8 +25,9 @@ packages = [
 
 
 [project.urls]
-packagehome = "https://pypi.com/artifactory/pypi-ax-sources/devapps/_VERSION_/devapps-_VERSION_.tar.gz"
-discusshome = "https://join.skype.com/abc123"
+packagehome = "https://pypi.com/"
+discusshome = "https://join.skype.com/"
+
 [tool.pyright]
 # thats where my dev version for dt is - should not interfere w/o that:
 extraPaths = ["../docutools/src", "./src/devapp/plugins/"]
