@@ -21,10 +21,10 @@ Since you installed the package version, lcdoc is installed e.g. in
 
 Saying:
 
-    dev rsl -r devapps,docutool link
+    dev rsl -r 'devapps,docutool,../relpath_to_other_repo,/abs/path/to/repo' link
 
-- will move all importable(!) package folders from devapps and docutools to a backup
-  dir (in site-packages/repo_sym_link_backup)
+- will move all importable(!) package folders from devapps and docutools and the 2 other
+  repos to a backup dir (in site-packages/repo_sym_link_backup)
 - symlink the repo versions into your site-packages dir 
 
 Result:
@@ -35,6 +35,7 @@ Result:
 """
 
 import os
+
 
 # Could be done far smaller.
 from datetime import datetime
@@ -66,7 +67,9 @@ class Flags:
 
     class repos:
         s = 'r'
-        n = 'Comma sep. repo sibling to this one where we should look for packages. Those repos must have their sources within a "/src" dir - (devapp convention)'
+        n = 'Comma sep. repos, where we should look for packages. Those repos must have their sources within a "/src" dir - (devapp convention).\n'
+        n += '- w/o "/": Must be siblings to this one.\n'
+        n += '- otherwise rel. or absolute paths to them.'
         t = list
 
     class force:
@@ -90,19 +93,18 @@ todos = {}
 msg_deb = 'delete existing backup'
 
 
-def inspect(repo):
+def inspect(d_repo):
     if not '.git' in dirs(here):
         app.die('Need to be in repo root')
-    dr = path.abspath('../' + repo)
-    if dr == here:
-        app.info('Ignoring our own repo', dir=dr)
+    if d_repo == here:
+        app.info('Ignoring our own repo', dir=d_repo)
         return
-    todos[repo] = mods = []
-    if not (exists(dr + '/.git') and exists(dr + '/src')):
-        app.die('No repo to link', dir=dr)
-    dr += '/src'
-    for k in dirs(dr):
-        ddr = dr + '/' + k
+    todos[d_repo] = mods = []
+    if not (exists(d_repo + '/.git') and exists(d_repo + '/src')):
+        app.die('No repo to link', dir=d_repo)
+    d_repo += '/src'
+    for k in dirs(d_repo):
+        ddr = d_repo + '/' + k
         if not path.isdir(ddr):
             continue
         try:
@@ -112,7 +114,7 @@ def inspect(repo):
             else:
                 mods.insert(0, D)
         except:
-            app.warning('Ignoring (not importable)', dir=k, within=dr)
+            app.warning('Ignoring (not importable)', dir=k, within=d_repo)
     for mod in mods:
         f = getattr(mod['mod'], '__file__', None)
         if f:
@@ -164,7 +166,7 @@ def status():
     d = d_backup()
     backups = os.listdir(d) if os.path.exists(d) else []
     # if not FLG.repos: app.die('No repo matches given')
-    r = {r: do(inspect, repo=r, ll=10) for r in FLG.repos}
+    r = {r: do(inspect, d_repo=r, ll=10) for r in FLG.repos}
     st = 'clean'
     if links:
         st = 'tainted'
@@ -179,7 +181,13 @@ def status():
 
 class ActionNS:
     def _pre():
+        def p(p):
+            a = os.path.abspath
+            if not '/' in p:
+                return a('../' + p)
+            return a(p)
 
+        FLG.repos = [p(i) for i in FLG.repos]
         global d_sitep
         d_sitep = devapp.__file__.rsplit('/', 2)[0]
 
@@ -224,14 +232,6 @@ class ActionNS:
             os.unlink(d_sitep + '/' + d)
             os.rename(d_backup() + '/' + d, d_sitep + '/' + d)
         return ActionNS.list()
-
-
-def run():
-    r = [do(mode, repo=r, ll=10) for mode in modes for r in FLG.repos]
-    if r:
-        return r[-1]
-    else:
-        return app.warn('Please specify repos')
 
 
 main = lambda: run_app(ActionNS, flags=Flags)
