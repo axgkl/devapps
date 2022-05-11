@@ -444,7 +444,9 @@ class Install:
             # for whoever needs that:
             allk = set()
             for m in to_dict(rsc), spec, spec_env:
-                for k, v in m.items():
+                for k, v in sorted(m.items()):
+                    if k == 'cmd_pre':
+                        continue
                     allk.add(k)
                     if k == 'port':
                         v = offset_port(v)
@@ -679,6 +681,7 @@ def complete_attrs(rsc, fn):
     rsc.__repr__ = lambda r: str(to_dict(r))
     rsc.__str__ = lambda r: to_str(r)
     rsc.module_dir = S.rsc_dirs[fn]
+    rsc.host_conf_dir = '$PROJECT_ROOT/bin/${host:-$HOSTNAME}/' + rsc.name
     rsc.disabled = g(rsc, 'disabled', g(rsc, 'd', False))
     rsc.installed = g(rsc, 'installed', False)
     [repl_callable(rsc, k, getattr(rsc, k)) for k in dir(rsc) if not k.startswith('_')]
