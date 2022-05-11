@@ -7,9 +7,17 @@ class tool:
     conda_env = 'lctools'
 
 
+redis_pre = '''
+test "$1" == "cli" && { shift; redis-cli "$@"; exit $?; }
+test -n "$1" && { redis-server "$@"; exit $?; }
+test -e "$host_conf_dir/redis.conf" && { redis-server "$host_conf_dir/redis.conf"; exit $?; }
+
+'''
+
+
 def redis_server(**kw):
-    m = {'cmd': 'redis-server --port %s' % offset_port(kw['rsc'].port)}
-    m['cmd_pre'] = 'test -n "$1" && { redis-server "$@"; exit $?; }\n'
+    m = {'cmd': ':redis-server --port %s' % offset_port(kw['rsc'].port)}
+    m['cmd_pre'] = redis_pre
     return m
 
 
