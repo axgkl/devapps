@@ -983,13 +983,17 @@ def check_start_env(req_env):
     return 'Passed requirements check'
 
 
-def read_file(fn, dflt=None, bytes=-1, strip_comments=False):
+def read_file(fn, dflt=None, mkfile=False, bytes=-1, strip_comments=False):
     """
     API function.
     read a file - return a default if it does not exist"""
     if not exists(fn):
         if dflt is not None:
+            if mkfile:
+                write_file(fn, dflt, mkdir=1)
             return dflt
+        if mkfile:
+            raise Exception(fn, 'Require dflt to make non existing file')
         raise Exception(fn, 'does not exist')
     with open(fn) as fd:
         # no idea why but __etc__hostname always contains a linesep at end
@@ -1018,17 +1022,30 @@ def unlink(fn, not_exist_ok=False, log=None, err_hint=None):
     os.unlink(fn)  # raise original exception (File not found)
 
 
+def get_app(c=[0]):
+    app = c[0]
+    if app:
+        return app
+    from devapp.app import app
+
+    c[0] = app
+    return app
+
+
 def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
     'API: Write a file. chmod e.g. 0o755 (as octal integer)'
-    from devapp.app import app
 
     fn = os.path.abspath(fn)
 
     if log > 0:
+        app = get_app()
         app.info('Writing file', fn=fn)
 
-    if isinstance(s, (list, tuple)):
+    if isinstance(s, (list, tuple)) and s and isinstance(s[0], str):
         s = '\n'.join(s)
+    elif isinstance(s, (dict, tuple, list)):  # think of bytes, mode wb
+        s = json.dumps(s, default=str)
+
     if log > 1:
         sep = '\n----------------------\n'
         ps = (
