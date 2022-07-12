@@ -101,6 +101,7 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
                 breakpoint()
                 keep_ctx = True
         by = ev.pop('by', None)
+        stack = ''
 
         # configured value formatter functions?
         # let them do their work here and replace ev vals by formatted ones:
@@ -109,12 +110,15 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
         fvs = self.cfg.get('fmt_vals')
         if fvs:
             phs = []
-            m = formatted_vals = {}
             for k in fvs:
                 v = ev.pop(k, None)
                 if v is not None:
-                    phs.append(RESET + self._val_formatters[fvs[k]](v))
-                    ev[k] = '_sl_%s__' % len(phs)
+                    v = RESET + self._val_formatters[fvs[k]](v)
+                    if k == 'stack':
+                        stack = v + RESET + '\n'
+                    else:
+                        phs.append(v)
+                        ev[k] = '_sl_%s__' % len(phs)
 
         try:
             s1 = call(self, _, level, ev)
@@ -136,7 +140,7 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
                 s1 = s1.replace('_sl_%s__' % len(phs), phs.pop())
 
         if not self.colorful or tn is None:
-            return s1
+            return stack + s1
 
         # Thread: a unique looking cell in the terminal matrix:
         symb = Cell.unique(tn)
@@ -151,4 +155,4 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
             else:
                 s1 = by + s1
         s = '\x1b[2m' + symb + ' ' + s2
-        return s
+        return stack + s
