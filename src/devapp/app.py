@@ -164,7 +164,11 @@ def set_app(name, log):
     set_dirs()
     # [setattr(app, k, v) for k, v in dirs(name).items()]
     # allows raise app.die(msg, **kw):
-    app.die = app_die(app)
+    def die(msg, **kw):
+        """Application decided to bail out"""
+        raise DieNow(msg, kw)
+
+    app.die = die
     app.name = name
     app.name_clean = tools.clean_env_key(name)
     app.is_initted = True
@@ -333,7 +337,9 @@ action = [0]
 
 class DieNow(Exception):
     # required since sys.exit will be catched - halting the app, not stopping it
-    ''
+    def __init__(self, msg, kw):
+        self.msg = msg
+        self.kw = kw
 
 
 class dev_app_exc_handler(abslapp.ExceptionHandler):
@@ -497,6 +503,9 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
                 signal.signal(1, reload_handler)
                 while 1:
                     time.sleep(10)
+        except DieNow as ex:
+            app.error(ex.msg, exc=ex, **ex.kw)
+            raise
         except Reloaded as ex:
             continue
         except SystemExit as ex:
@@ -527,6 +536,11 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     # exit phase. postprocessing, pretty to stdout, plain to | jq .:
     if FLG.flat:
         res = tools.flatten(res, sep='.')
+    f = getattr(app, 'out_formatter', 0)
+    if f:
+        r = f(res)
+        if r:
+            return
     if not sys.stdout.isatty():
         jres = json.dumps(res, default=str)
         print(jres)
@@ -537,18 +551,22 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     # return res
 
 
-class Die(Exception):
-    log = None
+#
+# class Die(Exception):
+#     log = None
+#
+#     def __xinit__(self, msg, log=None, **kw):
+#         raise DieNow(msg, kw)
 
-    def __init__(self, msg, log=None, **kw):
-        log = log or self.log
-        if log:
-            log.error(msg, **kw)
-        else:
-            print(
-                msg, json.dumps(kw, sort_keys=True, default=str, indent=4)[1:-1],
-            )
-        raise DieNow()
+# log = log or self.log
+# if log:
+#     log.error(msg, **kw)
+# else:
+#     print(
+#         msg, json.dumps(kw, sort_keys=True, default=str, indent=4)[1:-1],
+#     )
+# breakpoint()  # FIXME BREAKPOINT
+# raise DieNow()
 
 
 def app_func(inner=False):
