@@ -478,8 +478,9 @@ has_tty = lambda: sys.stdin.isatty() and sys.stdout.isatty()
 def confirm(msg, dflt='n'):
     if not has_tty():
         raise Exception('Require confirmation for: %s' % msg)
+
     print(msg)
-    opts = ['y|N'] if dflt.lower() == 'n' else 'Y|n'
+    opts = 'y|N' if dflt.lower() == 'n' else 'Y|n'
     r = input(f'Confirmed [{opts}]? ')
     if not r:
         r = dflt
@@ -1599,6 +1600,42 @@ def memoize(f):
     """
     f.cache = {}
     return decorate(f, _memoize)
+
+
+class Miss:
+    pass
+
+
+def cache(dt):
+    """decorator which forgets cached results and guarantees only one concurrent execution"""
+    from threading import RLock
+
+    def a(f, dt=dt):
+        f.cache = {}
+        flck = RLock()
+
+        def b(*a, _=[f, dt, Miss, flck], **kw):
+            key = a, frozenset(list(kw.items())) if kw else a
+            f, dt, Miss, flck = _
+            cache = f.cache
+            v = cache.get(key)
+            if v:
+                if dt == 0 or time.time() - v[0] < dt:
+                    # print('cached', a, v[1])
+                    return v[1]
+                del cache[key]
+            with flck:
+                v = cache.get(key)
+                if v:
+                    return v[1]
+                vf = f(*a, **kw)
+                # no need to calc time if we anyway memoize forever
+                cache[key] = [time.time() if dt > 0 else 0, vf]
+                return vf
+
+        return b
+
+    return a
 
 
 class appflags:
