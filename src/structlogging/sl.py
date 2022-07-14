@@ -254,7 +254,7 @@ def censor_passwords(_, __, ev, _censored=censored):
 def add_logger_name(logger, _, ev):
     # TODO parametrizeable frame info extraction.
     # ev.pop('_frame_')
-    ev['logger'] = '%s' % (logger.name)
+    ev['logger'] = ev.get('logger') or logger.name
     return ev
 
 
