@@ -54,6 +54,7 @@ class App:
 
     is_initted = False
     name = sys.argv[0]
+    selected_action = None
 
     def die(self, msg, **kw):
         App().warn(msg, **kw)
@@ -304,10 +305,11 @@ def define_action_flags_in_cli():
         have.add(key)
         args[p] = '--' + f['key']
         tools.define_flags(f['flg_cls'], sub=key, parent_autoshort=f['autoshort'])
-        action[0] = key
+        app.selected_action = key
+        # action[0] = key
 
 
-action = [0]
+# action = [0]
 # def on_flag_parse_err_have_action_flag(key, af, parser):
 #     p = sys.argv.index(key)
 #     key = af['key']  # short to long
@@ -452,7 +454,7 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
             print('Flags validation error: %s' % err, file=sys.stderr)
             sys.exit(1)
     sl.setup_logging(**kw_log)
-    log = sl.get_logger(name)
+    log = sl.get_logger(app.selected_action or name)
     set_app(name, log)
     watcher_pid = None
     if FLG.dirwatch:
@@ -475,19 +477,21 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     post = None
     if isinstance(main, type):
         action_cls = main
-        if not action[0]:
+        if not app.selected_action:
             for af in tools.action_flags.values():
                 if af['flg_cls'].d:
-                    action[0] = af['key']
+                    app.selected_action = af['key']
                     app.debug('Running default action', action=af['key'])
                     break
-        main = getattr(action_cls, action[0], None)
+        main = getattr(action_cls, app.selected_action, None)
         if not main:
             app.die('Require action')
         pre = getattr(action_cls, '_pre', 0)
         if pre:
-            # app.debug('Prepare hook')
-            pre()
+            # app.debug('Prepare hook') - may parametrize the action func
+            _ = pre()
+            if _:
+                main = _
             # app.debug(action[0])
         post = getattr(action_cls, '_post', 0)
 
@@ -532,7 +536,7 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     if not isinstance(res, (list, dict, tuple)):
         if not res is None:
             print(res)
-        return res
+        return
     # exit phase. postprocessing, pretty to stdout, plain to | jq .:
     if FLG.flat:
         res = tools.flatten(res, sep='.')
