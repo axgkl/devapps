@@ -30,7 +30,12 @@ See Actions at -h
 """
 # Could be done far smaller.
 import time
+import pycond
 from devapp import gevent_patched
+
+# from gevent import monkey
+
+# monkey.patch_all()
 import json
 import os
 
@@ -49,35 +54,46 @@ from devapp.tools import (
 
 from devapp.app import app, run_app, FLG
 
+DROPS = {}
+have_droplet_ips = [0]  # save unneccessary API hits.
 
-def dci():
+# Droplet list results are cached in tmp/droplets.json. We will read from here if recent.'
+# droplet_list_cache_max_age = int(os.environ.get('droplet_list_cache_max_age', 3))
+
+# even with accept-new on cloud infra you run into problems since host keys sometimes change for given ips:
+# so:
+ssh = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '
+
+
+def d_boostrap_feats():
     here = os.path.abspath(os.path.dirname(__file__))
-    return here + '/cloud_init_features'
+    return here + '/bootstrap_features'
 
 
 def all_feats():
     return [
         f
-        for f in os.listdir(dci())
+        for f in os.listdir(d_boostrap_feats())
         if not '.local' in f and ':' in f and f.endswith('.sh')
     ]
 
 
 def show_features():
     fs = all_feats()
-    r = [i.rsplit('.sh', 1)[0] for i in fs]
-    return ', '.join(r)
+    r = [i.rsplit('.sh', 1)[0].split(':', 1) for i in fs]
+    return ', '.join([i[1] for i in r])
 
 
+# fmt:off
 alias_sizes = [
-    ['XXS', 's-1vcpu-1gb'],
-    ['XS', 's-1vcpu-2gb'],
-    ['S', 's-2vcpu-4gb'],
-    ['M', 's-8vcpu-16gb'],
-    ['L', 'c2-16vcpu-32gb'],
-    ['XL', 'c2-32vcpu-64gb'],
+    ['XXS'      , 's-1vcpu-1gb']    ,
+    ['XS'       , 's-1vcpu-2gb']    ,
+    ['S'        , 's-2vcpu-4gb']    ,
+    ['M'        , 's-8vcpu-16gb']   ,
+    ['L'        , 'c2-16vcpu-32gb'] ,
+    ['XL'       , 'c2-32vcpu-64gb'] ,
 ]
-
+# fmt:on
 size_aliases = lambda: ', '.join([f'{i}:{k}' for i, k in alias_sizes])
 
 
@@ -129,11 +145,32 @@ class Flags:
         n += 'You may supply numbers only.'
         d = []
 
+    class force:
+        n = 'No questions asked'
+        d = False
+
+    class range:
+        n = 'Placeholder "{}" in name will be replaced with these.'
+        d = []
+
     class Actions:
+        class billing_list:
+            d = False
+
+        class billing:
+            n = 'Show current balance'
+
+        class billing_pdf:
+            n = 'download invoice as pdf'
+
+            class uuid:
+                n = 'run billing_list to see uuid'
+                d = ''
+
         class ssh_keys:
             n = 'show configured ssh keys'
 
-        class droplet_cloud_init:
+        class droplet_bootstrap:
             n = 'configure features at existing droplet'
 
         class list:
@@ -146,9 +183,6 @@ class Flags:
         class database_delete:
             s = 'dad'
 
-            class force:
-                n = 'No questions asked'
-
         class droplet_list:
             s = 'dl'
 
@@ -156,19 +190,18 @@ class Flags:
             n = 'List sizes'
 
         class droplet_create:
-            class ssh_add_config:
-                n = 'write the host into your ssh config'
+            pass
+            # class ssh_add_config:
+            #     n = 'write the host into your ssh config'
 
-            class enter:
-                n = 'ssh into it when ready'
+            # class no_bootstrap:
+            #     n = 'Do not wait for droplet up. No bootstrap'
+            #     d = False
 
         class droplet_delete:
             s = 'dd'
             n = 'Deletes all matching droplets. --name must be given, "*" accepted.'
             n = "Example: Delete all created within the last hour: \"dd --since 1h -n '*'"
-
-            class force:
-                n = 'No questions asked'
 
 
 syst = lambda s: os.popen(s).read().strip()
@@ -186,7 +219,16 @@ def die(msg):
     app.die(msg)
 
 
-def API(ep, meth, data=None):
+from devapp.tools import cache
+
+
+@cache(3)
+def GET(ep, **kw):
+    return API(ep, 'get', **kw)
+
+
+def API(ep, meth, data=None, plain=False):
+    app.info(f'API: {meth} {ep}')
     data = data if data is not None else {}
     token = pat[0]
     url = f'https://api.digitalocean.com/v2/{ep}'
@@ -196,6 +238,8 @@ def API(ep, meth, data=None):
     r = meth(url, data=json.dumps(data), headers=h) if data else meth(url, headers=h)
     if not r.status_code < 300:
         die(r.text)
+    if plain:
+        return r
     t = r.text or '{}'
     r = json.loads(t)
     app.debug('Result', json=r)
@@ -210,7 +254,7 @@ def get_ssh_id():
     id = FLG.ssh_key
     if id.isdigit():
         return id
-    r = API('account/keys', 'get')
+    r = GET('account/keys')
     i = [k['id'] for k in r['ssh_keys'] if k['name'] == id]
     if not i:
         app.die('key not found matching name', name=id)
@@ -222,34 +266,56 @@ import time
 now = lambda: int(time.time())
 
 
-def wait_for_ip(name, dt=5, cnt=100):
+def wait_for_ip(name):
     """name must match ONE droplet"""
-    t0 = now()
-    for i in range(cnt):
-        ds = ActionNS.droplet_list(name=name)['droplets']
-        assert len(ds) < 2, 'Name must match ONE droplet'
+
+    def waiter(name=name):
+        ds = Actions.droplet_list(name=name)['droplets']
+        # if len(ds) != 1: app.die('Name must match ONE droplet', have=ds, name=name)
         try:
             ips = ds[0]['ip']
             assert ips
             return ips.split(',', 1)[0]
         except:
             pass
-        time.sleep(dt)
-        w = now() - t0
-        app.info('waiting for ip of droplet', nr=f'{i}/{cnt}', name=name, since=f'{w}sec')
-    app.die('creation failed')
+
+    return wait_for(f'droplet {name} ip', waiter, tmout=300, dt=4)
 
 
-def wait_for_ssh(ip, dt=1, cnt=10):
+def wait_for_ssh(ip=None, name=None):
+    assert name
+    if not ip:
+        ip = wait_for_ip(name)
+    kw = {'tmout': 60, 'dt': 2}
+    wait_for_remote_cmd_output(f'droplet {name}@{ip} ssh', 'ls /', ip=ip, **kw)
+    return ip
+
+
+@cache(0)
+def wait_for_remote_cmd_output(why, cmd, ip, user='root', tmout=60, dt=3):
+    def waiter():
+        return os.popen(f'{ssh} {user}@{ip} {cmd} 2>/dev/null').read().strip()
+
+    return wait_for(why, waiter, tmout=tmout, dt=dt)
+
+
+def wait_for(why, waiter, tmout=60, dt=3):
     t0 = now()
-    for i in range(cnt):
+    tries = int(tmout / dt)
+    i = 0
+    l = getattr(threading.current_thread(), 'logger', app.name)
+    log = app.info
+    while now() - t0 < tmout:
+        i += 1
+        res = waiter()
+        if res:
+            return res
+        log(f'wait for: {why}', nr=f'{i}/{tries}', logger=l)
+        log = app.debug  # second...n times: debug mode
         time.sleep(dt)
-        w = now() - t0
-        app.info('waiting for ssh droplet', nr=f'{i}/{cnt}', ip=ip, since=f'{w}sec')
-        cmd = f'ssh -o StrictHostKeyChecking=accept-new root@{ip} touch /tmp/ssh_check'
-        if not system(cmd, no_fail=True):
-            return
-    app.die('no ssh login')
+        if DIE:
+            app.die('abort')
+    app.die(f'Timeout waiting for {why}', logger=l)
 
 
 def add_ssh_config(ip, name):
@@ -285,15 +351,19 @@ def formatter(res):
         return 1
 
 
-def list_resources(name, typ, simplifier, headers):
+def list_resources(name, typ, simplifier, headers, filtered=True):
     """droplet or database"""
-    name = FLG.name if name is None else name
+    name = name
     match = FLG.match
     since = FLG.since
     tags = FLG.tags
     # for list user expects this. All others will set it:
 
     def matches(d, name=name, match=match, since=since, tags=tags):
+        # creating?
+        if not d.get('id'):
+            return True
+
         if not fnmatch(d['name'], name):
             return
         if not fnmatch(str(d), f'*{match}*'):
@@ -308,8 +378,17 @@ def list_resources(name, typ, simplifier, headers):
         if times.utcnow() - times.iso_to_unix(d['created_at']) < dt:
             return True
 
-    total = [simplifier(d) for d in API(typ, 'get')[typ]]
-    all = [d for d in total if matches(d)]
+    if typ == 'droplets':
+        if have_droplet_ips[0]:
+            total = DROPS.values()
+        else:
+            total = [simplifier(d) for d in GET(typ)[typ]]
+            [DROPS.setdefault(d['name'], {}).update(d) for d in total]
+        have_droplet_ips[0] = not any([d for d in total if not d.get('ip')])
+    else:
+        total = [simplifier(d) for d in GET(typ)[typ]]
+
+    all = [d for d in total if matches(d)] if filtered else total
 
     def formatter(res, typ=typ, headers=headers, matching=len(all), total=len(total)):
         headers = headers(res[typ])
@@ -339,14 +418,132 @@ def resource_delete(typ, lister, force):
     for dr in ds:
         app.warn('deleting', **dr)
         id = dr['id']
-        API(f'{typ}/{id}', 'delete')
+        Thread(target=API, args=(f'{typ}/{id}', 'delete')).start()
     return d
 
 
-class ActionNS:
+def assert_sane_name(name):
+    if not name or '*' in name or '?' in name or '[' in name:
+        app.die('Require "name" with chars only from a-z, A-Z, 0-9, . and -')
+
+
+import sys
+
+# abort while in any waiting loop (concurrent stuff failed):
+DIE = []
+
+
+def run_this(cmd):
+    a = ' '.join(list(sys.argv[:2]))
+    a += ' ' + cmd
+    if do(system, a, log_level='info', no_fail=True):
+        DIE.append(True)
+
+
+from threading import Thread
+
+
+def bg_proc(cmd, **kw):
+    for k, v in kw.items():
+        cmd += f' --{k}="{v}"'
+    Thread(target=run_this, args=(cmd,), daemon=False).start()
+
+
+from functools import partial
+import threading
+
+
+def run_parallel(f, range_, kw):
+    n = kw['name']
+    names = [n.replace('{}', i) for i in range_]
+    t = []
+    for n in names:
+        k = dict(kw)
+        k['name'] = n
+        app.info('Background', **k)
+        # time.sleep(1)
+        t.append(Thread(target=f, kwargs=k, daemon=False))
+        t[-1].start()
+    while any([d for d in t if d.isAlive()]):
+        time.sleep(0.5)
+
+    return Actions.droplet_list()
+
+
+def parametrized_workflow(parallel={'droplet_create', 'droplet_bootstrap'}):
+    action = app.selected_action
+    if action in parallel:
+        f = getattr(Actions, action)
+        from inspect import signature
+
+        sig = signature(f).parameters
+        kw = {}
+        for k in sig:
+            v = getattr(FLG, k, None)
+            if v is None:
+                v = getattr(FLG, f'{action}_{k}', None)
+            if v is None:
+                app.die(f'Missing parameter {k}')
+            kw[k] = v
+
+        if '{}' in FLG.name:
+            range_ = FLG.range
+            if not range_:
+                app.die('Missing range', name=FLG.name)
+            return partial(run_parallel, f, range_, kw)
+        else:
+            return partial(f, **kw)
+
+
+droplet = lambda name: Actions.droplet_list(name=name)
+unalias_size = lambda s: dict(alias_sizes).get(s, s)
+
+
+class Actions:
     def _pre():
         app.out_formatter = formatter
         set_token()
+        # XL to real size:
+        # size_alias_to_real('size')
+        return parametrized_workflow()
+
+    def billing():
+        return GET('customers/my/balance')
+
+    def billing_pdf():
+        uid = FLG.billing_pdf_uuid
+        r = GET(f'customers/my/invoices/{uid}/pdf', plain=True)
+        fn = 'digital_ocean_invoice.pdf'
+        write_file(fn, r.content, mode='wb')
+        return f'created {fn}'
+
+    def billing_list():
+        r = GET('customers/my/billing_history?per_page=100')
+        for d in r['billing_history']:
+            d['date'] = times.dt_human(d['date'])
+
+        def formatter(res):
+            h = list(reversed(res['billing_history']))
+            t = [float(d['amount']) for d in h]
+            t = int(sum([i for i in t if i < 0]))
+            head = [
+                ['amount', {'title': f'{t}$', 'justify': 'right'}],
+                'description',
+                'invoice_uuid',
+                'date',
+                'type',
+            ]
+            return setup_table('Billing history', head, dicts=h)
+
+        r['formatter'] = formatter
+        return r
+
+        # breakpoint()  # FIXME BREAKPOINT
+        # app.info('history', json=r)
+        # breakpoint()  # FIXME BREAKPOINT
+        # r = API('customers/my/invoices/cc485dfc-e041-4b85-a52d-4b282bf24508/pdf', 'get')
+        # r = API('customers/my/balance', 'get')
+        # return r
 
     def database_list(name=None):
         def simplify_values(d):
@@ -375,7 +572,7 @@ class ActionNS:
             return r
 
         def headers(all):
-            t = int(sum([d['$'] for d in all]))
+            t = int(sum([d.get('$', 0) for d in all]))
             return [
                 ['name', {'style': 'green'}],
                 ['$', {'style': 'red', 'justify': 'right', 'title': f'{t}$ (estimated)'}],
@@ -389,9 +586,13 @@ class ActionNS:
 
     @classmethod
     def database_delete(A):
-        return resource_delete('databases', A.database_list, FLG.database_delete_force)
+        return resource_delete('databases', A.database_list, FLG.force)
 
-    def droplet_list(name=None):
+    def droplet_list(name=None, filtered=True):
+        if name is None:
+            name = FLG.name.replace('{}', '*')
+        # if name and name.endswith('2'): breakpoint()  # FIXME BREAKPOINT
+
         def simplify_values(d):
             r = {}
             for k in (
@@ -425,7 +626,7 @@ class ActionNS:
             return r
 
         def headers(all):
-            t = int(sum([d['$'] for d in all]))
+            t = int(sum([d.get('$', 0) for d in all]))
             return [
                 ['name', {'style': 'green'}],
                 ['ip'],
@@ -436,7 +637,10 @@ class ActionNS:
                 ['volume_ids'],
             ]
 
-        return list_resources(name, 'droplets', simplify_values, headers)
+        r = list_resources(name, 'droplets', simplify_values, headers, filtered=filtered)
+        return list_resources(
+            name, 'droplets', simplify_values, headers, filtered=filtered
+        )
 
     def ssh_keys():
         def format(res):
@@ -448,7 +652,7 @@ class ActionNS:
             ]
             return setup_table('SSH Keys', headers, dicts=res['ssh_keys'])
 
-        ks = API('account/keys', 'get')['ssh_keys']
+        ks = GET('account/keys')['ssh_keys']
 
         def f(d):
             d['public_key_end'] = '...' + d.get('public_key')[-30:]
@@ -456,36 +660,37 @@ class ActionNS:
 
         return {'ssh_keys': [f(k) for k in ks], 'formatter': format}
 
-    def droplet_create():
-        name = FLG.name
-        if not name or '*' in name or '?' in name or '[' in name:
-            app.die('Require "--name" with an exact value')
+    def droplet_create(name, image, region, size, tags, features):
+        threading.current_thread().logger = name
+        d = dict(locals())
+        app.info('Dropplet create', **d)
+        d['size'] = unalias_size(d['size'])
+        name = d['name']
+        assert_sane_name(name)
+        droplet(name)
 
-        tags = FLG.tags
-        set_features()
-        tags.extend(FLG.features)
-        size = FLG.size
-        size = dict(alias_sizes).get(size, size)
-
-        d = dict(
-            name=name,
-            image=FLG.image,
-            region=FLG.region,
-            size=FLG.size,
-            ssh_keys=[get_ssh_id()],
-            tags=tags,
-        )
-        d = dd('post', d)
-        ip = wait_for_ip(name)
-        wait_for_ssh(ip)
-        if FLG.droplet_create_ssh_add_config:
-            do(add_ssh_config, ip=ip, name=name)
-        ActionNS.droplet_cloud_init(name=name, ip=ip)
-        return ActionNS.droplet_list(name=name)
+        if name in DROPS:
+            app.warn(f'Droplet {name} exists already')
+            return DROPS[name]
+        have_droplet_ips[0] = False
+        DROPS[name] = {'name': name}
+        feats = validate_features(d.pop('features'))
+        d['tags'] = t = list(d['tags'])
+        t.extend(feats)
+        d['ssh_keys'] = [get_ssh_id()]
+        r = dd('post', d)
+        # if FLG.droplet_create_no_bootstrap:
+        #     app.info('Created. No bootstrap', **d)
+        #     return 'created'
+        # if FLG.droplet_create_ssh_add_config:
+        #     do(add_ssh_config, ip=ip, name=name)
+        Actions.droplet_bootstrap(name=name, features=feats)
+        # wait_for_ssh(name=name)
+        return Actions.droplet_list(name=name)
 
     @classmethod
     def droplet_delete(A):
-        return resource_delete('droplets', A.droplet_list, FLG.droplet_delete_force)
+        return resource_delete('droplets', A.droplet_list, FLG.force)
 
     def droplet_sizes():
         A = {k: v for v, k in dict(alias_sizes).items()}
@@ -500,7 +705,7 @@ class ActionNS:
                 s['description'],
             ]
 
-        all = API('sizes?per_page=100', 'get')
+        all = GET('sizes?per_page=100')
         l = [s(i) for i in reversed(all['sizes'])]
 
         def formatter(res):
@@ -522,22 +727,26 @@ class ActionNS:
         return {'sizes': l, 'formatter': formatter}
 
     def list():
-        dr = ActionNS.droplet_list()
+        dr = Actions.droplet_list()
         formatter(dr)
-        da = ActionNS.database_list()
+        da = Actions.database_list()
         if da['databases']:
             formatter(da)
-        return ''
+        a = Actions.billing()
+        app.info('month to date usage', amount=a['month_to_date_usage'])
 
-    def droplet_cloud_init(name=None, ip=None):
-        set_features()
-        name = name or FLG.name
-        if not ip:
-            ip = wait_for_ip(name)
+    def droplet_bootstrap(name, features):
+        threading.current_thread().logger = name
+        feats = validate_features(features)
+        if not feats:
+            app.warn('no bootstrap features')
+            return
+        app.info(f'bootstrapping', name=name, feats=feats, logger=name)
         feats = FLG.features
-        feats.insert(0, 'add_user')  # always
-        user = FLG.user
-        I = ['#!/bin/bash', f'export user="{user}"']
+        if FLG.user != 'root' and not 'add_sudo_user' in feats:
+            feats.insert(0, 'add_sudo_user')
+
+        I = []
         fns = []
         for f in feats:
             if '/' in f:
@@ -548,31 +757,182 @@ class ActionNS:
                     t for t in all_feats() if f == t.split(':', 1)[1].rsplit('.sh', 1)[0]
                 ]
                 assert len(fn) == 1
-                fn = dci() + '/' + fn[0]
+                fn = d_boostrap_feats() + '/' + fn[0]
             t = os.path.basename(fn)
             fns.append(fn)
-            app.info('adding feature', feat=t)
+            app.info('adding feature', feat=t, logger=name)
             I.append('\necho "----  %s ----"' % t)
+            s = read_file(fn).lstrip()
+            if s.startswith('#!/bin/bash'):
+                s = s.split('\n', 1)[1]
             I.append(read_file(fn))
 
-        init = '\n\n'.join(I)
-        fnt = '/tmp/cloud_init_%s.sh' % os.getpid()
-        write_file(fnt, init)
-        system('scp "%s" "root@%s:cloud_init.sh"' % (fnt, ip))
-        os.unlink(fnt)
-        system('ssh "root@%s" chmod +x /root/cloud_init.sh' % ip)
-        system('ssh "root@%s" /root/cloud_init.sh' % ip)
-        os.environ['ip'] = ip
-        for fn in fns:
-            fnp = fn.replace('.sh', '.post.local.sh')
-            if exists(fnp):
-                do(system, fnp, log_level='info')
-        app.info('initted', ip=ip, name=name, user=user)
+        I = '\n\n'.join(I)
+        parts = find_my_bootstrap_parts(name, I)
+        [run_bootstrap_part(name, part, nr) for part, nr in zip(parts, range(len(parts)))]
+        app.info('initted', logger=name)
 
 
-def set_features():
+def find_my_bootstrap_parts(name, script):
+    I = script.split('\n# part:')
+    I[0] = 'name\n' + I[0]
+    r = []
+    for part in I:
+        cond, body = part.split('\n', 1)
+        local = False
+        if cond.startswith('local:'):
+            cond = cond.split(':', 1)[1]
+            local = True
+        if pycond.pycond(cond.strip())(state=ItemGetter(name=name)):
+            r.append({'local': local, 'body': body})
+    return r
+
+
+from tempfile import NamedTemporaryFile
+
+
+def run_bootstrap_part(name, part, nr):
+    marker = '-RES-'
+    pre = '\n'.join(
+        [
+            '#!/bin/bash',
+            'ip="%(ip)s"',
+            f'name="{name}"',
+            f'function add_result {{ echo "{marker} $1 $2"; }}',
+            f'function ssh_ {{ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@"; }}',
+            f'function scp_ {{ scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@"; }}',
+            '',
+        ]
+    )
+    ctx = ItemGetter(name=name)
+    body = pre + part['body']
+    script = preproc_bootstrap_script(body, ctx) % ctx
+    fnt = NamedTemporaryFile(prefix=f'bootstrap_{nr}.{name}.').name
+    ip = DROPS[name]['ip']
+    fntr = f'root@{ip}:/root/' + os.path.basename(fnt)
+    fntres = f'{fnt}.res'
+    where = 'locally' if part['local'] else 'remotely'
+    app.info(f'Running script {nr} {where}', logger=name)
+    write_file(fnt, script, chmod=0o755)
+    system(f'cat "{fnt}"')
+    if not part['local']:
+        scp = ssh.replace('ssh', 'scp')
+        cmd = f'{scp} "{fnt}" "{fntr}"'
+        if os.system(cmd):
+            app.info('waiting for ssh', logger=name)
+            wait_for_ssh(ip, name)
+            if system(cmd):
+                app.die('Bootstrap failed', name=name)
+        fntr = '/root/' + fntr.split('/root/', 1)[1]
+        cmd = f'{ssh} "root@{ip}" "{fntr}"'
+    else:
+        cmd = f'"{fnt}"'
+    cmd += f' | tee >(grep -e {marker} --color=never > "{fntres}")'
+    if system(cmd):
+        app.die('cmd failed')
+    res = {}
+
+    def parse(res_line, name=name, res=res):
+        l = res_line.split(' ', 2)
+        DROPS[name][l[1]] = l[2]
+        res[l[1]] = l[2]
+
+    [parse(l) for l in read_file(f'{fntres}', dflt='').splitlines()]
+    if res:
+        app.info(f'{name} bootstrap result', **res)
+    # os.unlink(fnt)
+    # os.unlink(fntres)
+
+
+def preproc_bootstrap_script(init, ctx):
+    """ filter blocks by pycond statements
+    # cond: name not contains server
+    ...
+    # else
+    ...
+    # end cond
+
+    exit ends the parsing if not in negated condition.
+    """
+    r = []
+    lines = init.splitlines()
+    pyc = None
+    while lines:
+        line = lines.pop(0)
+        if line.startswith('# end cond'):
+            assert pyc is not None
+            pyc = None
+            continue
+        if line.startswith('# else'):
+            assert pyc is not None
+            pyc = not pyc
+            continue
+        if not line.startswith('# cond:'):
+            if pyc in (None, True):
+                r.append(line)
+                if line.startswith('exit '):
+                    return '\n'.join(r)
+            continue
+        assert pyc == None
+        pyc = pycond.pycond(line.split(':', 1)[1].strip())(state=ctx)
+    return '\n'.join(r)
+
+
+# s = read_file(
+#     '/home/gk/repos/gh/AXGKl/devapps/src/devapp/plugins/ops_devapp/infra_digital_ocean/bootstrap_features/500:k3s.sh'
+# )
+# pbs = preproc_bootstrap_script
+# breakpoint()  # FIXME BREAKPOINT
+# print(pbs(s, {'local': True, 'name': 'foo'}))
+# breakpoint()  # FIXME BREAKPOINT
+# print(pbs(s, {'local': False, 'name': 'foo'}))
+# breakpoint()  # FIXME BREAKPOINT
+# print(pbs(s, {'local': True, 'name': 'fooserver'}))
+# breakpoint()  # FIXME BREAKPOINT
+
+
+class ItemGetter(dict):
+    def __getitem__(self, k):
+        tmout = 120
+        if k.startswith('wait:'):
+            _, tmout, k = k.split(':', 2)
+        l = k.split('.')
+        if l[0] == 'flag':
+            return getattr(FLG, l[1])
+        if l[0] == 'env':
+            return os.environ.get(l[2], '')
+        name = self.get('name')
+        if l[0] in DROPS or l[0] == 'match:key':
+            drop, k = l[0], l[1]
+        elif l[0] == 'matched':
+            return self.get('matched')[l[1]]
+        else:
+            drop = name
+
+        def waiter(name=drop, k=k, self=self):
+            if name == 'match:key':
+                h = [d for d in DROPS.values() if k in d]
+                if not h:
+                    return
+                self['matched'] = h[0]
+                return h[0][k]
+            if not have_droplet_ips[0]:
+                Actions.droplet_list(name=name)
+            d = DROPS[name]
+            return d.get(k)
+
+        v = waiter()
+        if v:
+            return v
+        t0 = now()
+        r = wait_for(f'{k} of {drop}', waiter, tmout=int(tmout))
+        # print('ret', r, 'for', k)
+        app.info(f'got {k}', dt=now() - t0, logger=name)
+        return r
+
+
+def validate_features(feats):
     """featuers may have short forms - here we set the full ones"""
-    feats = FLG.features
     r, cust = [], []
     all_features = all_feats()
     for f in feats:
@@ -588,12 +948,22 @@ def set_features():
     r = sorted(r)
     r = [i.split(':', 1)[1].rsplit('.sh', 1)[0] for i in r]
     r.extend(cust)
-    FLG.features = r
+    return r
 
 
 def setup_table(title, headers, dicts=None):
     tble = Table(title=title)
-    headers = [[i] if isinstance(i, str) else i for i in headers]
+
+    def auto(col, dicts=dicts):
+        if dicts:
+            try:
+                float(dicts[0].get(col, ''))
+                return [col, {'justify': 'right'}]
+            except:
+                pass
+        return [col]
+
+    headers = [auto(i) if isinstance(i, str) else i for i in headers]
     headers = [[h[0], {} if len(h) == 1 else h[1]] for h in headers]
     [tble.add_column(h[1].pop('title', h[0]), **h[1]) for h in headers]
     if dicts is not None:
@@ -603,8 +973,49 @@ def setup_table(title, headers, dicts=None):
 
 
 def main():
-    run_app(ActionNS, flags=Flags)
+    run_app(Actions, flags=Flags)
 
 
 if __name__ == '__main__':
     main()
+
+
+# begin_archive
+# Demo for different flag style:
+# class Workflows:
+#     class k3s_cluster:
+#         """Create a single server K3S cluster"""
+#
+#         class workers:
+#             d = 2
+#
+#         class server_size:
+#             d = 'XXS'
+#
+#         def run(workers, server_size):
+#             pass
+#
+# def add_workflow_flags(name):
+#     wf = getattr(Workflows, name)
+#     if not isinstance(wf, type):
+#         return
+#     FA = Flags.Actions
+#     A = Actions
+#     setattr(FA, name, wf)
+#     setattr(A, name, wf.run)
+#
+#
+# [add_workflow_flags(w) for w in dir(Workflows) if not w[0] == '_']
+#
+#   ------------------ and in def _pre then:
+#
+# wf = getattr(Workflows, action, 0)
+# if not wf:
+#     return
+# attrs = lambda c: [i for i in dir(c) if i[0] not in ['_', 'd', 'n'] and i != 'run']
+# kw = {}
+# for a in attrs(wf):
+#     v = getattr(FLG, action + '_' + a, None)
+#     if v is not None:
+#         kw[a] = v
+# return partial(wf.run, **kw)
