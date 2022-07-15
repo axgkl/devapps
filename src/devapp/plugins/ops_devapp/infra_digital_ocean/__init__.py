@@ -39,18 +39,14 @@ from devapp import gevent_patched
 import json
 import os
 
+from tempfile import NamedTemporaryFile
 from rich.console import Console
 from rich.table import Table
 import requests
 from devapp.app import FLG, app, run_app, do, system
 from devapp.time_tools import times
 from fnmatch import fnmatch
-from devapp.tools import (
-    confirm,
-    exists,
-    read_file,
-    write_file,
-)
+from devapp.tools import confirm, exists, read_file, write_file, dirname
 
 from devapp.app import app, run_app, FLG
 
@@ -305,13 +301,18 @@ def wait_for(why, waiter, tmout=60, dt=3):
     i = 0
     l = getattr(threading.current_thread(), 'logger', app.name)
     log = app.info
+    tm, still = t0, ''
     while now() - t0 < tmout:
         i += 1
         res = waiter()
         if res:
             return res
-        log(f'wait for: {why}', nr=f'{i}/{tries}', logger=l)
+        log(f'{still}waiting for: {why}', nr=f'{i}/{tries}', logger=l)
         log = app.debug  # second...n times: debug mode
+        if now() - tm > 60:
+            log = app.info
+            tm = now()
+            still = 'still '
         time.sleep(dt)
         if DIE:
             app.die('abort')
@@ -443,10 +444,10 @@ def run_this(cmd):
 from threading import Thread
 
 
-def bg_proc(cmd, **kw):
-    for k, v in kw.items():
-        cmd += f' --{k}="{v}"'
-    Thread(target=run_this, args=(cmd,), daemon=False).start()
+# def bg_proc(cmd, **kw):
+#     for k, v in kw.items():
+#         cmd += f' --{k}="{v}"'
+#     Thread(target=run_this, args=(cmd,), daemon=False).start()
 
 
 from functools import partial
@@ -464,15 +465,31 @@ def run_parallel(f, range_, kw):
         # time.sleep(1)
         t.append(Thread(target=f, kwargs=k, daemon=False))
         t[-1].start()
+
     while any([d for d in t if d.isAlive()]):
         time.sleep(0.5)
 
     return Actions.droplet_list()
 
 
+tmp_dir = [0]
+
+
+def make_temp_dir(prefix):
+    dnt = NamedTemporaryFile(prefix=f'{prefix}_').name
+    user = FLG.user
+    os.makedirs(dnt, exist_ok=True)
+    sm = dirname(dnt) + f'/{prefix}.{user}'  # convenience
+    os.unlink(sm) if exists(sm) else 0
+    os.symlink(dnt, sm, target_is_directory=True)
+    tmp_dir[0] = sm
+
+
 def parametrized_workflow(parallel={'droplet_create', 'droplet_bootstrap'}):
     action = app.selected_action
     if action in parallel:
+        # utillity for temporary files - at the same place:
+        make_temp_dir(action)
         f = getattr(Actions, action)
         from inspect import signature
 
@@ -742,8 +759,9 @@ class Actions:
             app.warn('no bootstrap features')
             return
         app.info(f'bootstrapping', name=name, feats=feats, logger=name)
+        user = FLG.user
         feats = FLG.features
-        if FLG.user != 'root' and not 'add_sudo_user' in feats:
+        if user != 'root' and not 'add_sudo_user' in feats:
             feats.insert(0, 'add_sudo_user')
 
         I = []
@@ -765,10 +783,13 @@ class Actions:
             s = read_file(fn).lstrip()
             if s.startswith('#!/bin/bash'):
                 s = s.split('\n', 1)[1]
-            I.append(read_file(fn))
+            I.append(s)
+            # otherwise a local part in file1, followed by server feature would run *both* local:
+            I.append('# part:\n')
 
         I = '\n\n'.join(I)
         parts = find_my_bootstrap_parts(name, I)
+
         [run_bootstrap_part(name, part, nr) for part, nr in zip(parts, range(len(parts)))]
         app.info('initted', logger=name)
 
@@ -779,16 +800,18 @@ def find_my_bootstrap_parts(name, script):
     r = []
     for part in I:
         cond, body = part.split('\n', 1)
+        if not body.strip():
+            continue
         local = False
         if cond.startswith('local:'):
             cond = cond.split(':', 1)[1]
             local = True
-        if pycond.pycond(cond.strip())(state=ItemGetter(name=name)):
+        cond = cond.strip()
+        if not cond:
+            cond = 'name'  # always there
+        if pycond.pycond(cond)(state=ItemGetter(name=name)):
             r.append({'local': local, 'body': body})
     return r
-
-
-from tempfile import NamedTemporaryFile
 
 
 def run_bootstrap_part(name, part, nr):
@@ -807,7 +830,8 @@ def run_bootstrap_part(name, part, nr):
     ctx = ItemGetter(name=name)
     body = pre + part['body']
     script = preproc_bootstrap_script(body, ctx) % ctx
-    fnt = NamedTemporaryFile(prefix=f'bootstrap_{nr}.{name}.').name
+    d_tmp = tmp_dir[0]
+    fnt = f'{d_tmp}/{name}.{nr}'
     ip = DROPS[name]['ip']
     fntr = f'root@{ip}:/root/' + os.path.basename(fnt)
     fntres = f'{fnt}.res'
@@ -828,6 +852,7 @@ def run_bootstrap_part(name, part, nr):
     else:
         cmd = f'"{fnt}"'
     cmd += f' | tee >(grep -e {marker} --color=never > "{fntres}")'
+    print('running', cmd)
     if system(cmd):
         app.die('cmd failed')
     res = {}
@@ -878,19 +903,6 @@ def preproc_bootstrap_script(init, ctx):
     return '\n'.join(r)
 
 
-# s = read_file(
-#     '/home/gk/repos/gh/AXGKl/devapps/src/devapp/plugins/ops_devapp/infra_digital_ocean/bootstrap_features/500:k3s.sh'
-# )
-# pbs = preproc_bootstrap_script
-# breakpoint()  # FIXME BREAKPOINT
-# print(pbs(s, {'local': True, 'name': 'foo'}))
-# breakpoint()  # FIXME BREAKPOINT
-# print(pbs(s, {'local': False, 'name': 'foo'}))
-# breakpoint()  # FIXME BREAKPOINT
-# print(pbs(s, {'local': True, 'name': 'fooserver'}))
-# breakpoint()  # FIXME BREAKPOINT
-
-
 class ItemGetter(dict):
     def __getitem__(self, k):
         tmout = 120
@@ -918,7 +930,11 @@ class ItemGetter(dict):
                 return h[0][k]
             if not have_droplet_ips[0]:
                 Actions.droplet_list(name=name)
-            d = DROPS[name]
+            d = DROPS.get(name)
+            if not d:
+                app.die(
+                    f'Droplet {name} expected but not present.', hint='was it created?'
+                )
             return d.get(k)
 
         v = waiter()
