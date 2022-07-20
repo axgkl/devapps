@@ -6,6 +6,10 @@
 Low level Operations on the DO Cloud, using their REST API
 E.g. when terraform destroy fails, you can delete droplets using this.
 
+## Caution
+
+Most features are tested against a Fedora host filesystem (the default image)
+
 ## Requirements
 - API Token
 
@@ -26,7 +30,6 @@ E.g. when terraform destroy fails, you can delete droplets using this.
 ## Misc
 
 See Actions at -h
-
 """
 # Could be done far smaller.
 import time
@@ -42,11 +45,13 @@ import os
 from tempfile import NamedTemporaryFile
 from rich.console import Console
 from rich.table import Table
+from rich.markdown import Markdown
 import requests
 from devapp.app import FLG, app, run_app, do, system
+
 from devapp.time_tools import times
 from fnmatch import fnmatch
-from devapp.tools import confirm, exists, read_file, write_file, dirname
+from devapp.tools import confirm, exists, read_file, write_file, dirname, cast
 
 from devapp.app import app, run_app, FLG
 
@@ -67,17 +72,27 @@ def d_boostrap_feats():
 
 
 def all_feats():
-    return [
-        f
-        for f in os.listdir(d_boostrap_feats())
-        if not '.local' in f and ':' in f and f.endswith('.sh')
-    ]
+    h = []
+    D = getattr(FLG, 'features_dir', '')
+    for d in [D, d_boostrap_feats()]:
+        if not d or not exists(d):
+            continue
+        l = [
+            f
+            for f in os.listdir(d)
+            if not '.local' in f
+            and ':' in f
+            and f.endswith('.sh')
+            and not f in h
+        ]
+        h.extend(l)
+    return h
 
 
 def show_features():
     fs = all_feats()
     r = [i.rsplit('.sh', 1)[0].split(':', 1) for i in fs]
-    return ', '.join([i[1] for i in r])
+    return '- ' + '\n- '.join([i[1] for i in r])
 
 
 # fmt:off
@@ -137,9 +152,13 @@ class Flags:
 
     class features:
         n = 'Configure features via SSH (as root).'
-        n += 'Have: %s. Filename accepted.' % show_features()
+        n += 'Have:\n%s.\nFilename accepted.' % show_features()
         n += 'You may supply numbers only.'
         d = []
+
+    class features_dir:
+        s = 'fdir'
+        n = 'Custom feature catalog directory, in addition to built in one'
 
     class force:
         n = 'No questions asked'
@@ -150,6 +169,10 @@ class Flags:
         d = []
 
     class Actions:
+        class list_features:
+            s = 'feats'
+            n = 'describe features (given with -f or all). Supported: --list_features -m <match>, --list_features k3s (ident to --feature=k3s)'
+
         class billing_list:
             d = False
 
@@ -230,8 +253,15 @@ def API(ep, meth, data=None, plain=False):
     url = f'https://api.digitalocean.com/v2/{ep}'
     app.debug(f'API: {meth} {ep}', **data)
     meth = getattr(requests, meth)
-    h = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
-    r = meth(url, data=json.dumps(data), headers=h) if data else meth(url, headers=h)
+    h = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json',
+    }
+    r = (
+        meth(url, data=json.dumps(data), headers=h)
+        if data
+        else meth(url, headers=h)
+    )
     if not r.status_code < 300:
         die(r.text)
     if plain:
@@ -375,7 +405,14 @@ def list_resources(name, typ, simplifier, headers, filtered=True):
                     return
         if not since:
             return True
-        dt = times.to_sec(since)
+        try:
+            dt = times.to_sec(since)
+        except Exception as _:
+            app.die(
+                'Cannot convert to unixtime',
+                given=since,
+                hint='Wrong CLI flag? Try -h or --hf to see flag names',
+            )
         if times.utcnow() - times.iso_to_unix(d['created_at']) < dt:
             return True
 
@@ -391,7 +428,9 @@ def list_resources(name, typ, simplifier, headers, filtered=True):
 
     all = [d for d in total if matches(d)] if filtered else total
 
-    def formatter(res, typ=typ, headers=headers, matching=len(all), total=len(total)):
+    def formatter(
+        res, typ=typ, headers=headers, matching=len(all), total=len(total)
+    ):
         headers = headers(res[typ])
         taglist = ','.join(tags)
         T = typ.capitalize()
@@ -518,11 +557,40 @@ unalias_size = lambda s: dict(alias_sizes).get(s, s)
 
 class Actions:
     def _pre():
+        D = FLG.features_dir
+        if D:
+            FLG.features_dir = os.path.abspath(D)
         app.out_formatter = formatter
         set_token()
         # XL to real size:
         # size_alias_to_real('size')
         return parametrized_workflow()
+
+    def list_features():
+        md = []
+        if (
+            not FLG.features
+            and not sys.argv[-1][0] == '-'
+            and sys.argv[-2] == '--list_features'
+        ):
+            FLG.features = [sys.argv[-1]]
+        feats = FLG.features or all_feats()
+        feats = validate_features(feats)
+        match = FLG.match
+        for t, feat in feature_fns(feats):
+            c = read_file(feat)
+            if match and not match in c:
+                continue
+            try:
+                c, b = c.split("'", 1)[1].split("\n'", 1)
+                c = ('\n' + c).replace('\n#', '\n##')
+            except:
+                c, b = 'No description', c
+            b = f'```bash\n{b}\n```\n'
+            md.append(f'# {t}\n{feat}\n{b}\n\n{c}---- \n')
+        console = Console()
+        md = Markdown('\n'.join(md))
+        console.print(md)
 
     def billing():
         return GET('customers/my/balance')
@@ -592,7 +660,14 @@ class Actions:
             t = int(sum([d.get('$', 0) for d in all]))
             return [
                 ['name', {'style': 'green'}],
-                ['$', {'style': 'red', 'justify': 'right', 'title': f'{t}$ (estimated)'}],
+                [
+                    '$',
+                    {
+                        'style': 'red',
+                        'justify': 'right',
+                        'title': f'{t}$ (estimated)',
+                    },
+                ],
                 ['since', {'justify': 'right'}],
                 ['tags'],
                 ['size'],
@@ -646,15 +721,18 @@ class Actions:
             t = int(sum([d.get('$', 0) for d in all]))
             return [
                 ['name', {'style': 'green'}],
-                ['ip'],
+                ['ip', {'min_width': 15}],
                 ['$', {'style': 'red', 'justify': 'right', 'title': f'{t}$'}],
                 ['since', {'justify': 'right'}],
                 ['tags'],
                 ['size_slug'],
+                ['region'],
                 ['volume_ids'],
             ]
 
-        r = list_resources(name, 'droplets', simplify_values, headers, filtered=filtered)
+        r = list_resources(
+            name, 'droplets', simplify_values, headers, filtered=filtered
+        )
         return list_resources(
             name, 'droplets', simplify_values, headers, filtered=filtered
         )
@@ -686,16 +764,16 @@ class Actions:
         assert_sane_name(name)
         droplet(name)
 
-        if name in DROPS:
-            app.warn(f'Droplet {name} exists already')
-            return DROPS[name]
-        have_droplet_ips[0] = False
-        DROPS[name] = {'name': name}
         feats = validate_features(d.pop('features'))
         d['tags'] = t = list(d['tags'])
         t.extend(feats)
         d['ssh_keys'] = [get_ssh_id()]
-        r = dd('post', d)
+        if name in DROPS:
+            app.warn(f'Droplet {name} exists already')
+        else:
+            have_droplet_ips[0] = False
+            DROPS[name] = {'name': name}
+            dd('post', d)
         # if FLG.droplet_create_no_bootstrap:
         #     app.info('Created. No bootstrap', **d)
         #     return 'created'
@@ -763,22 +841,12 @@ class Actions:
         feats = FLG.features
         if user != 'root' and not 'add_sudo_user' in feats:
             feats.insert(0, 'add_sudo_user')
+        feats.insert(0, 'functions')
 
         I = []
-        fns = []
-        for f in feats:
-            if '/' in f:
-                assert exists(f)
-                fn = f
-            else:
-                fn = [
-                    t for t in all_feats() if f == t.split(':', 1)[1].rsplit('.sh', 1)[0]
-                ]
-                assert len(fn) == 1
-                fn = d_boostrap_feats() + '/' + fn[0]
-            t = os.path.basename(fn)
-            fns.append(fn)
-            app.info('adding feature', feat=t, logger=name)
+        fn_feats = feature_fns(feats)
+        for t, fn in fn_feats:
+            app.info('parsing feature', feat=t, logger=name)
             I.append('\necho "----  %s ----"' % t)
             s = read_file(fn).lstrip()
             if s.startswith('#!/bin/bash'):
@@ -790,8 +858,39 @@ class Actions:
         I = '\n\n'.join(I)
         parts = find_my_bootstrap_parts(name, I)
 
-        [run_bootstrap_part(name, part, nr) for part, nr in zip(parts, range(len(parts)))]
+        [
+            run_bootstrap_part(name, part, nr)
+            for part, nr in zip(parts, range(len(parts)))
+        ]
         app.info('initted', logger=name)
+
+
+def feature_fns(feats):
+    fns = []
+    D = FLG.features_dir
+    dirs = [d_boostrap_feats()]
+    dirs.insert(0, D) if D else 0
+    for f in feats:
+        if '/' in f:
+            assert exists(f)
+            fn = f
+        else:
+            fn = [
+                t
+                for t in all_feats()
+                if f == t.split(':', 1)[1].rsplit('.sh', 1)[0]
+            ]
+            assert len(fn) == 1
+            F = fn
+            for d in dirs:
+                fn = d + '/' + F[0]
+                if exists(fn):
+                    break
+        if not exists(fn):
+            app.die('Not found', feature=f, checked=dirs)
+        t = os.path.basename(fn)
+        fns.append([t, fn])
+    return fns
 
 
 def find_my_bootstrap_parts(name, script):
@@ -816,18 +915,9 @@ def find_my_bootstrap_parts(name, script):
 
 def run_bootstrap_part(name, part, nr):
     marker = '-RES-'
-    pre = '\n'.join(
-        [
-            '#!/bin/bash',
-            'ip="%(ip)s"',
-            f'name="{name}"',
-            f'function add_result {{ echo "{marker} $1 $2"; }}',
-            f'function ssh_ {{ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@"; }}',
-            f'function scp_ {{ scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@"; }}',
-            '',
-        ]
-    )
-    ctx = ItemGetter(name=name)
+    s = '\nsource "$(dirname "$0")/functions.sh"' if nr > 0 else ''
+    pre = f'#!/bin/bash\n\n{s}\n'
+    ctx = ItemGetter(name=name, marker=marker)
     body = pre + part['body']
     script = preproc_bootstrap_script(body, ctx) % ctx
     d_tmp = tmp_dir[0]
@@ -838,6 +928,9 @@ def run_bootstrap_part(name, part, nr):
     where = 'locally' if part['local'] else 'remotely'
     app.info(f'Running script {nr} {where}', logger=name)
     write_file(fnt, script, chmod=0o755)
+    if nr == 0:
+        # for local executions, also our lib:
+        write_file(f'{d_tmp}/functions.sh', script, chmod=0o755)
     system(f'cat "{fnt}"')
     if not part['local']:
         scp = ssh.replace('ssh', 'scp')
@@ -870,7 +963,7 @@ def run_bootstrap_part(name, part, nr):
 
 
 def preproc_bootstrap_script(init, ctx):
-    """ filter blocks by pycond statements
+    """filter blocks by pycond statements
     # cond: name not contains server
     ...
     # else
@@ -900,11 +993,26 @@ def preproc_bootstrap_script(init, ctx):
             continue
         assert pyc == None
         pyc = pycond.pycond(line.split(':', 1)[1].strip())(state=ctx)
-    return '\n'.join(r)
+    return '\n'.join(r) + '\n'
 
 
 class ItemGetter(dict):
-    def __getitem__(self, k):
+    # cond: env.selinux (pycond uses .get, not getitem) -> fwd to that:
+    def get(self, k, dflt=None):
+        if k in self:
+            return super().get(k)
+        return self.__getitem__(k, dflt)
+
+    def __getitem__(self, k, dflt=''):
+        l = k.rsplit('|', 1)
+        r = self.g(l[0])
+        if r in (None, '') and len(l) == 2:
+            return l[1]
+        return r
+
+    def g(self, k):
+        if k in self:
+            return self.get(k)
         tmout = 120
         if k.startswith('wait:'):
             _, tmout, k = k.split(':', 2)
@@ -912,7 +1020,7 @@ class ItemGetter(dict):
         if l[0] == 'flag':
             return getattr(FLG, l[1])
         if l[0] == 'env':
-            return os.environ.get(l[2], '')
+            return cast(os.environ.get(l[1], ''))
         name = self.get('name')
         if l[0] in DROPS or l[0] == 'match:key':
             drop, k = l[0], l[1]
@@ -933,7 +1041,8 @@ class ItemGetter(dict):
             d = DROPS.get(name)
             if not d:
                 app.die(
-                    f'Droplet {name} expected but not present.', hint='was it created?'
+                    f'Droplet {name} expected but not present.',
+                    hint='was it created?',
                 )
             return d.get(k)
 
