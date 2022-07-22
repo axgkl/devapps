@@ -169,8 +169,15 @@ def _build_base(_base_name, _base_parent_type):
 # Try to import the C-Extensions for AXTree
 try:
     from ax.utils.ax_tree._ax_tree import _AXTree
+
 except ImportError:
     # Fall back to the python implementation
+    import sys
+
+    print(
+        'No C-Extension for ax_tree. Slow python version loaded',
+        file=sys.stderr,
+    )
     _AXTree = _build_base('_SlowAXTree', dict)
 
 
