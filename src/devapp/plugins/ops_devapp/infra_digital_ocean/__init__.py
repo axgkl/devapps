@@ -840,8 +840,11 @@ class Actions:
         user = FLG.user
         feats = FLG.features
         if user != 'root' and not 'add_sudo_user' in feats:
+            app.info('Non root user -> adding add_sudo_user feat', user=user)
             feats.insert(0, 'add_sudo_user')
-        feats.insert(0, 'functions')
+        if not 'functions' in feats:
+            app.info('Adding common functions to features')
+            feats.insert(0, 'functions')
 
         I = []
         fn_feats = feature_fns(feats)
@@ -916,7 +919,8 @@ def find_my_bootstrap_parts(name, script):
 def run_bootstrap_part(name, part, nr):
     marker = '-RES-'
     s = '\nsource "$(dirname "$0")/functions.sh"' if nr > 0 else ''
-    pre = f'#!/bin/bash\n\n{s}\n'
+    pre = ['#!/bin/bash', 'ip="%(ip)s"', f'name="{name}"', s, '']
+    pre = '\n'.join(pre)
     ctx = ItemGetter(name=name, marker=marker)
     body = pre + part['body']
     script = preproc_bootstrap_script(body, ctx) % ctx

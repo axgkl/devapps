@@ -4,9 +4,6 @@ _='# Useful functions
 This is run at the very start and creates /root/functions.sh, which all others source
 '
 
-ip="%(ip)s" # causes wait for droplet ip
-name="%(name)s"
-
 function add_result { echo "%(marker)s $1 $2"; }
 
 function transfer {
