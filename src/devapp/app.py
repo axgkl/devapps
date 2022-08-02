@@ -21,7 +21,9 @@ FLG = flags_.FLAGS
 env = os.environ
 py_env = load.py_env
 
-kvmsg = lambda kw: '  ' + '\n  '.join(['%s: %s' % (k, str(v)) for k, v in kw.items()])
+kvmsg = lambda kw: '  ' + '\n  '.join(
+    ['%s: %s' % (k, str(v)) for k, v in kw.items()]
+)
 kvprint = lambda l, msg, kw: print('[%s] %s\n%s' % (l, msg, kvmsg(kw)))
 
 notifier = [None]
@@ -238,7 +240,10 @@ def run_app(
         # certain tests require starting the app when already an app is running:
         if call_main_when_already_running:
             return main()
-        app.die('Repeated call of app.run_app', hint='Should call only once per proc.')
+        app.die(
+            'Repeated call of app.run_app',
+            hint='Should call only once per proc.',
+        )
 
     running[0] = True
 
@@ -294,7 +299,13 @@ def define_action_flags_in_cli():
             continue
         if p > 1:
             pa = args[p - 1]
-            pa = pa[2:] if pa.startswith('--') else pa[1:] if pa.startswith('-') else pa
+            pa = (
+                pa[2:]
+                if pa.startswith('--')
+                else pa[1:]
+                if pa.startswith('-')
+                else pa
+            )
             pf = FLG.__flags.get(pa)
             if pf and pf.flag_type() != 'bool':
                 continue
@@ -304,7 +315,9 @@ def define_action_flags_in_cli():
             continue
         have.add(key)
         args[p] = '--' + f['key']
-        tools.define_flags(f['flg_cls'], sub=key, parent_autoshort=f['autoshort'])
+        tools.define_flags(
+            f['flg_cls'], sub=key, parent_autoshort=f['autoshort']
+        )
         app.selected_action = key
         # action[0] = key
 
@@ -583,7 +596,15 @@ def app_func(inner=False):
 
 
 def do(
-    func, *a, _step=[0], titelize='', log_level=None, ll=None, fl=None, store=None, **kw
+    func,
+    *a,
+    _step=[0],
+    titelize='',
+    log_level=None,
+    ll=None,
+    fl=None,
+    store=None,
+    **kw
 ):
     """When fl (full log level) is set to e.g. 10 we log only the message at higher levels"""
 
@@ -616,11 +637,15 @@ def do(
 
 
 def system(cmd, no_fail=False):
+    if isinstance(cmd, list):
+        cmd = ' '.join('"%s"' % str(i) for i in cmd)
     # print('\x1b[38;5;240m', end='')
     d = ' 1>&2'
     # cat -> colors off
     fnf = '/tmp/failed_system_cmd'
-    rcmd = 'echo -ne "\x1b[38;5;240m"%s; %s%s || touch "%s"; echo -ne "\x1b[0m"%s'
+    rcmd = (
+        'echo -ne "\x1b[38;5;240m"%s; %s%s || touch "%s"; echo -ne "\x1b[0m"%s'
+    )
     rcmd = rcmd % (d, cmd, d, fnf, d)
     os.system(rcmd)
     err = False

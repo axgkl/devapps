@@ -605,7 +605,7 @@ def rsc_cmds(rsc):
 
 
 def api():
-    from devapp import resource_tools as api
+    from devapp import tools.resource as api
 
     return api
 

@@ -4,6 +4,8 @@ _='# Docker Installation
 Fedora only version for now
 '
 
+source "%(feature:functions.sh)s"
+
 function docker_inst {
 	echo 'Installing docker'
 	dnf -y install dnf-plugins-core

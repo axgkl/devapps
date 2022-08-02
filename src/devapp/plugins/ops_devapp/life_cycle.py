@@ -26,7 +26,7 @@ from devapp.tools import (
     read_file,
     write_file,
 )
-import devapp.resource_tools as api
+import devapp.tools.resource as api
 
 
 class Flags(api.CommonFlags):
