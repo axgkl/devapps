@@ -486,31 +486,11 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         cmd = [w, ':'.join([d, str(os.getpid()), match, rec])]
         watcher_pid = subprocess.Popen(cmd).pid
 
-    # An Action class - use it:
-    post = None
-    if isinstance(main, type):
-        action_cls = main
-        if not app.selected_action:
-            for af in tools.action_flags.values():
-                if af['flg_cls'].d:
-                    app.selected_action = af['key']
-                    app.debug('Running default action', action=af['key'])
-                    break
-        main = getattr(action_cls, app.selected_action, None)
-        if not main:
-            app.die('Require action')
-        pre = getattr(action_cls, '_pre', 0)
-        if pre:
-            # app.debug('Prepare hook') - may parametrize the action func
-            _ = pre()
-            if _:
-                main = _
-            # app.debug(action[0])
-        post = getattr(action_cls, '_post', 0)
-
-    res = None
+    res = post = None
     while True:
         try:
+            if isinstance(main, type):
+                main, post = handle_action_cls(app, action_cls=main)
             # so that everybody knows what is running. informational
             app._app_func = main
             # main = lambda: run_app(Action, flags=Flags, wrapper=cleanup)
@@ -566,6 +546,32 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         print(coljhighlight(res))
     # abseil would print it again:
     # return res
+
+
+def handle_action_cls(app, action_cls, post=None):
+    # An Action class - use it:
+    if not app.selected_action:
+        for af in tools.action_flags.values():
+            if af['flg_cls'].d:
+                app.selected_action = af['key']
+                app.debug('Running default action', action=af['key'])
+                break
+    if not app.selected_action:
+        app.die('Require action. No default action is set.')
+    main = getattr(action_cls, app.selected_action, None)
+    if not main:
+        app.die('Require action', no_found=app.selected_action)
+    pre = getattr(action_cls, '_pre', 0)
+    if pre:
+        # app.debug('Prepare hook') - may parametrize the action func
+        _ = pre()
+
+        if _:
+            main = _
+    if isinstance(main, type):
+        main = main.run
+    post = getattr(action_cls, '_post', 0)
+    return main, post
 
 
 #

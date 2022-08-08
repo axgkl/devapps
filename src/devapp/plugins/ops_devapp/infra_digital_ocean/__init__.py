@@ -46,15 +46,6 @@ from operator import setitem
 # droplet_list_cache_max_age = int(os.environ.get('droplet_list_cache_max_age', 3))
 
 
-class Flags(Flags):
-    class Actions(Flags.Actions):   # for -h output (then def.ed in this mod)
-        class database_list:
-            s = 'dal'
-
-        class database_delete:
-            s = 'dad'
-
-
 class Actions(Actions):
     # only at DO:
     def database_list(name=None):
@@ -67,6 +58,7 @@ class Actions(Actions):
         )
 
 
+Flags._pre_init(Flags, Actions)
 Flags.token_cmd.d = 'pass show DO/pat'
 Flags.region.d = 'fra1'
 
@@ -93,7 +85,12 @@ def fmt_drops_in_vpc(_, d, into):
     fmt.droplet_id_to_name('droplet_ids', d, into)
 
 
-fmt_region = lambda key, d, into: setitem(into, key, d[key]['slug'])
+def fmt_region(key, d, into):
+    v = d[key]
+    v = v['slug'] if 'slug' in v else v
+    setitem(into, key, v)
+
+
 fmt_tags = lambda key, d, into: setitem(into, 'tags', ' '.join(d[key]))
 
 
@@ -121,6 +118,16 @@ class Prov(Provider):
             [i['region'].pop('sizes') for i in api_response]
         except:
             pass
+
+    class load_balancer:
+        # fmt:off
+        endpoint = 'load_balancers'
+        normalize = [
+            ['created_at'      , fmt.to_since           ] ,
+            ['droplet_ids'     , fmt.droplet_id_to_name ] ,
+            ['region'          , fmt_region             ] ,
+        ]
+        # fmt:on
 
     class volume:
         # fmt:off
@@ -183,6 +190,7 @@ class Prov(Provider):
     class network:
         # fmt:off
         endpoint = 'vpcs'
+        default = lambda: 'default-' + FLG.region
 
         normalize = [
             ['created_at', fmt.to_since           ] ,

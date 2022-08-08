@@ -1,5 +1,5 @@
 # FIXME
-fixme = '''
+fixme = """
 Remove all this.
 If colors are important, use the xml output of --helpfull.
 [2020-10-07 22:16] Done. Still due though:
@@ -8,7 +8,7 @@ in sync wiht absl cli flags.
 (do_action of old devapps)
 
 Remove the bloat sooner or later...
-'''
+"""
 
 # TODO: Display use cases and detailled help attributes (see devapp/app.py flags)
 
@@ -32,7 +32,7 @@ def func_from_partial(f):
 
 
 def call_doc(obj, level=2, render=False):
-    """ Used by devapps.app.py for -hh and -hhh"""
+    """Used by devapps.app.py for -hh and -hhh"""
     raise Exception('call_doc not implemented')
     f, kw = func_from_partial(obj)
     if type(f) == type:
@@ -54,7 +54,9 @@ def call_doc(obj, level=2, render=False):
     return out
 
 
-deindent = lambda d: ('\n'.join([l.strip() for l in d.splitlines()]).strip()) + '\n'
+deindent = (
+    lambda d: ('\n'.join([l.strip() for l in d.splitlines()]).strip()) + '\n'
+)
 
 
 def func_doc(obj, level=1):
@@ -99,14 +101,20 @@ def class_doc(cls, level=1, hir=0, out=None):
 
         elif callable(c):
             funcs.append(
-                {'short': '', 'long': k, 'expl': '\n'.join(func_doc(c, level=level)),}
+                {
+                    'short': '',
+                    'long': k,
+                    'expl': '\n'.join(func_doc(c, level=level)),
+                }
             )
     # FIXME
     add_md_list(funcs, out)
     for c in clss:
         class_doc(c, level, hir, out)
     if aliases:
-        out.append('\nAliases: ' + ', '.join(['%s->%s' % (i, k) for i, k in aliases]))
+        out.append(
+            '\nAliases: ' + ', '.join(['%s->%s' % (i, k) for i, k in aliases])
+        )
     out.append('- -hh[h] to get more details about calls.')
 
     if hir == 1:
@@ -123,7 +131,9 @@ def module_doc(mod):
 # --------------------------------------------------------------- -hf/--helpfull output
 def term_widths(have_match):
     tw = termwidth()
-    widths = dict(name=int(tw * 0.2 + 0.5), short_name=6, default=int(tw * 0.15 + 0.5))
+    widths = dict(
+        name=int(tw * 0.2 + 0.5), short_name=6, default=int(tw * 0.15 + 0.5)
+    )
     last = 'meaning'
     if have_match:
         widths = dict(name=25, short_name=8, meaning=0)
@@ -135,7 +145,7 @@ def term_widths(have_match):
 
 
 def term_line(line_spec, widths, have_match):
-    """One line of output - have_match typically [main module name] """
+    """One line of output - have_match typically [main module name]"""
     m = line_spec
     is_action = m.get('action')
     # if is_action:
@@ -303,7 +313,7 @@ def parse_xml_help(xml_help, match, cli_actions=None):
     return r
 
 
-invisible_sep = u'\u2063'
+invisible_sep = '\u2063'
 
 
 def get_argv_val(k, ign_val=''):
@@ -337,7 +347,7 @@ col = lambda c: ansi_col(
 
 def color_usage(*a, main_module, full=None, **kw):
     """
-        colorizes flag keys and match from --help <match>
+    colorizes flag keys and match from --help <match>
     """
     ret = []
     d = main_module.__doc__
@@ -358,7 +368,9 @@ def color_usage(*a, main_module, full=None, **kw):
     for k in sys.argv:
         af = action_flags.get(k)
         if af:
-            define_flags(af['flg_cls'], sub=af['key'], parent_autoshort=af['autoshort'])
+            define_flags(
+                af['flg_cls'], sub=af['key'], parent_autoshort=af['autoshort']
+            )
             afs.append(af)
 
     so = sys.stdout
@@ -384,7 +396,9 @@ def color_usage(*a, main_module, full=None, **kw):
     j['match'] = '[matching %s]' % match_hilite if match else ''
 
     if match:
-        n, n1 = ('All supported', '') if full else ('Main', ' (-hf for all flags)')
+        n, n1 = (
+            ('All supported', '') if full else ('Main', ' (-hf for all flags)')
+        )
         add('%s command line flags %s%s:' % (n, j['match'], n1))
     if hof != 'terminal':
         r = tabulate()
@@ -401,7 +415,11 @@ def color_usage(*a, main_module, full=None, **kw):
     # show non main module flags on helpfull:
     n = main_module.__name__
     if full:
-        [do(fn_mod) for fn_mod in sorted(all_flgs) if not fn_mod in (n, 'actions')]
+        [
+            do(fn_mod)
+            for fn_mod in sorted(all_flgs)
+            if not fn_mod in (n, 'actions')
+        ]
     if n in all_flgs:
         do(n)
     if all_flgs.get('actions'):

@@ -37,25 +37,25 @@ See Actions at -h
 
 from devapp.app import run_app, FLG, app
 from devapp.tools.infra import Actions, Flags, Provider, Api, prov, fmt
-from devapp.tools.times import times
 from operator import setitem
 
 # Droplet list results are cached in tmp/droplets.json. We will read from here if recent.'
 # droplet_list_cache_max_age = int(os.environ.get('droplet_list_cache_max_age', 3))
 
 
-class Flags(Flags):
-    class Actions(Flags.Actions):   # for -h output (then def.ed in this mod)
-        pass
-
-
 class Actions(Actions):
-    pass
+    def prices():
+        return Api.get('pricing')
+
+
+Flags._pre_init(Flags, Actions)
 
 
 Flags.token_cmd.d = 'pass show HCloud/token'
 Flags.region.d = 'hel1'
 Flags.image.d = 'fedora-36'
+_ = 'We will create default network, if not present yet'
+# Flags.Actions.droplet_create.private_network.n += _
 
 
 def monthly(server_type, region, which='monthly'):
@@ -131,6 +131,16 @@ class Prov(Provider):
         except:
             pass
 
+    class load_balancer:
+        # fmt:off
+        endpoint = 'load_balancers'
+        normalize = [
+            ['created'         , fmt.to_since           ] ,
+            ['droplet_ids'     , fmt.droplet_id_to_name ] ,
+            ['region'          , fmt_region             ] ,
+        ]
+        # fmt:on
+
     class volume:
         # fmt:off
         endpoint = 'volumes'
@@ -192,9 +202,9 @@ class Prov(Provider):
 
         def create_data(d):
             r = dict(d)
+            r['networks'] = [prov[0].NETWORKS[r.pop('private_network')]['id']]
             r['automount'] = False
             r['location'] = r.pop('region')
-            r.pop('private_networking')
             t = r.pop('tags')
             if t:
                 r['labels'] = {'feats': ','.join(t)}
@@ -204,6 +214,7 @@ class Prov(Provider):
     class network:
         # fmt:off
         endpoint = 'networks'
+        default = lambda: 'default'
         normalize = [
             ['created'  , fmt.to_since            ] ,
             ['tags'     , fmt_tags                ] ,
@@ -213,6 +224,17 @@ class Prov(Provider):
         # fmt:on
 
         def create_data(d):
+            i = d['ip_range']
+            if not i.startswith('10.'):
+                app.die('ip range must start with 10.', have=i)
+            d['ip_range'] = '10.0.0.0/8'
+            d['subnets'] = [
+                {
+                    'network_zone': 'eu-central',  # only option
+                    'ip_range': i,
+                    'type': 'cloud',
+                }
+            ]
             return d
 
 

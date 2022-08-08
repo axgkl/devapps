@@ -6,8 +6,8 @@ This is run at the very start and creates /root/functions.sh, which all others s
 ip="$ip"
 dir_project="$dir_project"
 name="$name"
+names="$names"
 cluster_name="$cluster_name"
-nodes="$nodes"
 
 function add_result { echo "%(marker)s $1 $2"; }
 

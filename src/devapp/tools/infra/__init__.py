@@ -9,6 +9,9 @@ from devapp.tools import (
     write_file,
     to_list,
 )
+
+
+from devapp.tools.flag import build_action_flags
 from functools import partial
 from rich.console import Console
 from rich.markdown import Markdown
@@ -36,10 +39,12 @@ from devapp.tools import confirm, exists, read_file, write_file, dirname, cast
 # abort while in any waiting loop (concurrent stuff failed):
 DIE = []
 secrets = {}
-
-now = lambda: int(time.time())
 DROPS = {}
+NETWORKS = {}
+SSH_KEYS = {}
+# pseudo droplet running parallel flows locally on the control machine
 local_drop = {'name': 'local', 'ip': '127.0.0.1'}
+now = lambda: int(time.time())
 
 
 class fs:
@@ -57,14 +62,12 @@ class fs:
 
 
 # even with accept-new on cloud infra you run into problems since host keys sometimes change for given ips:
-# so:
-# ssh = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '
-ssh = (
-    lambda: f'ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile={fs.tmp_dir[0]}/ssh_known_hosts '
-)
+# so: ssh = 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '
+_ = '-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile='
+ssh = lambda: f'ssh {_}{fs.tmp_dir[0]}/ssh_known_hosts '
 
 
-def run_parallel(f, range_, kw, after):
+def multithreaded(f, range_, kw, after):
     n = kw['name']
     n = n if '{}' in n else (n + '-{}')
     names = [n.replace('{}', str(i)) for i in range_]
@@ -76,7 +79,9 @@ def run_parallel(f, range_, kw, after):
         app.info('Background', **k)
         # time.sleep(1)
         _ = threading.Thread
-        t.append(_(target=paral, args=(f,), kwargs=k, daemon=False))
+        t.append(
+            _(target=in_thread_func_wrap, args=(f,), kwargs=k, daemon=False)
+        )
         t[-1].start()
     while any([d for d in t if d.isAlive()]) and not DIE:
         time.sleep(0.5)
@@ -86,7 +91,7 @@ def run_parallel(f, range_, kw, after):
     return after()
 
 
-def paral(f, *args, **kw):
+def in_thread_func_wrap(f, *args, **kw):
     n = kw.get('name') or f.__name__
     threading.current_thread().logger = n
     app.info(f.__name__, logger=n, **kw)
@@ -111,21 +116,24 @@ def require_tools(*tools):
 
 
 class env:
-    nodes = lambda: os.environ['nodes'].split(' ')
+    names = lambda: os.environ['names'].split(' ')
 
     def set_environ_vars(name=None, range=None):
         """Set common env vars, usable in feature scripts"""
         name = name if not name is None else FLG.name
         range = range if not range is None else FLG.range
-        rl, nodes = 1, [name]
+        rl, names = 1, [name]
         k = lambda r: name.replace('{}', r)
         if '{}' in name:
             rl = len(range)
-            nodes = [k(r) for r in range]
-        os.environ['cluster_name'] = k('').replace('-', '')
-        os.environ['rangelen'] = str(rl)
-        os.environ['nodes'] = ' '.join(nodes)
-        os.environ['dir_project'] = os.getcwd()
+            names = [k(r) for r in range]
+        E = {}
+        E['cluster_name'] = k('').replace('-', '')
+        E['rangelen'] = str(rl)
+        E['names'] = ' '.join(names)
+        E['dir_project'] = os.getcwd()
+        os.environ.update(E)
+        return E
 
 
 class wait:
@@ -356,7 +364,7 @@ class Api:
 from inspect import signature
 
 
-def parametrized_workflow(
+def actions_spawner_when_parallel(
     parallel={'droplet_create', 'droplet_init', 'volume_create'}
 ):
     """parallel -> threads are spawned for all names in a range"""
@@ -366,6 +374,9 @@ def parametrized_workflow(
         # utillity for temporary files - at the same place:
         fs.make_temp_dir(action)
         f = getattr(prov[0].Actions, action)
+        if isinstance(f, type):
+            f = f.run
+
         sig = signature(f).parameters
         kw = {}
         for k in sig:
@@ -375,14 +386,14 @@ def parametrized_workflow(
             if v is None:
                 v = getattr(FLG, f'{action}_{k}', None)
             if v is None:
-                app.die(f'Missing parameter {k}')
+                app.die('Missing action parameter', param=k)
             kw[k] = v
         if '{}' in FLG.name:
             range_ = FLG.range
             if not range_:
                 app.die('Missing range', name=FLG.name)
             return partial(
-                run_parallel, f, range_, kw, after=Actions.droplet_list
+                multithreaded, f, range_, kw, after=Actions.droplet_list
             )
         else:
             return partial(f, **kw)
@@ -514,8 +525,8 @@ class Flags:
         n = 'Set tags when creating or use as filter for list / delete'
         d = []
 
-    class ssh_key:
-        n = 'Must be present on DO. Can be ssh key id or name (slower then, add. API call, to find id)'
+    class ssh_keys:
+        n = 'Must be present on Infra Provider. Can be ssh key id or name (slower then, add. API call, to find id). If not set we add all present ones.'
         d = ''
 
     class user:
@@ -540,90 +551,21 @@ class Flags:
         n = 'Placeholder "{}" in name will be replaced with these.'
         d = []
 
-    class Actions:
-        class list_features:
-            s = 'feats'
-            n = 'describe features (given with -f or all). Supported: --list_features -m <match>, --list_features k3s (ident to --feature=k3s)'
+    class ip_range:
+        n = 'when creating networks or droplets with own networks'
+        s = 'ipr'
+        d = '10.0.0.0/16'
 
-        class billing_list:
-            d = False
-
-        class billing:
-            n = 'Show current balance'
-
-        class billing_pdf:
-            n = 'download invoice as pdf'
-
-            class uuid:
-                n = 'run billing_list to see uuid'
-                d = ''
-
-        class ssh_key_list:
-            s = 'kl'
-            n = 'show configured ssh keys'
-
-        class list:
-            n = 'list all resources'
-            d = True
-
-        class domain_list:
-            s = 'dol'
-
-        class domain_delete:
-            s = 'dod'
-
-        class droplet_create:
-            s = 'dc'
-
-        class droplet_delete:
-            s = 'dd'
-            n = 'Deletes all matching droplets. --name must be given, "*" accepted.'
-            n = "Example: Delete all created within the last hour: \"dd --since 1h -n '*'"
-
-        class droplet_init:
-            s = 'di'
-            n = 'configure basic (bootstrap) features of new or existing droplets'
-
-        class droplet_list:
-            s = 'dl'
-
-        class droplet_list_no_cache:
-            s = 'dlc'
-
-        class sizes_list:
-            s = 'sl'
-            n = 'List sizes'
-
-        class images_list:
-            s = 'il'
-            n = 'List images'
-
-        class loadbalancer_list:
-            s = 'lbl'
-
-        class loadbalancer_delete:
-            s = 'lbd'
-
-        class network_list:
-            s = 'nl'
-
-        class network_create:
-            s = 'nc'
-
-        class network_delete:
-            s = 'nd'
-
-        class volume_list:
-            s = 'vl'
-
-        class volume_create:
-            s = 'vc'
-
-        class volume_delete:
-            s = 'vd'
-
-
-now = lambda: int(time.time())
+    def _pre_init(Flags, Actions):
+        build_action_flags(Flags, Actions)
+        # adjust short names, we want droplet to get 'd'
+        A = Flags.Actions
+        for F in 'domain', 'database':
+            for d in 'list', 'create', 'delete':
+                c = getattr(A, f'{F}_{d}', 0)
+                if c:
+                    c.s = F[:2] + d[0]
+        A.list.d = True
 
 
 def add_ssh_config(ip, name):
@@ -702,7 +644,7 @@ def list_resources(
     lister=None,
     sorter=None,
 ):
-    """droplet, domain, loadbalancer, database"""
+    """droplet, domain, load_balancer, database"""
     name = name
     match = FLG.match
     since = FLG.since
@@ -718,8 +660,12 @@ def list_resources(
         if name == 'local':
             return
 
-        if not fnmatch(d['name'], name):
-            return
+        if FLG.range:
+            if not d['name'] in os.environ['names']:
+                return
+        else:
+            if not fnmatch(d['name'], name):
+                return
         if not fnmatch(str(d), f'*{match}*'):
             return
         if tags:
@@ -749,6 +695,12 @@ def list_resources(
     else:
         rsc, total = get_all(endpoint, normalizer, lister)
 
+    if endpoint == prov[0].network.endpoint:
+        prov[0].NETWORKS.clear()
+        prov[0].NETWORKS.update({k['name']: k for k in total})
+    elif endpoint == prov[0].ssh_keys.endpoint:
+        prov[0].SSH_KEYS.clear()
+        prov[0].SSH_KEYS.update({k['name']: k for k in total})
     all = [d for d in total if matches(d)] if filtered else total
     if sorter:
         all = [i for i in sorter(all)]
@@ -788,7 +740,7 @@ def resource_delete(typ, lister, force, pth=None):
         id = dr['id']
         path = f'{typ.endpoint}/{id}' if pth is None else pth(dr)
         _ = threading.Thread
-        _(target=paral, args=(Api.req, path, 'delete')).start()
+        _(target=in_thread_func_wrap, args=(Api.req, path, 'delete')).start()
     return d
 
 
@@ -838,7 +790,8 @@ class Actions:
             _ = 'Range given but no placeholder "{}" in name - assuming "%s-{}"'
             app.info(_ % FLG.name)
             FLG.name += '-{}'
-        env.set_environ_vars()
+        E = env.set_environ_vars()
+
         D = FLG.features_dir
         if D:
             FLG.features_dir = os.path.abspath(D)
@@ -846,9 +799,19 @@ class Actions:
         set_token()
         # XL to real size:
         # size_alias_to_real('size')
-        return parametrized_workflow()
+
+        if FLG.droplet_create:
+            pn = FLG.droplet_create_private_network
+            Actions.prepare_droplet_create(env=E, priv_net=pn)
+        a = actions_spawner_when_parallel()
+        return a
 
     def list_features():
+        """Query feature descriptions (given with -f or all).
+        --list_features -m <match>
+        --list_features k3s (ident to --feature=k3s)
+        """
+
         md = []
         if (
             not FLG.features
@@ -871,12 +834,18 @@ class Actions:
     def billing():
         return Api.get('customers/my/balance')
 
-    def billing_pdf():
-        uid = FLG.billing_pdf_uuid
-        r = Api.get(f'customers/my/invoices/{uid}/pdf', plain=True)
-        fn = 'digital_ocean_invoice.pdf'
-        write_file(fn, r.content, mode='wb')
-        return f'created {fn}'
+    class billing_pdf:
+        n = 'download invoice as pdf'
+
+        class uuid:
+            n = 'run billing_list to see uuid'
+
+        def run():
+            uid = FLG.billing_pdf_uuid
+            r = Api.get(f'customers/my/invoices/{uid}/pdf', plain=True)
+            fn = 'digital_ocean_invoice.pdf'
+            write_file(fn, r.content, mode='wb')
+            return f'created {fn}'
 
     def billing_list():
         r = Api.get('customers/my/billing_history?per_page=100')
@@ -933,57 +902,30 @@ class Actions:
             'domain_records', A.domain_list, FLG.force, pth=p
         )
 
-    def loadbalancer_list(name=None):
-        if name is None:
-            name = FLG.name.replace('{}', '*')
+    def load_balancer_list(name=None):
 
-        def simplify_values(d):
-            drops = d.get('droplet_ids', ())
-            r = {
-                k: d.get(k)
-                for k in ['ip', 'name', 'status', 'tag', 'id', fmt.key_created]
-            }
-            r.update(
-                {
-                    'algo': d.get('algorithm'),
-                    'letsencr': d.get('disable_lets_encrypt_dns_records'),
-                    'droplets': ','.join([dropname_by_id(i) for i in drops]),
-                    'rules': ','.join(
-                        [
-                            '{entry_port}->{target_port}'.format(**i)
-                            for i in d['forwarding_rules']
-                        ]
-                    ),
-                }
-            )
-            r['$'] = 100
-            r['since'] = times.dt_human(d[fmt.key_created])
-            r['region'] = d['region']['slug']
-            return r
-
-        def headers(all):
-            t = int(sum([d.get('$', 0) for d in all]))
-            return [
-                ['name', {'style': 'green'}],
-                'ip',
-                ['since', {'justify': 'right'}],
-                'rules',
-                'droplets',
-                'status',
-                'tag',
-                'algo',
-                'letsencr',
-            ]
-
-        return list_resources(name, 'load_balancers', simplify_values, headers)
+        headers = [
+            'name',
+            'id',
+            'since',
+            fmt.key_droplets,
+            'region',
+            'ip',
+            'size',
+            # 'droplet',
+            # fmt.key_disk_size,
+            # 'format',
+        ]
+        return list_simple(name, prov[0].load_balancer, headers=headers)
 
     @classmethod
-    def loadbalancer_delete(A):
+    def load_balancer_delete(A):
         return resource_delete(
-            'load_balancers', A.loadbalancer_list, FLG.force
+            'load_balancers', A.load_balancer_list, FLG.force
         )
 
     def volume_list(name=None):
+
         headers = [
             'name',
             'id',
@@ -991,7 +933,7 @@ class Actions:
             fmt.key_curncy_tot,
             'region',
             'since',
-            'droplet',
+            fmt.key_droplets,
             fmt.key_disk_size,
             'format',
         ]
@@ -1038,14 +980,27 @@ class Actions:
             'tags',
             'id',
         ]
-        return list_simple(name, prov[0].network, headers=headers)
+        ns = list_simple(name, prov[0].network, headers=headers)
+        return ns
 
-    def network_create(name):
-        d = dict(locals())
-        # assert_sane_name(d['name'])
-        data = prov[0].network.create_data(d)
-        Api.req(prov[0].network.endpoint, 'post', data=data)
-        return Actions.network_list(name=name)
+    class network_create:
+        def run(name=None, ip_range=None):
+            name = FLG.name if name is None else name
+            assert_sane_name(name, True)
+            d = {
+                'ip_range': FLG.ip_range if ip_range is None else ip_range,
+                'name': name,
+            }
+            data = prov[0].network.create_data(d)
+            Api.req(prov[0].network.endpoint, 'post', data=data)
+            r = Actions.network_list(name=name)
+
+            # while not prov[0].NETWORKS.get(name):
+            #     breakpoint()   # FIXME BREAKPOINT
+            #     r = Actions.network_list(name=name)
+            #     time.sleep(0.3)
+
+            return r
 
     @classmethod
     def network_delete(A):
@@ -1082,49 +1037,84 @@ class Actions:
 
     def ssh_key_list(name=None):
         h = ['name', 'fingerprint', 'id', fmt.key_ssh_pub_key]
-        return list_simple(
-            name, prov[0].ssh_keys, headers=h, lister='ssh_keys'
-        )
+        s = list_simple(name, prov[0].ssh_keys, headers=h, lister='ssh_keys')
+        return s
 
-    def droplet_create(name, image, region, size, tags, features):
-        d = dict(locals())
-        d['size'] = prov[0].unalias_size(d['size'])
-        name = d['name']
-        assert_sane_name(name, True)
-        droplet(name)
+    def prepare_droplet_create(env, priv_net):
+        """Main Thread here still.
+        default network is always 10.0.0.1/8"""
 
-        feats = Features.validate(d.pop('features'))
-        d['tags'] = t = list(d['tags'])
-        t.extend(feats)
-        id = FLG.ssh_key
+        id = FLG.ssh_keys
         if not id.isdigit():
-            r = Actions.ssh_key_list(name='*')
-            i = [k['id'] for k in r['data'] if not id or k['name'] == id]
-            if not i:
-                app.die('key not found matching name', name=id)
-            id = i
+            Actions.ssh_key_list(name='*')
+            sn = FLG.ssh_keys
+            id = [
+                int(i['id'])
+                for i in prov[0].SSH_KEYS.values()
+                if not sn or i['name'] == sn
+            ]
+            if not id:
+                app.die('No ssh key')
         else:
-            id = [id]
-        d['ssh_keys'] = [int(i) for i in id]
-        if name in DROPS or name == 'local':
-            if not name == 'local':
-                app.warn(f'Droplet {name} exists already')
-        else:
-            DROPS[name] = {'name': name}
-            data = prov[0].droplet.create_data(d)
-            Api.req(prov[0].droplet.endpoint, 'post', data=data)
+            id = [int(id)]
+        app.info('Setting ssh key ids', ids=id)
+        FLG.ssh_keys = id
 
-        # if FLG.droplet_create_no_init:
-        #     app.info('Created. No init', **d)
-        #     return 'created'
-        # if FLG.droplet_create_ssh_add_config:
-        #     do(add_ssh_config, ip=ip, name=name)
-        Actions.droplet_init(name=name, features=feats)
-        # wait_for_ssh(name=name)
-        return Actions.droplet_list(name=name)
+        Actions.network_list()
+        ns = prov[0].NETWORKS
+        dn = prov[0].network.default()
+        nn, nr = FLG.ip_range = dn, '10.0.0.0/8'
+        if priv_net == 'own':
+            nn, nr = env['cluster_name'], FLG.ip_range
+        if not nn in ns:
+            app.info('Creating network', name=nn, range=nr)
+            Actions.network_create.run(nn, ip_range=nr)
+
+    class droplet_create:
+        class private_network:
+            n = 'Name of private network to attach to.'
+            t = ['default', 'own']
+            d = 'default'
+
+        def run(
+            name,
+            image,
+            region,
+            size,
+            tags,
+            ssh_keys,
+            private_network,
+            features,
+        ):
+            d = dict(locals())
+            d['size'] = prov[0].unalias_size(d['size'])
+            name = d['name']
+            assert_sane_name(name, True)
+            droplet(name)   # assure up to date status
+            D = prov[0].droplet
+            feats = Features.validate(d.pop('features'))
+            d['tags'] = t = list(d['tags'])
+            t.extend(feats)
+
+            if name in DROPS or name == 'local':
+                if not name == 'local':
+                    app.warn(f'Droplet {name} exists already')
+            else:
+                DROPS[name] = {'name': name}
+                data = D.create_data(d)
+                Api.req(D.endpoint, 'post', data=data)
+
+            Actions.droplet_init(name=name, features=feats)
+            # wait_for_ssh(name=name)
+            return Actions.droplet_list(name=name)
 
     @classmethod
     def droplet_delete(A):
+        """
+        Deletes all matching droplets. --name must be given, "*" accepted.'
+        Example: Delete all created within the last hour: "dd --since 1h -n '*'"
+        """
+
         ep = prov[0].droplet.endpoint
         return resource_delete(
             prov[0].droplet, partial(A.droplet_list, cache=False), FLG.force
@@ -1176,12 +1166,13 @@ class Actions:
     def list():
         dr = Actions.droplet_list()
         fmt.printer(dr)
-        da = Actions.database_list()
+        # da = Actions.database_list()
+        # if da['data']:
+        #     fmt.printer(da)
+        da = Actions.load_balancer_list()
         if da['data']:
             fmt.printer(da)
-        da = Actions.loadbalancer_list()
-        if da['data']:
-            fmt.printer(da)
+        return
         a = Actions.billing()
         app.info('month to date usage', amount=a['month_to_date_usage'])
 
@@ -1421,7 +1412,7 @@ class ItemGetter(dict):
                 Actions.droplet_list(name=name)
             if name == 'all':
                 if any(
-                    [n for n in env.nodes() if not DROPS.get(n, {}).get(k)]
+                    [n for n in env.names() if not DROPS.get(n, {}).get(k)]
                 ):
                     return
                 return True
@@ -1457,6 +1448,8 @@ class Provider:
     list_simple = list_simple
     resource_delete = resource_delete
     DROPS = DROPS
+    NETWORKS = NETWORKS
+    SSH_KEYS = SSH_KEYS
 
 
 prov = [0]   # set by the specific one, a derivation of Provider
