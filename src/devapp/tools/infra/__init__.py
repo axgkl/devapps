@@ -198,18 +198,21 @@ class wait:
 
 
 class fmt:
-    key_ram = 'RAM GB'
-    key_created = 'created'
-    key_ip_range = 'iprange'
-    key_curncy = '€'
-    key_curncy_tot = f'∑{key_curncy}'
-    key_disk_size = 'Disk GB'
-    key_size_alias = ''
+    # fmt:off
+    key_ram           = 'RAM GB'
+    key_tags          = 'tags'
+    key_created       = 'created'
+    key_ip_range      = 'iprange'
+    key_curncy        = '€'
+    key_curncy_tot    = f'∑{key_curncy}'
+    key_disk_size     = 'Disk GB'
+    key_size_alias    = ''
     key_price_monthly = f'{key_curncy}/Month'
-    key_droplet = 'droplet'
-    key_droplets = 'droplets'
-    key_ssh_pub_key = 'pub key end'
-    key_typ = '🖥'
+    key_droplet       = 'droplet'
+    key_droplets      = 'droplets'
+    key_ssh_pub_key   = 'pub key end'
+    key_typ           = '🖥'
+    # fmt:on
 
     volumes = lambda key, d, into: setitem(into, 'volumes', ' '.join(d[key]))
 
@@ -615,23 +618,32 @@ def make_normalizer(n):
         return n
 
     def _(d, n=n):
-        r = {}
+        r, np = {}, None
+        if isinstance(n, tuple):
+            n, np = n
         for k, f in n:
             v = d.get(k)
             if callable(f):
                 f(k, d, into=r)
             else:
                 r[f] = v
+        if np:
+            np(d, r)
         d.update(r)
         return d
 
     return _
 
 
+g = lambda o, k, d=None: getattr(o, k, d)
+
+
 def list_simple(name, cls, headers=None, **kw):
-    n = getattr(cls, 'normalize', lambda x: x)
-    ep = getattr(cls, 'endpoint', cls.__name__)
-    h = getattr(cls, 'headers', headers)
+    ep = g(cls, 'endpoint', cls.__name__)
+    h = g(cls, 'headers', headers)
+    np = g(prov[0], 'normalize_post')
+    np = np if np is None else partial(np, cls=cls, headers=h)
+    n = (g(cls, 'normalize', []), np)
     return list_resources(name, ep, n, h, **kw)
 
 
@@ -1036,7 +1048,7 @@ class Actions:
         )
 
     def ssh_key_list(name=None):
-        h = ['name', 'fingerprint', 'id', fmt.key_ssh_pub_key]
+        h = ['name', 'fingerprint', 'id', 'since', fmt.key_ssh_pub_key]
         s = list_simple(name, prov[0].ssh_keys, headers=h, lister='ssh_keys')
         return s
 

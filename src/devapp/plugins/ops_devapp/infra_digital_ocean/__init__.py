@@ -113,6 +113,18 @@ class Prov(Provider):
     ]
     # fmt:on
 
+    def normalize_post(d, r, cls, headers):
+        if 'created_at' in d:
+            fmt.to_since('created_at', d, r)
+        if 'region' in d:
+            fmt_region('', d, r)
+        if 'tags' in d:
+            fmt_tags('tags', d, r)
+        for k in 'droplet_ids', 'droplet_id':
+            if k in d:
+                fmt.droplet_id_to_name(k, d, r)
+        return r
+
     def rm_junk(api_response):
         try:
             [i['region'].pop('sizes') for i in api_response]
@@ -122,22 +134,14 @@ class Prov(Provider):
     class load_balancer:
         # fmt:off
         endpoint = 'load_balancers'
-        normalize = [
-            ['created_at'      , fmt.to_since           ] ,
-            ['droplet_ids'     , fmt.droplet_id_to_name ] ,
-            ['region'          , fmt_region             ] ,
-        ]
         # fmt:on
 
     class volume:
         # fmt:off
         endpoint = 'volumes'
         normalize = [
-            ['created_at'      , fmt.to_since           ] ,
             ['filesystem_type' , 'format'               ] ,
-            ['droplet_ids'     , fmt.droplet_id_to_name ] ,
             ['size_gigabytes'  , fmt.key_disk_size      ] ,
-            ['region'          , fmt_region             ] ,
             ['id'              , fmt.vol_price          ] ,
         ]
         # fmt:on
@@ -151,7 +155,6 @@ class Prov(Provider):
         endpoint = 'images'
         normalize = [
             ['slug'           , 'name'            ] ,
-            ['created_at'     , fmt.to_since      ] ,
             ['size_gigabytes' , fmt.key_disk_size ] ,
             ['rapid_deploy'   , 'rapid'           ] ,
         ]
@@ -174,10 +177,7 @@ class Prov(Provider):
         endpoint = 'droplets'
         # fmt:off
         normalize = [ 
-            ['created_at' , fmt.to_since ] ,
-            ['region'     , fmt_region   ] ,
             ['volume_ids' , fmt.volumes  ] ,
-            ['tags'       , fmt_tags     ] ,
             ['networks'   , fmt_ips      ] ,
             ['size'       , fmt_price    ] ,
         ]
@@ -193,8 +193,7 @@ class Prov(Provider):
         default = lambda: 'default-' + FLG.region
 
         normalize = [
-            ['created_at', fmt.to_since           ] ,
-            ['description','tags'                 ] ,
+            ['description',fmt.key_tags           ] ,
             ['ip_range' , fmt.key_ip_range        ] ,
             ['id'       , fmt_drops_in_vpc        ] ,
         ]
@@ -208,17 +207,13 @@ class Prov(Provider):
         # fmt:off
         endpoint = 'databases'
         normalize = [
-            ['created_at'     , fmt.to_since      ] ,
-            ['tags'           , fmt_tags          ] ,
             ['num_nodes'      , 'nodes'           ] ,
         ]
         # fmt:on
         # prices not derivable. expensive (2 * price of droplet)
         headers = [
             'name',
-            'region',
             'since',
-            'tags',
             'size',
             'nodes',
             'engine',

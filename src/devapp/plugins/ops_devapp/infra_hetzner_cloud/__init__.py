@@ -47,6 +47,13 @@ class Actions(Actions):
     def prices():
         return Api.get('pricing')
 
+    def placement_group_list(name=None):
+        return prov[0].list_simple(
+            name,
+            prov[0].placement_group,
+            headers=['id', 'name', fmt.key_tags, 'since', fmt.key_droplets],
+        )
+
 
 Flags._pre_init(Flags, Actions)
 
@@ -72,7 +79,7 @@ def monthly(server_type, region, which='monthly'):
 
 
 def fmt_region(key, d, into):
-    l = d[key]['location'] if key == 'datacenter' else d[key]
+    l = d['datacenter']['location'] if 'datacenter' in d else d['location']
     into['region'] = l['name']
 
 
@@ -125,76 +132,31 @@ class Prov(Provider):
     ]
     # fmt:on
 
+    def normalize_post(d, r, cls, headers):
+        if 'created' in d:
+            fmt.to_since('created', d, r)
+        if 'datacenter' in d or 'location' in d:
+            fmt_region('', d, r)
+        if 'labels' in d:
+            fmt_tags('labels', d, r)
+        if 'servers' in d:
+            fmt.droplet_id_to_name('servers', d, r)
+        if 'server' in d:
+            fmt.droplet_id_to_name('server', d, r)
+        return r
+
     def rm_junk(api_response):
         try:
             [i['datacenter'].pop('server_types') for i in api_response]
         except:
             pass
 
-    class load_balancer:
-        # fmt:off
-        endpoint = 'load_balancers'
-        normalize = [
-            ['created'         , fmt.to_since           ] ,
-            ['droplet_ids'     , fmt.droplet_id_to_name ] ,
-            ['region'          , fmt_region             ] ,
-        ]
-        # fmt:on
-
-    class volume:
-        # fmt:off
-        endpoint = 'volumes'
-        normalize = [
-            ['created'  , fmt.to_since           ] ,
-            ['location' , fmt_region             ] ,
-            ['server'   , fmt.droplet_id_to_name ] ,
-            ['size'     , fmt.key_disk_size      ] ,
-            ['id'       , fmt.vol_price          ] ,
-        ]
-        # fmt:on
-
-        def create_data(d):
-            r = dict(d)
-            r['location'] = r.pop('region')
-            t = r.pop('tags')
-            return r
-
-    class ssh_keys:
-        endpoint = 'ssh_keys'
-        normalize = [['public_key', fmt.ssh_pub_key]]
-
-    class image:
-        # fmt:off
-        endpoint = 'images'
-        normalize = [
-            ['created'      , fmt.to_since      ] ,
-            ['disk_size'    , fmt.key_disk_size ] ,
-            ['rapid_deploy' , 'rapid'           ] ,
-        ]
-        # fmt:on
-
-    class sizes:
-        # fmt:off
-        endpoint = 'server_types?per_page=100'
-        normalize = [
-            ['name'        , fmt.size_name_and_alias ] ,
-            ['prices'      , fmt_price               ] ,
-            ['cores'       , 'CPU'                   ] ,
-            ['memory'      , fmt.to_ram              ] ,
-            ['disk'        , fmt.key_disk_size       ] ,
-            ['description' , 'Descr'                 ] ,
-        ]
-        # fmt:on
-
     class droplet:
         # fmt:off
         endpoint = 'servers'
 
         normalize = [
-            ['created'     , fmt.to_since ] ,
-            ['datacenter'  , fmt_region   ] ,
             ['volumes'     , fmt.volumes  ] ,
-            ['tags'        , fmt_tags     ] ,
             ['id'          , fmt_ips      ] ,
             ['server_type' , fmt_price    ] ,
         ]
@@ -211,17 +173,22 @@ class Prov(Provider):
             r['server_type'] = r.pop('size')
             return r
 
-    class network:
+    class image:
         # fmt:off
-        endpoint = 'networks'
-        default = lambda: 'default'
+        endpoint = 'images'
         normalize = [
-            ['created'  , fmt.to_since            ] ,
-            ['tags'     , fmt_tags                ] ,
-            ['servers'  , fmt.droplet_id_to_name  ] ,
-            ['subnets'  , fmt_ip_ranges           ] ,
+            ['disk_size'    , fmt.key_disk_size ] ,
+            ['rapid_deploy' , 'rapid'           ] ,
         ]
         # fmt:on
+
+    class load_balancer:
+        endpoint = 'load_balancers'
+
+    class network:
+        endpoint = 'networks'
+        default = lambda: 'default'
+        normalize = [['subnets', fmt_ip_ranges]]
 
         def create_data(d):
             i = d['ip_range']
@@ -236,6 +203,41 @@ class Prov(Provider):
                 }
             ]
             return d
+
+    class placement_group:
+        endpoint = 'placement_groups'
+
+    class ssh_keys:
+        endpoint = 'ssh_keys'
+        normalize = [['public_key', fmt.ssh_pub_key]]
+
+    class sizes:
+        # fmt:off
+        endpoint = 'server_types?per_page=100'
+        normalize = [
+            ['name'        , fmt.size_name_and_alias ] ,
+            ['prices'      , fmt_price               ] ,
+            ['cores'       , 'CPU'                   ] ,
+            ['memory'      , fmt.to_ram              ] ,
+            ['disk'        , fmt.key_disk_size       ] ,
+            ['description' , 'Descr'                 ] ,
+        ]
+        # fmt:on
+
+    class volume:
+        # fmt:off
+        endpoint = 'volumes'
+        normalize = [
+            ['size'     , fmt.key_disk_size      ] ,
+            ['id'       , fmt.vol_price          ] ,
+        ]
+        # fmt:on
+
+        def create_data(d):
+            r = dict(d)
+            r['location'] = r.pop('region')
+            t = r.pop('tags')
+            return r
 
 
 prov[0] = Prov
