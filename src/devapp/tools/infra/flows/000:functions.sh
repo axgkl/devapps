@@ -1,15 +1,19 @@
 #!/bin/bash
 _='# Useful functions
 
-This is run at the very start and creates /root/functions.sh, which all others source
+  This is run at the very start and creates /root/functions.sh, which all others source
 '
-ip="$ip"
-dir_project="$dir_project"
-name="$name"
-names="$names"
-cluster_name="$cluster_name"
+cluster_name="%(env.cluster_name)s"
+dir_project="%(env.dir_project)s"
+names="%(env.names)s"
 
-function add_result { echo "%(marker)s $1 $2"; }
+function set_fact { echo "%(marker)s $1 $2"; }
+
+function die {
+    echo -e "\x1b[48;5;124mERROR $name: $*\x1b[0m"
+    set_fact ERR "$*"
+    exit 1
+}
 
 function h1 {
     echo -e "\x1b[1;38;49m $name \x1b[1;30;41m $*\x1b[0;37m"
@@ -37,6 +41,9 @@ function transfer_kubeconfig {
     echo "source $dir_project/environ, to activate KUBECONFIG=$fn"
 }
 
+# query the drops cache by node and key:
+function kv { cat "$fn_cache" | jq -r '."'$1'"."'$2'"'; }
+
 function kubeconf { echo "$dir_project/conf/k8s/$cluster_name/config.yaml"; }
 
 function K {
@@ -47,6 +54,12 @@ function K {
 function HELM {
     export KUBECONFIG="$(kubeconf)"
     helm "$@"
+}
+
+function pkg_inst {
+    local i
+    type apt && i=apt || i=dnf
+    $i install -y "$@"
 }
 
 function scp_ { scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@"; }

@@ -17,8 +17,7 @@ def new(name, mod, p=None):
     return n
 
 
-def add_action(Flags, f, into, mod):
-    n = f.__name__
+def add_action(Flags, n, f, into, mod):
     if isinstance(f, type):
         if not g(f, 'run', None):
             return
@@ -42,5 +41,5 @@ def build_action_flags(Flags, Actions):
     if not FA:
         FA = Flags.Actions = new('Actions', mod)
 
-    As = [g(Actions, i) for i in dir(Actions) if i[0] != '_']
-    [add_action(Flags, f, into=FA, mod=mod) for f in As if callable(f)]
+    As = [(i, g(Actions, i)) for i in dir(Actions) if i[0] != '_']
+    [add_action(Flags, n, f, into=FA, mod=mod) for n, f in As if callable(f)]

@@ -36,7 +36,7 @@ See Actions at -h
 
 
 from devapp.app import run_app, FLG, app
-from devapp.tools.infra import Actions, Flags, Provider, Api, prov, fmt
+from devapp.tools.infra import Actions, Flags, Provider, Api, Prov, fmt, rm
 from operator import setitem
 
 # Droplet list results are cached in tmp/droplets.json. We will read from here if recent.'
@@ -48,17 +48,29 @@ class Actions(Actions):
         return Api.get('pricing')
 
     def placement_group_list(name=None):
-        return prov[0].list_simple(
+        return Prov().list_simple(
             name,
-            prov[0].placement_group,
+            Prov().placement_group,
             headers=['id', 'name', fmt.key_tags, 'since', fmt.key_droplets],
         )
+
+    def placement_group_create(name=None, type='spread'):
+        name = FLG.name if name is None else name
+        d = dict(locals())
+        Api.req(Prov().placement_group.endpoint, 'post', data=d)
+        return Actions.placement_group_list(name=name)
+
+    placement_group_delete = rm('placement_group')
+
+
+class Flags(Flags):
+    class hcloud_api_token:
+        d = 'cmd:pass show HCloud/token'
 
 
 Flags._pre_init(Flags, Actions)
 
 
-Flags.token_cmd.d = 'pass show HCloud/token'
 Flags.region.d = 'hel1'
 Flags.image.d = 'fedora-36'
 _ = 'We will create default network, if not present yet'
@@ -115,10 +127,23 @@ def fmt_price(key, d, into):
         fmt.price_total(key, d, into, monthly(st, reg, 'hourly'))
 
 
-class Prov(Provider):
+def fmt_target_to_servers(_, d, into):
+    t = d['targets']
+    if not t:
+        d['servers'] = []
+        return
+    # we've seen 2 formats of targets, once nested one direct, dependent no label sel presence
+    if 'server' in t[0]:
+        return [s['server']['id'] for s in t]
+    d['servers'] = [i['server']['id'] for k in range(len(t)) for i in t[k]['targets']]
+
+
+class HProv(Provider):
     name = 'Hetzner'
+    secrets = 'hcloud_api_token'
     base_url = 'https://api.hetzner.cloud/v1'
     vol_price_gig_month = 0.0476   # https://www.hetzner.com/cloud/#pricing
+    pgroup = None
     Actions = Actions
 
     # fmt:off
@@ -132,18 +157,21 @@ class Prov(Provider):
     ]
     # fmt:on
 
-    def normalize_post(d, r, cls, headers):
+    def normalize_pre(d, r, cls, headers):
         if 'created' in d:
             fmt.to_since('created', d, r)
         if 'datacenter' in d or 'location' in d:
             fmt_region('', d, r)
         if 'labels' in d:
             fmt_tags('labels', d, r)
+        if 'targets' in d:   # loadbalancer
+            fmt_target_to_servers('', d, r)
         if 'servers' in d:
             fmt.droplet_id_to_name('servers', d, r)
         if 'server' in d:
             fmt.droplet_id_to_name('server', d, r)
-        return r
+        if 'public_net' in d:
+            fmt_ips('', d, r)
 
     def rm_junk(api_response):
         try:
@@ -162,14 +190,31 @@ class Prov(Provider):
         ]
         # fmt:on
 
+        def prepare_create(env):
+            if not FLG.range:
+                return app.info('Skipping placement group for single droplet')
+            A, cn = Prov().Actions, env['cluster_name']
+
+            def h(k):
+                i = [i for i in k['data'] if i['name'] == cn]
+                return i[0] if i else None
+
+            HProv.pgroup = _ = h(A.placement_group_list())
+            if _:
+                return
+            HProv.pgroup = h(A.placement_group_create(cn))
+
         def create_data(d):
             r = dict(d)
-            r['networks'] = [prov[0].NETWORKS[r.pop('private_network')]['id']]
+            if HProv.pgroup:
+                r['placement_group'] = HProv.pgroup['id']
+            pn = r.pop('private_network')
+            r['networks'] = [Prov().NETWORKS[pn]['id']]
             r['automount'] = False
             r['location'] = r.pop('region')
             t = r.pop('tags')
             if t:
-                r['labels'] = {'feats': ','.join(t)}
+                r['labels'] = {'feats': ','.join([i.replace(':', '_') for i in t])}
             r['server_type'] = r.pop('size')
             return r
 
@@ -235,13 +280,26 @@ class Prov(Provider):
 
         def create_data(d):
             r = dict(d)
-            r['location'] = r.pop('region')
+            s, rg = d.pop('_attach_to', ''), d.pop('region')
+            if s:
+                r['server'] = s['server']['id']
+                # r['automount'] = True
+            else:
+                r['location'] = rg
             t = r.pop('tags')
             return r
 
+        def prepare_delete(d):
+            s = d.get('server')
+            if not s:
+                return
+            id = d['id']
+            app.warn('detaching', **d)
+            Api.req(f'volumes/{id}/actions/detach', 'post', data={})
 
-prov[0] = Prov
-Flags.size.n = 'aliases ' + Prov.size_aliases()
+
+Prov(init=HProv)
+Flags.size.n = 'aliases ' + HProv.size_aliases()
 main = lambda: run_app(Actions, flags=Flags)
 
 if __name__ == '__main__':

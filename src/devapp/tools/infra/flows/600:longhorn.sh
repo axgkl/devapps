@@ -9,7 +9,7 @@ function install_longhorn_tools {
 }
 
 systemctl status iscsid >/dev/null || install_longhorn_tools
-add_result have_longhorn_tools true
+set_fact have_longhorn_tools true
 
 # else:
 echo "have all longhorn tools: %(all.have_longhorn_tools)s"

@@ -7,7 +7,7 @@ _='# Deploy a single server k3s.
 
 ## Conventions:
 
-Server must have "control" within its name.
+Server must have "master" within its name.
 
 ## Env Parameters
 
@@ -17,11 +17,11 @@ Server must have "control" within its name.
 
 - 4 Node server cluster:
 
-	ops infra_digital_ocean droplet_create --features k3s --name k2{} --range control,1,2,3 --size M
+	ops infra_digital_ocean droplet_create --features k3s --name k2{} --range master,1,2,3 --size M
 
 - Same with selinux off (faster install), relative time and by thread indication:
 
-	selinux=false ops ido dc -f k3s -n k2{} -r control,1,2,3 -S M -ltf dt -latn
+	selinux=false ops ido dc -f k3s -n k2{} -r master,1,2,3 -S M -ltf dt -latn
 
 
 
@@ -35,13 +35,13 @@ source "%(feature:functions.sh)s"
 
 # part: name eq local
 function generate_token {
-    add_result k3s_server_token "$(tr -dc A-Za-z0-9 </dev/urandom | head -c 64)"
+    set_fact k3s_server_token "$(tr -dc A-Za-z0-9 </dev/urandom | head -c 64)"
 }
 do_ generate_token
 
-# part: name contains control
+# part: name contains master
 
-add_result is_control true
+set_fact is_master true
 
 # part: name not eq local
 
@@ -65,7 +65,7 @@ install_k3s_() {
     set +x
 }
 
-# cond: name contains control
+# cond: name contains master
 function install_k3s {
     local fn="/var/lib/rancher/k3s/server/node-token"
     test -f "$fn" && return 0
@@ -85,7 +85,7 @@ function install_k3s {
 
 function install_k3s {
     test -e "/var/lib/rancher/k3s/agent" && return 0
-    echo "%(wait:200:match:key.is_control)s"
+    echo "%(wait:200:match:key.is_master)s"
     #export K3S_URL="https://%(matched.ip_priv)s:6443"
     export K3S_URL="https://%(matched.ip)s:6443"
     export INSTALL_K3S_EXEC='agent'
@@ -94,13 +94,14 @@ function install_k3s {
 # end
 # rpm often not ready:
 do_ install_k3s || do_ install_k3s || exit 1
-add_result k3s_installed true
+set_fact k3s_installed true
 
 # part: name eq local
 
 echo "%(wait:200:all.k3s_installed)s"
+
 function get_kubeconfig {
-    echo "%(match:key.is_control)s"
+    echo "%(match:key.is_master)s"
     ip="%(matched.ip)s"
     transfer_kubeconfig "/etc/rancher/k3s/k3s.yaml"
 }
