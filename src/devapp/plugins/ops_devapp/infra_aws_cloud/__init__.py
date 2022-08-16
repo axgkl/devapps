@@ -18,6 +18,7 @@ from devapp.tools.infra import Actions, Flags, Provider, Api, Prov, fmt, rm
 import time
 import hmac, hashlib, requests, base64
 from operator import setitem
+from devapp.tools import cache
 
 # Droplet list results are cached in tmp/droplets.json. We will read from here if recent.'
 # droplet_list_cache_max_age = int(os.environ.get('droplet_list_cache_max_age', 3))
@@ -38,8 +39,8 @@ def dotted(name, create=True):
 
 
 class Actions(Actions):
-    def dns_list(name=None):
-        return Prov().list_simple(name, Prov().dns, lister=get_zones)
+    def dns_list(name=None, **kw):
+        return Prov().list_simple(name, Prov().dns, lister=zones.get, **kw)
 
     def domain_list(name=None):
         return Prov().list_simple(name, Prov().domain, lister=get_domains)
@@ -61,14 +62,24 @@ class Actions(Actions):
             n = 'delete any existing zone before creation'
             d = False
 
-        def run(name=None, ips=None, ttl=None):
+        class multi:
+            s = 'multi'
+            n = 'Provide host::ip1:ip2,host2:ip3 in one go. Ignores name and ips flags. ttl and rm is used'
+            d = []
+
+        def run(name=None, ips=None, ttl=None, c=[0], multi=False):
             """we do it all here"""
+            if not multi:
+                m = FLG.dns_create_multi
+                if m:
+                    return multi_create(m)
+
             name = dotted(name)
             # we allow (and filter) empty start or end comma, simplifies bash scripts a lot in loops:
             ips = [i for i in ips or FLG.dns_create_ips if i]
             ttl = ttl or FLG.dns_create_ttl
             rm = FLG.dns_create_rm
-            have = Actions.dns_list(name='*')['data']
+            have = c[0] or Actions.dns_list(name='*')['data']
             id = [i for i in have if name.endswith(i['domain'])]
             if id:
                 if rm:
@@ -77,11 +88,12 @@ class Actions(Actions):
                         Actions.dns_delete(name=name, force=True)
                 id = id[0]['zoneid']
             else:
-                have = Actions.domain_list(name='*')
+                have = c[0] or Actions.domain_list(name='*')
                 id = [i for i in have['data'] if name.endswith(i['name'])]
                 if len(id) != 1:
                     app.die('No matching domain', name=name, have=have['data'])
                 id = id[0]['id']
+            c[0] = have
             dns_modify('CREATE', ips=ips, name=name, ttl=ttl, zoneid=id)
             return Actions.dns_list(name=name)
 
@@ -101,6 +113,25 @@ def dns_modify(action, ips, name, ttl, zoneid, **_):
     path = f'hostedzone/{zoneid}/rrset'
     r = AA.send_request(path, xml, 'post')
     return r
+
+
+def multi_create(m):
+    zones.origget = zones.get
+    if FLG.dns_create_rm:
+        # speed up:
+        zones.get = zones.get_cached
+    hosts = []
+    for hip in m:
+        host, ips = hip.split('::', 1)
+        hosts.append(host + '.' if not host.endswith('.') else '')
+        ips = ips.split(':')
+        Actions.dns_create.run(name=host, ips=ips, multi=True)
+    zones.get = zones.origget
+
+    def f(all, hosts=hosts):
+        return [i for i in all if i['name'] in hosts]
+
+    return Actions.dns_list(name='*', filtered=f)
 
 
 class Flags(Flags):
@@ -178,6 +209,7 @@ class AA:
         }
 
     def send_request(path, data, method):
+        app.info(f'{method} request', path=path)
         headers = AA.get_request_headers()
         ep = f'{AA.base}/{path}'
         r = getattr(requests, method)(ep, data, headers=headers)
@@ -194,43 +226,48 @@ def xval(s, tag, d=''):
     return d if not t in s else s.split(t, 1)[1].split(f'</{tag}>', 1)[0]
 
 
-def get_zones(max_items=1000, get_records=True):
-    r = AA.send_request('hostedzone', {'maxitems': 1000}, 'get')
-    assert 'ListHostedZonesResponse' in r
-    All = []
-    for hz in r.split('<HostedZone>')[1:]:
-        id = xval(hz, 'Id')[1:].replace('hostedzone/', '')
-        dom_name = xval(hz, 'Name')
-        if not get_records:
-            comment = xval(hz, 'Comment')
-            All.append({'id': id, 'name': dom_name, 'comment': comment})
-            continue
-        d = {'identifier': None, 'maxitems': 1000, 'name': None, 'type': None}
-        r = AA.send_request(f'hostedzone/{id}/rrset', d, 'get')
-        assert 'ListResourceRecordSetsResponse' in r
+class zones:
+    @cache(10)
+    def get_cached(max_items=1000, get_records=True):
+        return zones.origget(max_items, get_records)
 
-        def d(s, id=id):
-            r = {
-                'domain': dom_name,
-                'name': xval(s, 'Name'),
-                'type': xval(s, 'Type'),
-                'ttl': int(xval(s, 'TTL', 0)),
-                'zoneid': id,
-            }
-            if not r['type'] == 'A':
-                return
+    def get(max_items=1000, get_records=True):
+        r = AA.send_request('hostedzone', {'maxitems': 1000}, 'get')
+        assert 'ListHostedZonesResponse' in r
+        All = []
+        for hz in r.split('<HostedZone>')[1:]:
+            id = xval(hz, 'Id')[1:].replace('hostedzone/', '')
+            dom_name = xval(hz, 'Name')
+            if not get_records:
+                comment = xval(hz, 'Comment')
+                All.append({'id': id, 'name': dom_name, 'comment': comment})
+                continue
+            d = {'identifier': None, 'maxitems': 1000, 'name': None, 'type': None}
+            r = AA.send_request(f'hostedzone/{id}/rrset', d, 'get')
+            assert 'ListResourceRecordSetsResponse' in r
 
-            r['ips'] = [xval(k, 'Value') for k in s.split('<ResourceRecord>')[1:]]
-            return r
+            def d(s, id=id):
+                r = {
+                    'domain': dom_name,
+                    'name': xval(s, 'Name'),
+                    'type': xval(s, 'Type'),
+                    'ttl': int(xval(s, 'TTL', 0)),
+                    'zoneid': id,
+                }
+                if not r['type'] == 'A':
+                    return
 
-        all = [d(s) for s in r.split('<ResourceRecordSet>')[1:]]
-        all = sorted([k for k in all if k], key=lambda d: d['name'])
-        All.extend(all)
-    return All
+                r['ips'] = [xval(k, 'Value') for k in s.split('<ResourceRecord>')[1:]]
+                return r
+
+            all = [d(s) for s in r.split('<ResourceRecordSet>')[1:]]
+            all = sorted([k for k in all if k], key=lambda d: d['name'])
+            All.extend(all)
+        return All
 
 
 def get_domains():
-    return get_zones(max_items=100, get_records=False)
+    return zones.get(max_items=100, get_records=False)
 
 
 xmlhead = "<?xml version='1.0' encoding='UTF-8'?>"
