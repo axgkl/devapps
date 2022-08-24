@@ -7,8 +7,15 @@ cluster_name="%(env.cluster_name)s"
 dir_project="%(env.dir_project)s"
 names="%(env.names)s"
 
-function set_fact { echo "%(marker)s $1 $2"; }
+SKIP_PRESENT=20
 
+function set_fact { echo -e "%(marker)s \x1b[48;5;56m$1\x1b[0m $2"; }
+function deindent {
+    (
+        IFS='' # drop only once (i.e. the first) 4 spaces:
+        while read -r line; do echo "${line/    /}"; done
+    )
+}
 function die {
     echo -e "\x1b[48;5;124mERROR $name: $*\x1b[0m"
     set_fact ERR "$*"
@@ -18,27 +25,52 @@ function die {
 function h1 {
     echo -e "\x1b[1;38;49m $name \x1b[1;30;41m $*\x1b[0;37m"
 }
+function info {
+    echo -e "INFO: $name $*"
+}
 
 function do_ {
     h1 "$1"
+    eval "$@"
+    local res=$?
+    test $res == $SKIP_PRESENT && {
+        h1 "$1 skipped (present already)"
+        return 0
+    }
+    test $res != 0 && die "$1 failed"
+    return $res
+}
+function shcmd {
+    info "$@"
     eval "$@"
 }
 
 function transfer {
     local src="$1"
     local dst="$2"
+    local ip="$3"
     mkdir -p "$(dirname "$dst")"
     scp_ "root@$ip:$src" "$dst"
 }
 
 function transfer_kubeconfig {
-    local fn="$(kubeconf)"
-    transfer "$1" "$fn"
-    sed -i "s/127.0.0.1/$ip/g" "$fn"
+    local fn api_host ip
+    api_host="${2?}"
+    ip="${3?}"
+    fn="$(kubeconf)"
+    transfer "$1" "$fn" "$ip"
+    sed -i "s/127.0.0.1/${api_host}/g" "$fn"
+    chmod 600 "$fn" # helm says group readable is unsecure
     touch environ
     # adding all fo them, user can comment then:
     echo "export KUBECONFIG=\"$fn\"" >>"$dir_project/environ"
     echo "source $dir_project/environ, to activate KUBECONFIG=$fn"
+    # takes a while (ssl)
+    for i in 1 2 3 4 5; do
+        K get nodes --request-timeout=2 --show-labels | grep kubernetes.io && return
+        sleep 1
+    done
+    die "local kubectl failed"
 }
 
 # query the drops cache by node and key:

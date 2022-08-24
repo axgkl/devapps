@@ -1,4 +1,5 @@
 #!/bin/bash
+# vim: set sw=4
 
 _='# Deploy a single server k3s.
   
@@ -32,99 +33,142 @@ _='# Deploy a single server k3s.
   '
 
 source "%(feature:functions.sh)s"
+function define_vars_and_functions {
+    set -a
+    D="%(!$dir_project)s"
+    api_base="%(!$infra_api_base)s"
+    dns_provider="%(!$dns_provider)s" # aws or digitialociean
+    domain="%(!$domain)s"
+    company="${domain#*.}" # foo.company.com -> company.com (for node labels)
+    email="%(!$email)s"
+    k3s_debug="true"
+    k3s_server_location="/var/lib/rancher/k3s"
+    k8s_cluster_cidr_v4="10.244.54.0/23"
+    k8s_coredns_srv_ip_v4="10.43.0.10"
+    k8s_max_pods_per_node=32
+    k8s_node_cidr_size_v4=27
+    k8s_service_cidr_v4="10.43.0.0/24"
+    #k8s_service_node_port_range="32225-32767"
+    k8s_service_node_port_range="30000-32767" # XT has a 32222 one but cilium tests are hardcoded on 31sth
+    log_fmt=2                                 # colored term output also for devapp subprocessesut also for devapp subprocesses
+    no_selinux="%($no_selinux)s"
+    tools="%($tools|net-tools tcpdump tcpflow dnsutils lvm2 parted)s"
+    ttl="%($ttl|120)s"
+    v_certmgmr="%($certmgr_version|1.9.1)s"
+    v_cilium="%($cilium_version|1.11.8)s"
+    v_ext_dns="%($ext_dns_version|0.12.0)s"
+    v_hetzner_ccm="%($ccm_version|1.12.1)s"
+    v_k3s="%($k3s_version|v1.24.2+k3s2)s"
+    zone="$cluster_name.$domain"
+    set +a
 
-set -a
-INSTALL_K3S_VERSION="%($k3s_version|v1.24.2+k3s2)s"
-domain="%(!$domain)s"
-dns_provider="%(!$dns_provider)s" # aws or digitialociean
-email="%(!$email)s"
-k3s_debug="true"
-k3s_server_location="/var/lib/rancher/k3s"
-k8s_cluster_cidr_v4="10.244.54.0/23"
-k8s_service_cidr_v4="10.43.0.0/24"
-k8s_coredns_srv_ip_v4="10.43.0.10"
-k8s_node_cidr_size_v4=27
-k8s_max_pods_per_node=32
-no_selinux="%($no_selinux)s"
-tools="%($tools|net-tools tcpdump tcpflow dnsutils lvm2 parted)s"
-ttl="%($ttl|120)s"
-set +a
+    mkdir -p "$D/conf" # for stuff we want to keep
+    mkdir -p "$D/tmp"  # for stuff we want to keep for debug
+}
+
+function dns_ops_plugin {
+    # our helpers for dns and certmgr configuration
+    case "$dns_provider" in
+    "digitalocean") echo "infra_digital_ocean" ;;
+    "aws") echo "infra_aws_cloud" ;;
+    *) die "DNS Provider $dns_provider not supported" ;;
+    esac
+}
+
+do_ define_vars_and_functions
 
 # part: ========================================================== name eq local
 
-echo "Have all internal ips: %(wait:200:all.ip_priv)s" # we start when we have those
-
 function generate_token {
-    set_fact k3s_server_token "$(tr -dc A-Za-z0-9 </dev/urandom | head -c 64)"
+    echo "Have all internal ips: %(wait:200:all.ip_priv)s" # we start when we have those
+    set_fact k3s_server_token "$(tr -dc A-Za-z0-9 </dev/urandom 2>/dev/null | head -c 64)"
 }
 
 function configure_dns_to_k8s_api {
-  local zone="$cluster_name.$domain"
-
-    local dp='infra_aws_cloud'
-    test "$dns_provider" == "digitalocean" && dp="infra_digital_ocean"
     export ttl="${ttl:-120}"
     local ips_ext="" ips_int=""
-    set -x
     for n in $names; do
-      ips_ext="$ips_ext,$(kv "$n" ip)"
-      ips_int="$ips_int,$(kv "$n" ip_priv)"
+        if [[ $n =~ master ]]; then
+            ips_ext="$ips_ext:$(kv "$n" ip)"
+            ips_int="$ips_int:$(kv "$n" ip_priv)"
+        fi
     done
-    ops $dp dns_create -n "k3s-api-ext-$zone" -ips "$ips_ext" --dns_create_rm
-    ops $dp dns_create -n "k3s-api-int-$zone" -ips "$ips_int" --dns_create_rm
-    set +x
-    sleep 10000
+    test -z "$ips_ext" && die "No master node"
+    # we have time for that, waiting for ssh access anyway on the remote side:
+    # TODO: create multi for digitalocean:
+    shcmd ops "$(dns_ops_plugin)" dns_create --dns_create_multi "k3s-api-ext-$zone::$ips_ext,k3s-api-int-$zone::$ips_int" --dns_create_rm &
 }
-
-
 
 do_ generate_token
 do_ configure_dns_to_k8s_api
-
 # part: ========================================================== name contains master
 set_fact is_master true
 
-
 # part: ========================================================== name not eq local
-sleep 10000
-function double_check_priv_network_present { ip addr show | grep 'inet 10\.' || die "private iface missing"1; }
-
+function double_check_priv_network_present {
+    ip addr show | grep 'inet 10\.' || die "private iface missing"1
+}
 function install_tools {
-    type tcpflow && return # installed
+    type tcpflow && return "$SKIP_PRESENT"
     # shellcheck disable=SC2086
     pkg_inst ${tools}
 }
-
-function configure_forwarding {
+function networking_sysctls {
+    local _='most for cilium
+    See https://github.com/cilium/cilium/pull/20072
+    See https://github.com/cilium/cilium/issues/10645#issuecomment-701419363
+    See https://github.com/cilium/cilium/issues/20125#issuecomment-1155684032
+    '
     local fn=/etc/sysctl.d/99-sysctl.conf
-    echo 'net.ipv4.ip_forward=1' >>$fn
-    echo 'net.ipv6.conf.all.forwarding=1' >>$fn
-    /sbin/sysctl -p
+    #local fn=/etc/sysctl.d/99-zzz-override_cilium.conf
+    grep 'martians' <$fn && return "$SKIP_PRESENT"
+    deindent <<'    EOF' >"$fn"
+    net.ipv4.ip_forward=1
+    net.ipv6.conf.all.forwarding=1
+    net.ipv4.conf.*.log_martians=1
+    net.ipv4.conf.all.log_martians=1
+    net.ipv4.conf.all.log_martians=1
+    net.ipv4.conf.*.rp_filter=0
+    net.ipv4.conf.all.rp_filter=0
+    net.ipv4.conf.default.rp_filter=0
+    EOF
+    systemctl restart systemd-sysctl # globs only understood by systemd not sysctl -p
+}
+function write_kubelet_config {
+    mkdir -p /etc/rancher/k3s
+    deindent <<'    EOF' >/etc/rancher/k3s/kubelet.yaml
+    ---
+    apiVersion: kubelet.config.k8s.io/v1beta1
+    kind: KubeletConfiguration
+    shutdownGracePeriod: 80s
+    shutdownGracePeriodCriticalPods: 40s
+    EOF
 }
 
-install_k3s_() {
-    set -x
+function run_k3s_installer {
     function disable_selinux {
         setenforce 0
         export INSTALL_K3S_SKIP_SELINUX_RPM=true
         export INSTALL_K3S_SELINUX_WARN=true
     }
     test -n "$no_selinux" && do_ disable_selinux
-    curl -sfL https://get.k3s.io | sh -s - "${INSTALL_K3S_EXEC:-}" \
-        --token "%(local.k3s_server_token)s" \
-        --kubelet-arg="cloud-provider=external" \
-        --kubelet-arg="provider-id=digitalocean://%(id)s" "$@"
-    set +x
+    export INSTALL_K3S_VERSION="$v_k3s"
+    curl -sfL https://get.k3s.io | sh -s - "${INSTALL_K3S_EXEC:-}"
+}
+
+function install_k3s {
+    local fn="/etc/rancher/k3s/config.yaml"
+    test -f "$fn" && return "$SKIP_PRESENT"
+    do_ write_kubelet_config
+    do_ write_k3s_config
+    do_ run_k3s_installer
 }
 
 # cond: _____________________________________________________________________ name contains master
+export INSTALL_K3S_EXEC='server'
 
-function install_k3s {
-    local fn="/var/lib/rancher/k3s/server/node-token"
-    test -f "$fn" && return 0
-    export INSTALL_K3S_EXEC='server'
-    mkdir -p /etc/rancher/k3s
-    cat << EOF | sed -e 's/^    //g' > /etc/rancher/k3s/config.yaml
+function write_k3s_config {
+    deindent <<EOF >/etc/rancher/k3s/config.yaml
     ---
     node-name: $name
     node-ip: %(ip_priv)s
@@ -139,13 +183,13 @@ function install_k3s {
     data-dir: $k3s_server_location
     cluster-cidr: $k8s_cluster_cidr_v4
     service-cidr: $k8s_service_cidr_v4
-    service-node-port-range: 32225-32767
+    service-node-port-range: $k8s_service_node_port_range
     cluster-dns: $k8s_coredns_srv_ip_v4
     kubelet-arg:
       - "v=5"
       - "feature-gates=TopologyAwareHints=true,EphemeralContainers=true,GracefulNodeShutdown=true"
       - "config=/etc/rancher/k3s/kubelet.yaml"
-      - "max-pods=$k8s_max_pods_per_node
+      - "max-pods=$k8s_max_pods_per_node"
       - "make-iptables-util-chains=false"
       - "cloud-provider=external"
       - "node-status-update-frequency=4s"
@@ -170,50 +214,58 @@ function install_k3s {
     #kube-proxy-arg:
     #  - "metrics-bind-address=0.0.0.0"
     tls-san:
-      - "{{ k3s_api_int }}.{{ k3s_svc_dns_suffix }}.{{ k3s_dns_zone }}"
-      - "{{ k3s_api_ext }}.{{ k3s_svc_dns_suffix }}.{{ k3s_dns_zone }}"
-      - "{{ address }}"
+      - "k3s-api-ext-$zone"
+      - "k3s-api-int-$zone"
+      - "%(ip_priv)s"
     write-kubeconfig-mode: 644
     debug: $k3s_debug
     node-label:
-    {% for kn, kv in k3s_labels.items() %}
-      - "{{ kn }}={{ kv }}"
-    {% endfor %}
-    token: {{ hostvars['localhost']['k3s_token'] }}
+      - "$company/type=master"
+      - "$company/layer=control"
+    token: %(local.k3s_server_token)s
 
     # See https://rancher.com/docs/k3s/latest/en/security/hardening_guide/
     #    --protect-kernel-defaults=true \
     #    --secrets-encryption=true \
-EOF
-    
-  
 
-    install_k3s_ \
-        --write-kubeconfig-mode 644 \
-        --disable-cloud-controller \
-        --no-deploy servicelb \
-        --node-taint CriticalAddonsOnly=true:NoExecute
-    #--disable traefik \
-    #		--node-external-ip="$ip" \
-    #		--node-taint CriticalAddonsOnly=true:NoExecute \
-    #--disable local-storage || exit 1
+EOF
 }
 
 # else __________________________________________________________________________________________
+export INSTALL_K3S_EXEC='agent'
 
-function install_k3s {
-    test -e "/var/lib/rancher/k3s/agent" && return 0
+function write_k3s_config {
     echo "%(wait:200:match:key.is_master)s"
     #export K3S_URL="https://%(matched.ip_priv)s:6443"
-    export K3S_URL="https://%(matched.ip)s:6443"
-    export INSTALL_K3S_EXEC='agent'
-    install_k3s_ --node-external-ip="$ip"
+    export K3S_URL="https://%(matched.ip_priv)s:6443"
+
+    deindent <<EOF >/etc/rancher/k3s/config.yaml
+    ---
+    node-name: $name
+    node-ip: %(ip_priv)s
+    kubelet-arg:
+      - "v=5"
+      - "feature-gates=TopologyAwareHints=true,EphemeralContainers=true,GracefulNodeShutdown=true"
+      - "config=/etc/rancher/k3s/kubelet.yaml"
+      - "max-pods=$k8s_max_pods_per_node"
+      - "make-iptables-util-chains=false"
+      - "cloud-provider=external"
+      - "node-status-update-frequency=4s"
+      #- "network-plugin=cni"
+    debug: $k3s_debug
+    node-label:
+      - "$company/type=worker"
+      - "$company/layer=work"
+    token: %(local.k3s_server_token)s
+    server: https://k3s-api-int-$zone:6443
+EOF
 }
+
 # end ___________________________________________________________________________________________
 
 do_ double_check_priv_network_present
 do_ install_tools
-do_ configure_forwarding
+do_ networking_sysctls
 do_ install_k3s
 set_fact k3s_installed true
 
@@ -222,65 +274,234 @@ set_fact k3s_installed true
 echo "%(wait:200:all.k3s_installed)s"
 
 function get_kubeconfig {
+    # copy it over from a master, ssh-ing to it's ip:
     echo "%(match:key.is_master)s"
-    ip="%(matched.ip)s"
-    transfer_kubeconfig "/etc/rancher/k3s/k3s.yaml"
+    transfer_kubeconfig "/etc/rancher/k3s/k3s.yaml" "k3s-api-ext-$zone" "%(matched.ip)s"
 }
-
-function install_ccm {
+function rm_master_node_label {
+    local l R="node-role.kubernetes.io/master"
+    l="$(K get nodes --show-labels)"
+    grep "$R" <<<"$l" || return "$SKIP_PRESENT"
+    # https://github.com/kubernetes/kubernetes/issues/65618 In later version of k8s there is a better mechanics to allow services on master
+    for n in $names; do
+        if [[ $n =~ master ]]; then K label node "$n" "$R-"; fi
+    done
+}
+function install_digital_ocean_ccm {
     ccm_version="v0.1.36"
-    K -n kube-system create secret generic digitalocean --from-literal=access-token="%(secret.do_token)s"
+    K -n kube-system create secret generic digitalocean --from-literal=access-token="%(secret.hcloud_api_token)s"
+    K -n kube-system create secret generic digitalocean --from-literal=access-token="%(secret.hcloud_api_token)s"
     K apply -f "https://raw.githubusercontent.com/digitalocean/digitalocean-cloud-controller-manager/master/releases/$ccm_version.yml"
 }
+function install_hetzner_ccm {
+    K -n kube-system get pods | grep hcloud-cloud-controller-manager && return "$SKIP_PRESENT"
+    shcmd ops infra_hetzner_cloud kube_add_ccm \
+        --kube_config="$(kubeconf)" \
+        --kube_add_ccm_network_name="%(flag.droplet_create_private_network)s" \
+        --kube_add_ccm_cidr="$k8s_cluster_cidr_v4" \
+        --kube_add_ccm_version="$v_hetzner_ccm"
+}
 
-function install_ext_dns {
-    function inst_ext_dns {
-        HELM -n kube-system install external-dns \
-            --set provider=digitalocean \
-            --set digitalocean.apiToken="%(secret.do_token)s" \
-            --set policy=sync \
-            bitnami/external-dns
-    }
-    inst_ext_dns || {
-        HELM repo add bitnami https://charts.bitnami.com/bitnami
-        inst_ext_dns || exit 1
-    }
+function install_cilium {
+    K -n kube-system get pods | grep cilium && return "$SKIP_PRESENT"
+    helm repo add cilium https://helm.cilium.io 2>/dev/null
+    local fn="$D/conf/cilium_values.yaml"
+    local replicas=0
+    for n in $names; do
+        if [[ $n =~ master ]]; then replicas=$((replicas + 1)); fi
+    done
+    test $replicas == "1" || replicas=2 # default
+    info "Cilium replicas set to $replicas"
+
+    deindent <<EOF >"$fn"
+    ---
+    name: cilium-k3s
+    cluster:
+      name: k3s-cluster
+      id: 1
+
+    agent: true
+    rollOutCiliumPods: true
+
+    operator:
+      enabled: true
+      rollOutPods: true
+      replicas: ${replicas?}
+
+    debug:
+      enabled: $k3s_debug
+    k8sServiceHost: k3s-api-int-$zone
+    k8sServicePort: 6443
+
+    # Bandwith Manager
+    # https://cilium.io/blog/2020/11/10/cilium-19#bwmanager
+    # https://docs.cilium.io/en/stable/operations/performance/tuning/#bandwidth-manager
+    bandwidthManager: true
+
+    # Tunnelling mode
+    tunnel: "geneve"
+    autoDirectNodeRoutes: false
+
+    # BPF stuff
+    bpf:
+      masquerade: true
+      hostRouting: false
+      tproxy: true
+      lbBypassFIBLookup: false
+    ipMasqAgent:
+      enabled: true
+
+    # Kube-Proxy replacement
+    kubeProxyReplacement: "strict"
+    kubeProxyReplacementHealthzBindAddr: "[::]:10256"
+    localRedirectPolicy: false
+    ipv4NativeRoutingCIDR: "10.0.0.0/8"
+    l2NeighDiscovery:
+      enabled: false
+      refreshPeriod: "30s"
+
+    l7Proxy: false
+
+    policyEnforcementMode: "never"
+
+    hostServices:
+      enabled: true
+      protocols: tcp,udp
+
+    installIptablesRules: false
+    installNoConntrackIptablesRules: false
+
+    ipam:
+      mode: "kubernetes"
+
+    # Load-balancing - DSR requires native routing
+    # https://docs.cilium.io/en/stable/gettingstarted/kubeproxy-free/#xdp-acceleration
+    loadBalancer:
+      standalone: false
+      algorithm: maglev
+      mode: snat
+      acceleration: disabled
+      dsrDispatch: opt
+      serviceTopology: true
+
+    nodePort:
+      enabled: true
+      range: "${k8s_service_node_port_range//-/,}"
+      bindProtection: true
+      autoProtectPortRange: true
+      enableHealthCheck: true
+
+    cleanState: true
+    nodeinit:
+      enabled: $k3s_debug
+    enableK8sTerminatingEndpoint: true
+
+    # Hubble/Observability
+    hubble:
+      enabled: $k3s_debug
+      metrics:
+        enabled:
+          - dns:query;ignoreAAAA
+          - drop
+          - tcp
+          - flow
+          - icmp
+          - http
+      relay:
+        enabled: $k3s_debug
+        rollOutPods: true
+      ui:
+        enabled: $k3s_debug
+        standalone:
+          enabled: false
+        rollOutPods: true
+        podLabels:
+          lb-app: hubble-ui
+
+    ipv4:
+      enabled: true
+    ipv6:
+      enabled: false
+
+    enableIPv4Masquerade: true
+    enableIPv6Masquerade: false
+EOF
+    helm install cilium cilium/cilium --version "${v_cilium?}" --namespace kube-system --values "$fn"
+    local c
+    for ((i = 1; i < 20; i++)); do
+        sleep 1
+        c="$(K -n kube-system get pods | grep cilium)"
+        test -z "$c" && continue
+        grep -v Running <<<"$c" || break
+    done
+    test "$i" == "20" && die "cilium did not come up"
+    info 'cilium is ready'
 }
 
 function install_cert_mgr {
-    K -n kube-system create secret generic digitalocean-dns --from-literal=access-token="%(secret.do_token)s"
-    HELM -n kube-system install cert-manager bitnami/cert-manager --set installCRDs=true
-    sleep 4
+    # K -n cert-manager get pods | grep cainjector && return "$SKIP_PRESENT"
+    shcmd ops "$(dns_ops_plugin)" kube_add_cert_manager \
+        --kube_config="$(kubeconf)" \
+        --kube_add_cert_manager_version="$v_certmgmr" \
+        --kube_add_cert_manager_email="$email" \
+        --kube_add_cert_manager_zone="$domain"
 }
 
-function install_dns_issuer {
-    echo -e '
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-dns
-spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: '$email'
-    # Name of a secret used to store the ACME account private key
-    privateKeySecretRef:
-      name: letsencrypt-dns
-    solvers:
-    - dns01:
-        digitalocean:
-          tokenSecretRef:
-            name: digitalocean-dns
-            key: access-token
-' >dns_issuer.yaml
-
-    until (K -n kube-system apply -f dns_issuer.yaml); do
-        echo 'cert manager not ready yet. '
-        sleep 4
-    done
+function install_ext_dns {
+    K -n external-dns get pods | grep external-dns && return "$SKIP_PRESENT"
+    shcmd ops "$(dns_ops_plugin)" kube_add_ext_dns \
+        --kube_config="$(kubeconf)" \
+        --kube_add_ext_dns_version="$v_ext_dns" \
+        --kube_add_ext_dns_zone="$domain" \
+        --kube_add_ext_dns_gw_api=true
 }
+
+# function install_ext_dns {
+#     function inst_ext_dns {
+#         HELM -n kube-system install external-dns \
+#             --set provider=digitalocean \
+#             --set digitalocean.apiToken="(secret.do_token)s" \
+#             --set policy=sync \
+#             bitnami/external-dns
+#     }
+#     inst_ext_dns || {
+#         HELM repo add bitnami https://charts.bitnami.com/bitnami
+#         inst_ext_dns || exit 1
+#     }
+# }
+#
+# function install_dns_issuer {
+#     echo -e '
+#   apiVersion: cert-manager.io/v1
+#   kind: ClusterIssuer
+#   metadata:
+#     name: letsencrypt-dns
+#   spec:
+#   acme:
+#     server: https://acme-v02.api.letsencrypt.org/directory
+#     email: '$email'
+#     # Name of a secret used to store the ACME account private key
+#     privateKeySecretRef:
+#       name: letsencrypt-dns
+#     solvers:
+#     - dns01:
+#         digitalocean:
+#           tokenSecretRef:
+#             name: digitalocean-dns
+#             key: access-token
+# ' >dns_issuer.yaml
+#
+#     until (K -n kube-system apply -f dns_issuer.yaml); do
+#         echo 'cert manager not ready yet. '
+#         sleep 4
+#     done
+# }
 do_ get_kubeconfig
-#do_ install_ccm
+do_ rm_master_node_label
+if [[ $api_base =~ hetzner ]]; then do_ install_hetzner_ccm; fi
+if [[ $api_base =~ digitalocean ]]; then do_ install_digital_ocean_ccm; fi
+do_ install_cilium
+do_ install_cert_mgr
+do_ install_ext_dns
 #do_ install_ext_dns
-#do_ install_cert_mgr
 #do_ install_dns_issuer

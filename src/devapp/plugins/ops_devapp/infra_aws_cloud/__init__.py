@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim:sw=4
 """
 # AWS Infra Mgmt
 
@@ -18,7 +19,7 @@ from devapp.tools.infra import Actions, Flags, Provider, Api, Prov, fmt, rm
 import time
 import hmac, hashlib, requests, base64
 from operator import setitem
-from devapp.tools import cache
+from devapp.tools import cache, write_file
 
 # Droplet list results are cached in tmp/droplets.json. We will read from here if recent.'
 # droplet_list_cache_max_age = int(os.environ.get('droplet_list_cache_max_age', 3))
@@ -47,6 +48,59 @@ class Actions(Actions):
 
     list = dns_list
 
+    class kube_add_cert_manager:
+        class version:
+            d = '1.9.1'
+
+        class email:
+            d = 'me@mydomain.com'
+
+        class zone:
+            d = 'mydomain.com'
+
+        def run():
+            breakpoint()   # FIXME BREAKPOINT
+            v, k = FLG.kube_add_cert_manager_version, Prov().kubectl
+            url = f'https://github.com/cert-manager/cert-manager/releases/download/v{v}/cert-manager.yaml'
+            k.apply(url)   # creates ns
+            _ = {'secret-access-key': Api.secrets['aws_secret']}
+            k.add_secret(name='prod-route53-credentials-secret', ns='cert-manager', kv=_)
+            email = FLG.kube_add_cert_manager_email
+            zone = FLG.kube_add_cert_manager_zone
+            t = TCertMgr.format(email=email, zone=zone, id=Api.secrets['aws_key'])
+            for tries in range(10):
+                if not k.apply(
+                    'conf/cert_request.yaml',
+                    body=t,
+                ):
+                    return
+                app.info('retrying cert request', attempts=f'{tries}/10')
+                time.sleep(1)
+
+    class kube_add_ext_dns:
+        class gw_api:
+            n = 'Configure GatewayAPI'
+            d = False
+
+        class zone:
+            d = 'mydomain.com'
+
+        class version:
+            d = '0.12.0'
+
+        def run():
+            assert FLG.kube_add_ext_dns_gw_api, 'Only GW API Support Supported'
+            k, S = Prov().kubectl, Api.secrets
+            D = 'external-dns'
+            k.add_namespace(D)
+            T = TINI.format(key=S['aws_key'], secret=S['aws_secret']).strip()
+            k.add_secret(f'{D}-aws', D, {'credentials': T})
+            k.apply('conf/ext_dns.yaml', TEXTDNS)
+            zone = FLG.kube_add_ext_dns_zone
+            version = FLG.kube_add_ext_dns_version
+            s = T_EXTDNS_DEPL.format(zone=zone, version=version, user=os.environ['USER'])
+            k.apply('conf/ext_dns_depl.yaml', s)
+
     class dns_create:
         class ips:
             s = 'ips'
@@ -64,7 +118,7 @@ class Actions(Actions):
 
         class multi:
             s = 'multi'
-            n = 'Provide host::ip1:ip2,host2:ip3 in one go. Ignores name and ips flags. ttl and rm is used'
+            n = 'Provide host::ip1:ip2,host2:ip3 in one go. Ignores name and ips flags. ttl and rm is respected. If rm is set, we safe get roundtrips and just delete before creating when present.'
             d = []
 
         def run(name=None, ips=None, ttl=None, c=[0], multi=False):
@@ -80,6 +134,10 @@ class Actions(Actions):
             ttl = ttl or FLG.dns_create_ttl
             rm = FLG.dns_create_rm
             have = c[0] or Actions.dns_list(name='*')['data']
+            me = [i for i in have if name == i['name']]
+            if me and me[0]['ips'] == ips:
+                app.info('Already present', ips=ips, name=name)
+                return 'present'
             id = [i for i in have if name.endswith(i['domain'])]
             if id:
                 if rm:
@@ -120,13 +178,16 @@ def multi_create(m):
     if FLG.dns_create_rm:
         # speed up:
         zones.get = zones.get_cached
+    Actions.dns_list(name='*')['data']
     hosts = []
+    res = []
     for hip in m:
         host, ips = hip.split('::', 1)
         hosts.append(host + '.' if not host.endswith('.') else '')
         ips = ips.split(':')
-        Actions.dns_create.run(name=host, ips=ips, multi=True)
-    zones.get = zones.origget
+        res.append(Actions.dns_create.run(name=host, ips=ips, multi=True))
+    if not res == ['present', 'present']:
+        zones.get = zones.origget
 
     def f(all, hosts=hosts):
         return [i for i in all if i['name'] in hosts]
@@ -286,6 +347,126 @@ TAR = """
 </ChangeResourceRecordSetsRequest>"""
 TARR = '<ResourceRecord><Value>{ip}</Value></ResourceRecord>'
 
+
+TCertMgr = """
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  namespace: cert-manager
+spec:
+  acme:
+    email: "{email}"
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod-issuer-account-key
+    solvers:
+      - selector:
+          dnsZones:
+            - "{zone}"
+        dns01:
+          route53:
+            region: eu-west-3
+            accessKeyID: "{id}"
+            secretAccessKeySecretRef:
+              name: prod-route53-credentials-secret
+              key: secret-access-key
+"""
+
+TEXTDNS = """
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-dns
+  namespace: external-dns
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: external-dns
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["gateways", "httproutes", "tlsroutes", "tcproutes", "udproutes"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: external-dns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: external-dns
+subjects:
+  - kind: ServiceAccount
+    name: external-dns
+    namespace: external-dns
+
+"""
+
+T_EXTDNS_DEPL = """
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: external-dns
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: external-dns
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      serviceAccountName: external-dns
+      containers:
+        - name: external-dns
+          image: k8s.gcr.io/external-dns/external-dns:v{version}
+          args:
+            - --log-level=debug
+            - --source=gateway-httproute
+            - --source=gateway-tlsroute
+            - --source=gateway-tcproute
+            - --source=gateway-udproute
+            - --interval=1m
+            - --policy=upsert-only
+            - --registry=txt
+            - --txt-owner-id={user}
+            - --domain-filter={zone}
+            - --provider=aws
+            - --aws-zone-type=public
+          resources:
+            limits:
+              memory: 1024M
+            requests:
+              cpu: 100m
+              memory: 64Mi
+          env:
+            - name: AWS_SHARED_CREDENTIALS_FILE
+              value: /.aws/credentials
+          volumeMounts:
+            - name: aws-credentials
+              mountPath: /.aws
+              readOnly: true
+      volumes:
+        - name: aws-credentials
+          secret:
+            secretName: external-dns-aws
+"""
+
+
+TINI = """
+[default]
+aws_access_key_id = {key}
+aws_secret_access_key = {secret}
+"""
 
 if __name__ == '__main__':
     main()

@@ -38,6 +38,7 @@ See Actions at -h
 from devapp.app import run_app, FLG, app
 from devapp.tools.infra import Actions, Flags, Provider, Api, Prov, fmt, rm
 from operator import setitem
+from devapp.tools import write_file, os
 
 # Droplet list results are cached in tmp/droplets.json. We will read from here if recent.'
 # droplet_list_cache_max_age = int(os.environ.get('droplet_list_cache_max_age', 3))
@@ -61,6 +62,28 @@ class Actions(Actions):
         return Actions.placement_group_list(name=name)
 
     placement_group_delete = rm('placement_group')
+
+    class kube_add_ccm:
+        class network_name:
+            n = 'name of subnet this cluster is within'
+            d = 'default'
+
+        class cidr:
+            n = 'k8s cluster-cidr value'
+            d = '10.0.0.8/24'
+
+        class version:
+            d = '1.12.1'
+
+        def run():
+            k = Prov().kubectl
+            token = Api.secrets['hcloud_api_token']
+            net = FLG.kube_add_ccm_network_name
+            k.add_secret('hcloud', 'kube-system', {'token': token, 'network': net})
+            cidr = FLG.kube_add_ccm_cidr
+            version = FLG.kube_add_ccm_version
+            s = TCCM.format(cidr=cidr, version=version)
+            k.apply('conf/ccm.yaml', s)
 
 
 class Flags(Flags):
@@ -244,7 +267,7 @@ class HProv(Provider):
                 {
                     'network_zone': 'eu-central',  # only option
                     'ip_range': i,
-                    'type': 'cloud',
+                    'type': 'server',  # not sure difference to 'cloud'
                 }
             ]
             return d
@@ -301,6 +324,106 @@ class HProv(Provider):
 Prov(init=HProv)
 Flags.size.n = 'aliases ' + HProv.size_aliases()
 main = lambda: run_app(Actions, flags=Flags)
+
+TCCM = """
+---
+# https://github.com/hetznercloud/hcloud-cloud-controller-manager
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloud-controller-manager
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: system:cloud-controller-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: cloud-controller-manager
+    namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hcloud-cloud-controller-manager
+  namespace: kube-system
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: hcloud-cloud-controller-manager
+  template:
+    metadata:
+      labels:
+        app: hcloud-cloud-controller-manager
+      annotations:
+        # TODO: yields warning
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      serviceAccountName: cloud-controller-manager
+      dnsPolicy: Default
+      tolerations:
+        # this taint is set by all kubelets running --cloud-provider=external
+        # so we should tolerate it to schedule the cloud controller manager
+        - key: "node.cloudprovider.kubernetes.io/uninitialized"
+          value: "true"
+          effect: "NoSchedule"
+        - key: "CriticalAddonsOnly"
+          operator: "Exists"
+        # cloud controller manages should be able to run on masters
+        - key: "node-role.kubernetes.io/master"
+          effect: NoSchedule
+          operator: Exists
+        - key: "node-role.kubernetes.io/control-plane"
+          effect: NoSchedule
+          operator: Exists
+        - key: "node.kubernetes.io/not-ready"
+          effect: "NoSchedule"
+      hostNetwork: true
+      containers:
+        # TODO FIXME: kustomize for private registry/version
+        # TODO FIXME: kustomize for pod CIDR
+        - image: hetznercloud/hcloud-cloud-controller-manager:v{version}
+          name: hcloud-cloud-controller-manager
+          command:
+            - "/bin/hcloud-cloud-controller-manager"
+            - "--cloud-provider=hcloud"
+            - "--leader-elect=false"
+            - "--allow-untagged-cloud"
+            - "--allocate-node-cidrs=true"
+            - "--cluster-cidr={cidr}"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
+          env:
+            # TODO: kustomize debug
+            - name: HCLOUD_DEBUG
+              value: "true"
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: HCLOUD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hcloud
+                  key: token
+            - name: HCLOUD_NETWORK
+              valueFrom:
+                secretKeyRef:
+                  name: hcloud
+                  key: network
+
+
+"""
+
 
 if __name__ == '__main__':
     main()

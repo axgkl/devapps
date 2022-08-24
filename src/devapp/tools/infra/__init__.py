@@ -5,7 +5,7 @@ from devapp.app import FLG, app, do, system
 from devapp.app import app, FLG, system, DieNow
 from devapp.tools import json, dirname, cache
 from devapp.tools import os, sys, write_file, to_list
-from devapp.tools import confirm, exists, read_file, write_file, dirname, cast
+from devapp.tools import confirm, exists, read_file, dirname, cast
 from devapp.tools.flag import build_action_flags
 from devapp.tools.times import times
 from fnmatch import fnmatch
@@ -91,8 +91,10 @@ class env:
         E['cluster_name'] = k('').replace('-', '')
         E['rangelen'] = str(rl)
         E['names'] = ' '.join(names)
-        E['dir_project'] = os.getcwd()
+        E['dir_project'] = os.environ.get('dir_project', os.getcwd())
         E['fn_cache'] = fs.fn_drops_cache()
+        E['infra_api_base'] = attr(Prov(), 'base_url', '')
+        app.info('Environ vars', **E)
         os.environ.update(E)
         return E
 
@@ -546,11 +548,13 @@ class Flags:
         d = []
 
     class ip_range:
-        n = 'when creating networks or droplets with own networks'
+        n = 'When creating networks or droplets with own networks. Given range will be configured as subnet within a 10/8 network.'
         s = 'ipr'
-        d = '10.0.0.0/16'
+        d = '10.140.10.0/24'
 
     # class domain: d = ''
+    class kube_config:
+        n = 'Filename of kubeconfig to use (for Actions where relevant)'
 
     def _pre_init(Flags, Actions):
         build_action_flags(Flags, Actions)
@@ -711,7 +715,10 @@ def list_resources(
         P.SSH_KEYS.clear()
         P.SSH_KEYS.update({k['name']: k for k in total})
     # if name != 'local' and attr(P, 'droplet', nil).endpoint == endpoint: breakpoint()   # FIXME BREAKPOINT
-    all = [d for d in total if matches(d)] if filtered else total
+    if callable(filtered):
+        all = filtered(total)
+    else:
+        all = [d for d in total if matches(d)] if filtered else total
     if sorter:
         all = [i for i in sorter(all)]
 
@@ -1035,18 +1042,39 @@ class Actions:
             p = a.index('--')
             cmd = ' '.join([f'{i}' for i in a[p + 1 :]])
             a = a[:p]
+        # convenience: he ssh <name> or he ssh <nr in list>
         if FLG.name == Flags.name.d:
             FLG.name = a[-1]
+        # we allow he ssh 2- -> goes up from the end:
+        i = None
+        if FLG.name[-1] == '-' and FLG.name[:-1].isdigit():
+            i = -int(FLG.name[:-1]) - 1
+        if FLG.name.isdigit():
+            i = int(FLG.name) - 1
+        if i is not None:
+            ips = [Actions.droplet_list(name='*')['data'][i]['ip']]
+        else:
+            ips = [i['ip'] for i in Actions.droplet_list(name=FLG.name)['data']]
+            if not ips:
+                app.die('no name match')
         fs.make_temp_dir('ssh')
-        ips = [i['ip'] for i in Actions.droplet_list(name=FLG.name)['data']]
-        if not ips:
-            app.die('no name match')
         [os.system(ssh() + f'root@{ip} {cmd}') for ip in ips]
 
     class droplet_create:
+        class private_network:
+            n = 'Name of private network to attach to. iprange flag determines subnet size.'
+            t = ['default', 'own']
+            d = 'default'
+
+        class volume:
+            n = 'Gigabytes of volume to create and attach to droplet(s)'
+            d = 0
+
         def _pre(env, priv_net):
             """Main Thread here still.
             default network is always 10.0.0.1/8"""
+            DROPS.clear()
+            Actions.droplet_list.run(cache=False)
 
             id = FLG.ssh_keys
             if not id.isdigit():
@@ -1065,26 +1093,27 @@ class Actions:
             FLG.ssh_keys = id
 
             Actions.network_list()
-            ns = Prov().NETWORKS
-            dn = Prov().network.default()
-            nn, nr = FLG.ip_range = dn, '10.0.0.0/8'
+            netw_have = Prov().NETWORKS
+            # we cannot delete existing networks here, want to run the create cmd many times, not creating existing servers:
+            # means: Say own when you want a new one and give the cluster a unique name.
+            # only then ip range is respected.
             if priv_net == 'own':
-                nn, nr = env['cluster_name'], FLG.ip_range
-            if not nn in ns:
-                app.info('Creating network', name=nn, range=nr)
-                Actions.network_create.run(nn, ip_range=nr)
+                ndn = env['cluster_name']
+            else:
+                ndn = Prov().network.default()   # on DO sth like "fra1-default"
+            FLG.droplet_create_private_network = ndn
+            # networkd is default
+            if not ndn in netw_have:
+                app.info('Creating network', name=ndn, range=FLG.ip_range)
+                Actions.network_create.run(ndn, ip_range=FLG.ip_range)
+                while not ndn in Prov().NETWORKS:
+                    app.info(f'waiting for network: {ndn}')
+                    Actions.network_list()
+                    time.sleep(0.5)
+
             f = attr(Prov().droplet, 'prepare_create')
             if f:
                 f(env)
-
-        class private_network:
-            n = 'Name of private network to attach to.'
-            t = ['default', 'own']
-            d = 'default'
-
-        class volume:
-            n = 'Gigabytes of volume to create and attach to droplet(s)'
-            d = 0
 
         def run(
             name,
@@ -1103,7 +1132,6 @@ class Actions:
             Prov().assert_sane_name(name, True)
             droplet(name)   # assure up to date status
             # if not name == 'local': breakpoint()   # FIXME BREAKPOINT
-            D = Prov().droplet
             feats = Features.validate(d.pop('features'))
             d['tags'] = t = list(d['tags'])
             t.extend(feats)
@@ -1112,6 +1140,7 @@ class Actions:
                 if not name == 'local':
                     app.warn(f'Droplet {name} exists already')
             else:
+                D = Prov().droplet
                 DROPS[name] = {'name': name}
                 data = D.create_data(d)
 
@@ -1126,10 +1155,12 @@ class Actions:
 
             Actions.droplet_init(name=name, features=feats)
             # wait_for_ssh(name=name)
-            if not name == 'local':
-                # withint init this will not show it, takes around 4,5 seconds until
-                # in get result
-                return Actions.droplet_list_no_cache.run(name=name)
+
+            # if not name == 'local':
+            #     # withint init this will not show it, takes around 4,5 seconds until
+            #     # in get result
+            #     WOULD KILL WAITING for DROPS facts results elsewhere:
+            #     return Actions.droplet_list_no_cache.run(name=name)
 
     class droplet_delete:
         """
@@ -1294,9 +1325,10 @@ def find_my_feat_flow_parts(name, script):
 
 def run_flow_part(feat, name, part, nr, local):
     # feat like 001:add_sudo_user
+    # if not name == 'local': time.sleep(10000)
     assert len(feat.split(':')) == 2, f'Exected nr:feat, got {feat}'
     # if not name == 'local': time.sleep(1000000)
-    marker = '-\x1b[48;5;56mFACT\x1b[0m-'
+    marker = 'NEW FACT:'
     pre = [
         '#!/bin/bash',
         f'echo "--------------  {name} {feat} part {nr} --------------  "',
@@ -1323,8 +1355,8 @@ def run_flow_part(feat, name, part, nr, local):
     write_file(fnt, script, chmod=0o755, mkdir=True)
 
     # print the rendered script content (if its not the tools (functions)):
-    if not 'functions' in feat:
-        os.system(f'echo -e "\x1b[35m";cat "{fnt}"; echo -e "\x1b[0m"')
+    # if not 'functions' in feat:
+    #     os.system(f'echo -e "\x1b[35m";cat "{fnt}"; echo -e "\x1b[0m"')
     # local could have been set, when this is a dep of another one.
     if not local:
         scp = 'scp -q ' + ssh().split(' ', 1)[1]
@@ -1339,10 +1371,10 @@ def run_flow_part(feat, name, part, nr, local):
     else:
         cmd = f'"{fnt}"'
         cmd = f'cd "{d_tmp}" && {cmd}'
-    cmd += f' | tee >(grep -e {marker} --color=never > "{fntres}")'
+    # strip all ansi colors:
+    cmd += f' | tee >(grep -e "{marker}" --color=never | sed -e \'s/\\x1B\\[[0-9;]*[JKmsu]//g\' > "{fntres}")'
     # if not local: cmd += ' &'
-    if name == 'local':
-        breakpoint()   # FIXME BREAKPOINT
+    # if name == 'local': breakpoint()   # FIXME BREAKPOINT
     if system(cmd):
         app.die('cmd failed')
     facts = {}
@@ -1351,10 +1383,10 @@ def run_flow_part(feat, name, part, nr, local):
     #     print(name, 'wait fntres')
     #     time.sleep(0.5)
 
-    def parse(res_line, name=name, facts=facts):
-        l = res_line.split(' ', 2)
-        DROP[l[1]] = l[2]
-        facts[l[1]] = l[2]
+    def parse(res_line, name=name, facts=facts, marker=marker, drop=DROP):
+        l = res_line.split(marker, 1)[1].strip().split(' ', 1)
+        drop[l[0]] = l[1]
+        facts[l[0]] = l[1]
 
     [parse(l) for l in read_file(f'{fntres}', dflt='').splitlines()]
     if facts:
@@ -1507,6 +1539,41 @@ def assert_sane_name(name, create=False):
         )
 
 
+class kubectl:
+    def add_namespace(self, ns):
+        self(f'create namespace "{ns}"', on_err='report')
+
+    def add_secret(self, name, ns, kv, on_exists='rm'):
+        app.info('adding secret', name=name, keys=[i for i in kv])
+        vals = ' '.join([f'--from-literal="{k}={v}"' for k, v in kv.items()])
+        if self(f'--namespace {ns} create secret generic {name} {vals}', on_err='report'):
+            assert on_exists == 'rm'
+            app.warning('have to first remove existing secret', name=name)
+            self(f'--namespace {ns} delete secret {name}')
+            self(f'--namespace {ns} create secret generic {name} {vals}')
+
+    def apply(self, fn, body=None):
+        if not '://' in fn:
+            if not fn[0] == '/':
+                fn = os.environ['dir_project'] + '/' + fn
+            if body:
+                write_file(fn, body, mkdir=True)
+        self(f'apply -f "{fn}"')
+
+    def __call__(self, *args, on_err='die'):
+        fn = FLG.kube_config
+        if not exists(fn):
+            app.die('No kubeconfig file', fn=fn)
+        k = ' '.join([f'"{i}"' for i in args]) if len(args) > 1 else args[0]
+        err = os.system(f'export KUBECONFIG="{fn}" && kubectl {k}')
+        if err:
+            if on_err == 'die':
+                app.die('kubectl command failed', args=args)
+            elif on_err == 'report':
+                return err
+            app.die(f'on_err handler not defined for failing kubectl', args=args)
+
+
 class Provider:
     """Provider specific."""
 
@@ -1520,6 +1587,7 @@ class Provider:
     DROPS = DROPS
     NETWORKS = NETWORKS
     SSH_KEYS = SSH_KEYS
+    kubectl = kubectl()   # obj only for call method, was a function before
 
 
 prov = [0]   # set by the specific one, a derivation of Provider
