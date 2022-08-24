@@ -2,6 +2,9 @@
 """
 Ansi Escape Tools for Terminal Output
 
+Note: This was written while I did not yet realize the base16 term indirection,
+I.e. global shell themes.
+Meanwhile I don't think, hardcoded colorthemes per app should even exist.
 """
 from __future__ import absolute_import, division, print_function
 
@@ -182,6 +185,15 @@ class Theme:
         Color names and tags can be given by providing a list and not the code.
         E.g. setup(I=123, X=[333, 'My Title', 'Foo, Bar'])
         """
+        try:
+            # hack to respect col_fmt plain even when piped
+            from devapp.app import FLG
+
+            cf = FLG.log_fmt
+            if cf in {'2', 2, 'plain'}:
+                cls.force_colors = True
+        except:
+            pass
 
         def col_def(k, v, dt='Unnamed %s Color', tt='<Untagged>'):
             if not Theme.is_col_key(k):
@@ -216,12 +228,15 @@ class Theme:
         e, t = '', '%s'
         if do_cols:
             if not cls.ignore_env:
+                # superdangerous. A defined '$D' matches for example.
                 # TODO perf?:
                 e = envget(key, '')
                 if e.isdigit():
                     e = '1;38;5;%sm' % e
                 elif e:
-                    e = e.split('[', 1)[1]
+                    e = e.split('[', 1)
+                    e = '' if len(e) == 1 else e[1]
+
             if not e and dflt:
                 e = b + '38;5;%sm' % dflt
             if e:
@@ -286,6 +301,7 @@ class Theme:
 
 
 Theme.setup()
+
 # Its colorizer functions are now set - e.g. Theme.r('error')
 # they HAVE to be supershort to not distract the reader of code:
 M = Theme.m
