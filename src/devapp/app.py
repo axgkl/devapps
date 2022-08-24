@@ -307,9 +307,29 @@ def define_action_flags_in_cli():
             continue
         have.add(key)
         args[p] = '--' + f['key']
+        # after this all subclass flags for that action are defined:
         tools.define_flags(f['flg_cls'], sub=key, parent_autoshort=f['autoshort'])
+        allow_short_action_cli_args(args, p, key)
         app.selected_action = key
         # action[0] = key
+
+
+def allow_short_action_cli_args(args, p, key):
+    """
+    make 'myaction --filename[=v]' ident to 'myaction --myaction_filename[=v]' cli
+    """
+    L = len(args) - 1
+    while p < L:
+        p += 1
+        a = args[p]
+        if not a[:2] == '--':
+            continue
+        a = a[2:].split('=', 1)
+        s = f'{key}_{a[0]}'
+        if s in FLG.__flags:
+            args[p] = f'--{s}'
+            if len(a) == 2:
+                args[p] += f'={a[1]}'
 
 
 # action = [0]

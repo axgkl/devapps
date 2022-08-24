@@ -13,7 +13,11 @@ from structlogging.stacktrace import rich_stack
 class formatters:
     coljson = partial(coljson, indent=2, no_indent_len=100, style=Theme.pygments_style)
     coljson_no_colors = partial(
-        coljson, indent=2, no_indent_len=0, style=Theme.pygments_style, colorize=False,
+        coljson,
+        indent=2,
+        no_indent_len=0,
+        style=Theme.pygments_style,
+        colorize=False,
     )
 
     # its done anyway key val based to single line, so we indent:
