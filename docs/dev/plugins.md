@@ -96,7 +96,7 @@ Means: A package "foo" depending on devapp may add a
 
     /src(of_foo package)/bar/plugins/myapp_bar/bettergreeter.py
 
-so that the `myapp` tool has a better greeter plugin.
+so that the `myapp` tool has a better/more specialized greeter plugin.
 
 Derived package foo may also *change* the behaviour of the "say_hello" plugin of "myapp" by
 providing this module as well.

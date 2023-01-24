@@ -263,7 +263,7 @@ Test it:
 /tmp/action_flagtest.py run --install_verbose=True || true # lp: asserts="Unknown command line flag 'install_verbose'"
 ```
 
-Note the concatenation of action and flag name for the nested property verbose within install
+Mind the concatenation of action and flag name for the nested property verbose within `def install()`
 action.
 
 
