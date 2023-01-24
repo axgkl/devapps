@@ -9,7 +9,8 @@ def download(url, to, chmod=None):
 
 
 def fetch(url, to):
-    os.makedirs(os.path.dirname(to), exist_ok=True)
+    if '/' in to:
+        os.makedirs(os.path.dirname(to), exist_ok=True)
 
     if tools.exists(to):
         return app.info('exists already', file=to, store_log=True)

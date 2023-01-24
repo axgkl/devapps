@@ -1122,9 +1122,10 @@ def set_flag(k, v):
 def set_flag_vals_from_env():
     """allows so ref $foo as default var a flag"""
     # hmm. pytest -> nrtesting -> run_app in greenlet. How to pass flags, e.g. to drawflow
-    ef = FLG.environ_flags or os.environ.get(
-        'environ_flags'
-    )  # if set we check all from environ
+    ef = FLG.environ_flags
+    if not ef:
+        if envget( 'environ_flags', '').lower() in {'true', '1'}:
+            ef = True
     for f in dir(FLG):
         if ef:
             v = os.environ.get(f)
@@ -1236,7 +1237,11 @@ def make_flag(c, module, autoshort, default, sub=False, **kw):
         val = partial(build_pycond_flag_expr, key=key, done=[0])
         flags.register_validator(key, val, message=m)
     else:
-        define_flag(key, d, txt, **mkw)
+        try:
+            define_flag(key, d, txt, **mkw)
+        except Exception as ex:
+            print('conflicting:', c, module, kw)
+            raise
 
 
 human = lambda key: ' '.join([k.capitalize() for k in key.split(' ')])

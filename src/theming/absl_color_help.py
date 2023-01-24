@@ -54,9 +54,7 @@ def call_doc(obj, level=2, render=False):
     return out
 
 
-deindent = (
-    lambda d: ('\n'.join([l.strip() for l in d.splitlines()]).strip()) + '\n'
-)
+deindent = lambda d: ('\n'.join([l.strip() for l in d.splitlines()]).strip()) + '\n'
 
 
 def func_doc(obj, level=1):
@@ -112,9 +110,7 @@ def class_doc(cls, level=1, hir=0, out=None):
     for c in clss:
         class_doc(c, level, hir, out)
     if aliases:
-        out.append(
-            '\nAliases: ' + ', '.join(['%s->%s' % (i, k) for i, k in aliases])
-        )
+        out.append('\nAliases: ' + ', '.join(['%s->%s' % (i, k) for i, k in aliases]))
     out.append('- -hh[h] to get more details about calls.')
 
     if hir == 1:
@@ -131,9 +127,7 @@ def module_doc(mod):
 # --------------------------------------------------------------- -hf/--helpfull output
 def term_widths(have_match):
     tw = termwidth()
-    widths = dict(
-        name=int(tw * 0.2 + 0.5), short_name=6, default=int(tw * 0.15 + 0.5)
-    )
+    widths = dict(name=int(tw * 0.2 + 0.5), short_name=6, default=int(tw * 0.15 + 0.5))
     last = 'meaning'
     if have_match:
         widths = dict(name=25, short_name=8, meaning=0)
@@ -146,6 +140,7 @@ def term_widths(have_match):
 
 def term_line(line_spec, widths, have_match):
     """One line of output - have_match typically [main module name]"""
+    # if 'cache' in str(line_spec) or 'filtered' in str(line_spec): breakpoint()   # FIXME BREAKPOINT
     m = line_spec
     is_action = m.get('action')
     # if is_action:
@@ -165,9 +160,13 @@ def term_line(line_spec, widths, have_match):
         if colmn == 'meaning':
             choi = m.get('choices')
             if choi:
-                choi = ' [%s]' % ','.join(choi)
-                if have_match or len(v) + len(choi) <= w:
-                    v += col('choices') + choi
+                v += m['opts']
+
+                # breakpoint()   # FIXME BREAKPOINT
+                # choi = ' [%s]' % ','.join(choi)
+                # if have_match or len(v) + len(choi) <= w:
+                #     v += col('choices') + choi
+
             det = m.get('details')
             if det:
                 # det = ' 🗎 ' + det
@@ -222,7 +221,10 @@ def to_terminal(flags, widths, match=None):
 
 
 def parse_xml_help(xml_help, match, cli_actions=None):
-    """parse --helpxml output of absl"""
+    """parse --helpxml output of absl
+    cli_actions: the action possibly given to the cli
+
+    """
 
     class types:
         def do_float(c, el):
@@ -240,7 +242,8 @@ def parse_xml_help(xml_help, match, cli_actions=None):
 
         def do_string_enum(c, el):
             c['choices'] = [e.text for e in el]
-            c['meaning'] = c['meaning'].split('>: ', 1)[-1]
+            c['opts'], c['meaning'] = c['meaning'].split('>: ', 1)
+            c['opts'] += '>'
 
         def do_multi_string_enum(c, el):
             return types.do_string_enum(c, el)
@@ -250,7 +253,7 @@ def parse_xml_help(xml_help, match, cli_actions=None):
 
     tree = ET.fromstring(xml_help)
     m, items = {}, {}
-    r = {'program': tree[0].text, 'usage': tree[0].text, 'flags': m}
+    j = {'program': tree[0].text, 'usage': tree[0].text, 'flags': m, 'actions': []}
     for fs in tree[2:]:
         f = fs
         c = {}
@@ -274,7 +277,9 @@ def parse_xml_help(xml_help, match, cli_actions=None):
         items[c['name']] = {'pos': len(l) - 1, 'mod': c['file']}
 
     have = set()
+    # action_flags registered by flag tools at flag class parsing
     for f, af in action_flags.items():
+        # if f == 'droplet_list': breakpoint()
         k = af['key']
         if k in have:
             continue
@@ -283,34 +288,30 @@ def parse_xml_help(xml_help, match, cli_actions=None):
         if not item:
             continue  # not match
         p, mod = item['pos'] + 1, item['mod']
-        m[mod][p - 1]['action'] = True
-        m[mod][p - 1]['is_default'] = af['is_default']
+        modflags = m[mod]
+        modflags[p - 1]['action'] = True
+        modflags[p - 1]['is_default'] = af['is_default']
         # afp.append([p - 1, mod, k, True])
-        if af in cli_actions:
-            f = m[mod][p]
-            while f['name'].startswith(k + '_'):
-                f['action'] = True
-                f['action_flag'] = True
+        # we must now, when an action is given on CLI, list also it's action flags,
+        # defined within this help show module. They'll start with the action + _:
+        if af in cli_actions and p < len(modflags):
+            j['actions'].append(modflags[p - 1])
+            f = modflags[p]
+            fn = f['name']
+            # mind e.g. droplet_list action and droplet_list_no_cache action:
+            while fn.startswith(k + '_') and not fn in action_flags:
+                j['actions'].append(f)
+                f['action'] = f['action_flag'] = True
+                f['action_name'] = k
                 f['name'] = f['name'].split(k + '_', 1)[1]
+                # if f['name'] == 'private_network': breakpoint()   # FIXME BREAKPOINT
+                if p > len(modflags):
+                    break
                 p += 1
-    # if afp:
-    #     fs = r['flags']
-    #     l = []
-    #     m = {}
-    #     for a in afp:
-    #         mod = a[1]
-    #         action = a[2]
-    #         main = a[3]
-    #         f = fs[mod].pop(a[0] + m.get(mod, 0))
-    #         m[mod] = m.setdefault(mod, 0) - 1
-    #         l.append(f)
-    #         if main:
-    #             f['action'] = True
-    #             f['default'] = 'ACTION'
-    #         else:
-    #             f['name'] = f['name'].split(action + '_', 1)[1]
-    #     fs['actions'] = l
-    return r
+                f = modflags[p]
+                fn = f['name']
+
+    return j
 
 
 invisible_sep = '\u2063'
@@ -353,7 +354,7 @@ def color_usage(*a, main_module, full=None, **kw):
     d = main_module.__doc__
     if d:
         ret.append('\n' + d.strip() + '\n\n')
-    add = lambda s, end='\n': ret.append(s + end)
+    add = lambda s, end='\n', ret=ret: ret.append(s + end)
     # catch the original output:
     hof = get_argv_val('--help_output_fmt')
     hof = hof if hof else 'terminal'
@@ -368,9 +369,7 @@ def color_usage(*a, main_module, full=None, **kw):
     for k in sys.argv:
         af = action_flags.get(k)
         if af:
-            define_flags(
-                af['flg_cls'], sub=af['key'], parent_autoshort=af['autoshort']
-            )
+            define_flags(af['flg_cls'], sub=af['key'], parent_autoshort=af['autoshort'])
             afs.append(af)
 
     so = sys.stdout
@@ -396,34 +395,32 @@ def color_usage(*a, main_module, full=None, **kw):
     j['match'] = '[matching %s]' % match_hilite if match else ''
 
     if match:
-        n, n1 = (
-            ('All supported', '') if full else ('Main', ' (-hf for all flags)')
-        )
+        n, n1 = ('All supported', '') if full else ('Main', ' (-hf for all flags)')
         add('%s command line flags %s%s:' % (n, j['match'], n1))
     if hof != 'terminal':
         r = tabulate()
 
-    def do(fn_mod):
+    w = term_widths(match)
+
+    def do(fn_mod, w=w, flgs=None):
         # module headline:
-        flgs = all_flgs[fn_mod]
+        flgs = all_flgs[fn_mod] if flgs is None else flgs
         if len(all_flgs) > 1:
             add(ansi_col('1;34') + fn_mod)
-        w = term_widths(match)
         add(to_terminal(flgs, w, match=match))
 
     # main_help = all_flgs.pop(main_module.__name__, [])
     # show non main module flags on helpfull:
     n = main_module.__name__
     if full:
-        [
-            do(fn_mod)
-            for fn_mod in sorted(all_flgs)
-            if not fn_mod in (n, 'actions')
-        ]
+        [do(fn_mod) for fn_mod in sorted(all_flgs) if not fn_mod in (n, 'actions')]
+
     if n in all_flgs:
         do(n)
-    if all_flgs.get('actions'):
-        do('actions')
+    # when user has selected an action on CLI, show it last, again:
+    if j.get('actions'):
+        add(ansi_col('1;34') + '\nSelected Action')
+        do('actions', flgs=j['actions'])
 
     # show main module's flags last - always:
     add('\033[0m')
