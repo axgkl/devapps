@@ -1,3 +1,4 @@
+from io import StringIO
 import json
 import os
 import signal
@@ -21,8 +22,10 @@ FLG = flags_.FLAGS
 env = os.environ
 py_env = load.py_env
 
-kvmsg = lambda kw: '  ' + '\n  '.join(['%s: %s' % (k, str(v)) for k, v in kw.items()])
-kvprint = lambda l, msg, kw: print('[%s] %s\n%s' % (l, msg, kvmsg(kw)))
+
+def kvmsg(kw): return '  ' + '\n  '.join(['%s: %s' % (k, str(v)) for k, v in kw.items()])
+def kvprint(l, msg, kw): return print('[%s] %s\n%s' % (l, msg, kvmsg(kw)))
+
 
 notifier = [None]
 
@@ -144,7 +147,7 @@ def set_dirs():
     #        if k.startswith(p)
     #    ]
     # )
-    ## an app (like build may allow to set --da_dir, overruling env:
+    # an app (like build may allow to set --da_dir, overruling env:
     # d['da_dir'] = getattr(FLG, 'da_dir', env.get('DA_DIR', '.'))
     # we are used e.g. at construct/prepare.sh w/o DA:
     # c = 'CONDA_PREFIX'
@@ -153,7 +156,7 @@ def set_dirs():
     # return d
 
 
-command_name = lambda: sys.argv[0].rsplit('/', 1)[-1].replace('.py', '')
+def command_name(): return sys.argv[0].rsplit('/', 1)[-1].replace('.py', '')
 
 
 def set_app(name, log):
@@ -165,6 +168,7 @@ def set_app(name, log):
     set_dirs()
     # [setattr(app, k, v) for k, v in dirs(name).items()]
     # allows raise app.die(msg, **kw):
+
     def die(msg, **kw):
         """Application decided to bail out"""
         raise DieNow(msg, kw)
@@ -368,7 +372,7 @@ class DieNow(Exception):
 
 
 class dev_app_exc_handler(abslapp.ExceptionHandler):
-    wants = lambda self, exc: True
+    def wants(self, exc): return True
 
     def handle(self, exc):
         if type(exc) == DieNow:
@@ -400,9 +404,6 @@ class Reloaded(Exception):
 
 def reload_handler(signum, frame):
     raise Reloaded('signal')
-
-
-from io import StringIO
 
 
 # def wrap_flag_parser_with_action_detector(flags_parser):
@@ -483,7 +484,7 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     if FLG.dirwatch:
         # TODO: simply do it with entr:
         # cat conf/reload _py3.8
-        ##!/usr/bin/env bash
+        # !/usr/bin/env bash
 
         # ps wwwax |grep python |grep app | grep client | xargs kill
 
@@ -672,3 +673,7 @@ def system(cmd, no_fail=False):
 # allows raise app.die(msg, **kw) with correct error logging:
 # we want to raise for --pdb_post_mortem
 # app_die = lambda app: type('Die', (Die,), {'log': app.log})
+
+i = 1
+
+i = 1
