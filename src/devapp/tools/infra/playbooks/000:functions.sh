@@ -6,6 +6,7 @@ _='# Useful functions
 cluster_name="%(env.cluster_name)s"
 dir_project="%(env.dir_project)s"
 names="%(env.names)s"
+function_filter="%(env.function_filter)s"
 
 SKIP_PRESENT=20
 
@@ -22,6 +23,7 @@ function die {
     exit 1
 }
 
+function have { type $1 1>/dev/null 2>/dev/null; }
 function h1 {
     echo -e "\x1b[1;38;49m $name \x1b[1;30;41m $*\x1b[0;37m"
 }
@@ -30,11 +32,24 @@ function info {
 }
 
 function do_ {
-    h1 "$1"
+    local filter="$function_filter"
+    test "$1" == "always" && {
+        filter=
+        shift
+    }
+
+    local func="$1"
+    test -z "$filter" || {
+        if [[ $func != *$filter* ]]; then
+            h1 "$func skipped (filtered)"
+            return 0
+        fi
+    }
+    h1 "$func"
     eval "$@"
     local res=$?
     test $res == $SKIP_PRESENT && {
-        h1 "$1 skipped (present already)"
+        h1 "$func skipped (present already)"
         return 0
     }
     test $res != 0 && die "$1 failed"
@@ -90,7 +105,8 @@ function HELM {
 
 function pkg_inst {
     local i
-    type apt && i=apt || i=dnf
+    type apt 2>/dev/null && i=apt || i=dnf
+    info "package system is $i"
     $i install -y "$@"
 }
 

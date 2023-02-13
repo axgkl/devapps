@@ -10,7 +10,7 @@ E.g. when terraform destroy fails, you can delete droplets using this.
 
 ## Caution
 
-Most features are tested against a Fedora host filesystem (the default image)
+Most playbooks are tested against a Fedora host filesystem (the default image)
 
 ## Requirements
 - API Token
@@ -36,7 +36,8 @@ See Actions at -h
 
 
 from devapp.app import run_app, FLG, app
-from devapp.tools.infra import Actions, Flags, Provider, Api, Prov, fmt, rm
+from devapp.tools.infra import Provider, Api, Prov, fmt, rm
+from devapp.tools.infra.actions import Actions, Flags, conv2classmethods
 from operator import setitem
 from devapp.tools import write_file, os
 
@@ -45,45 +46,39 @@ from devapp.tools import write_file, os
 
 
 class Actions(Actions):
-    def prices():
+    class _cli(Actions._cli):
+        image = 'i', 'fedora-36'   # 'fedora-36-x64'
+        region = 'w', 'hel1', '*w*here to create the resource'
+        network_name = 'nn', '', 'name of subnet this cluster is within'
+
+    def prices(A):
         return Api.get('pricing')
 
-    def placement_group_list(name=None):
-        return Prov().list_simple(
+    def placement_group_list(A, name='*'):
+        return HProv.list_simple(
             name,
-            Prov().placement_group,
+            HProv.placement_group,
             headers=['id', 'name', fmt.key_tags, 'since', fmt.key_droplets],
         )
 
-    def placement_group_create(name=None, type='spread'):
-        name = FLG.name if name is None else name
-        d = dict(locals())
-        Api.req(Prov().placement_group.endpoint, 'post', data=d)
+    def placement_group_create(A, name, type='spread'):
+        HProv.assert_sane_name(name, True)
+        d = {'name': name, 'type': type}
+        Api.req(HProv.placement_group.endpoint, 'post', data=d)
         return Actions.placement_group_list(name=name)
 
-    placement_group_delete = rm('placement_group')
+    # TODO
+    # placement_group_delete = rm('placement_group')
 
-    class kube_add_ccm:
-        class network_name:
-            n = 'name of subnet this cluster is within'
-            d = 'default'
+    def kube_add_ccm(A, network_name='default', cidr='10.0.0.8/24', version='1.12.1'):
+        k = HProv.kubectl
+        token = Api.secrets['hcloud_api_token']
+        k.add_secret('hcloud', 'kube-system', {'token': token, 'network': network_name})
+        s = TCCM.format(cidr=cidr, version=version)
+        k.apply('conf/ccm.yaml', s)
 
-        class cidr:
-            n = 'k8s cluster-cidr value'
-            d = '10.0.0.8/24'
 
-        class version:
-            d = '1.12.1'
-
-        def run():
-            k = Prov().kubectl
-            token = Api.secrets['hcloud_api_token']
-            net = FLG.kube_add_ccm_network_name
-            k.add_secret('hcloud', 'kube-system', {'token': token, 'network': net})
-            cidr = FLG.kube_add_ccm_cidr
-            version = FLG.kube_add_ccm_version
-            s = TCCM.format(cidr=cidr, version=version)
-            k.apply('conf/ccm.yaml', s)
+conv2classmethods(Actions)
 
 
 class Flags(Flags):
@@ -91,23 +86,18 @@ class Flags(Flags):
         d = 'cmd:pass show HCloud/token'
 
 
-Flags._pre_init(Flags, Actions)
-
-
-Flags.region.d = 'hel1'
-Flags.image.d = 'fedora-36'
 _ = 'We will create default network, if not present yet'
 # Flags.Actions.droplet_create.private_network.n += _
 
 
-def monthly(server_type, region, which='monthly'):
+def monthly(server_type, region='hel1', which='monthly'):
     s = server_type
     p = [l for l in s['prices'] if l['location'] == region]
     if not p:
         app.info(
             'Not available in region',
             name=s['name'],
-            region=FLG.region,
+            region=region,
         )
         return -1
     return round(float(p[0][f'price_{which}']['gross']), 2)
@@ -126,6 +116,9 @@ fmt_ip_ranges = lambda key, d, into: setitem(
 )
 
 
+fmt_net = lambda key, d, into: setitem(into, key, d['ip_range'])
+
+
 def fmt_ips(key, d, into):
     r = into
     try:
@@ -141,7 +134,7 @@ def fmt_ips(key, d, into):
 
 def fmt_price(key, d, into):
     if key == 'prices':
-        into[fmt.key_price_monthly] = monthly(d, FLG.region)   # size list
+        into[fmt.key_price_monthly] = monthly(d)
     else:
         st = d['server_type']
         into[fmt.key_typ] = fmt.typ(st['cores'], int(st['memory']), st['disk'])
@@ -213,32 +206,32 @@ class HProv(Provider):
         ]
         # fmt:on
 
-        def prepare_create(env):
-            if not FLG.range:
-                return app.info('Skipping placement group for single droplet')
-            A, cn = Prov().Actions, env['cluster_name']
-
-            def h(k):
-                i = [i for i in k['data'] if i['name'] == cn]
-                return i[0] if i else None
-
-            HProv.pgroup = _ = h(A.placement_group_list())
-            if _:
-                return
-            HProv.pgroup = h(A.placement_group_create(cn))
+        # def prepare_create(env):
+        #     if not FLG.range:
+        #         return app.info('Skipping placement group for single droplet')
+        #     A, cn = HProv.Actions, env['cluster_name']
+        #     def h(k):
+        #         i = [i for i in k['data'] if i['name'] == cn]
+        #         return i[0] if i else None
+        #     HProv.pgroup = _ = h(A.placement_group_list())
+        #     if _:
+        #         return
+        #     HProv.pgroup = h(A.placement_group_create(cn))
 
         def create_data(d):
-            r = dict(d)
+            _ = {'image', 'name', 'ssh_keys'}
+            r = {k: v for k, v in d.items() if k in _}
             if HProv.pgroup:
                 r['placement_group'] = HProv.pgroup['id']
-            pn = r.pop('private_network')
-            r['networks'] = [Prov().NETWORKS[pn]['id']]
+            pn = d.get('private_network')
+            if pn:
+                r['networks'] = [HProv.NETWORKS[pn]['id']]
             r['automount'] = False
-            r['location'] = r.pop('region')
-            t = r.pop('tags')
+            r['location'] = d.get('region')
+            t = d.get('tags')
             if t:
-                r['labels'] = {'feats': ','.join([i.replace(':', '_') for i in t])}
-            r['server_type'] = r.pop('size')
+                r['labels'] = {'plays': ','.join([i.replace(':', '_') for i in t])}
+            r['server_type'] = d.get('size')
             return r
 
     class image:
@@ -256,21 +249,25 @@ class HProv(Provider):
     class network:
         endpoint = 'networks'
         default = lambda: 'default'
-        normalize = [['subnets', fmt_ip_ranges]]
+        normalize = [['subnets', fmt_ip_ranges], ['net', fmt_net]]
 
         def create_data(d):
+            r = {'name': d['name']}
             i = d['ip_range']
             if not i.startswith('10.'):
                 app.die('ip range must start with 10.', have=i)
-            d['ip_range'] = '10.0.0.0/8'
-            d['subnets'] = [
+            r['ip_range'] = '10.0.0.0/8'
+            r['subnets'] = [
                 {
                     'network_zone': 'eu-central',  # only option
                     'ip_range': i,
                     'type': 'server',  # not sure difference to 'cloud'
                 }
             ]
-            return d
+            t = d.pop('tags')
+            if t:
+                r['labels'] = {'l': ','.join([i.replace(':', '_') for i in t])}
+            return r
 
     class placement_group:
         endpoint = 'placement_groups'
@@ -321,8 +318,6 @@ class HProv(Provider):
             Api.req(f'volumes/{id}/actions/detach', 'post', data={})
 
 
-Prov(init=HProv)
-Flags.size.n = 'aliases ' + HProv.size_aliases()
 main = lambda: run_app(Actions, flags=Flags)
 
 TCCM = """
@@ -423,6 +418,8 @@ spec:
 
 
 """
+Prov(init=HProv)
+Flags._pre_init(Flags, Actions)
 
 
 if __name__ == '__main__':

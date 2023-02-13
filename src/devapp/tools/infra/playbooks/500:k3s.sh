@@ -17,7 +17,7 @@ Server must have "master" within its name.
 
 - 4 Node server cluster:
 
-	ops infra_digital_ocean droplet_create --features k3s --name k2{} --range master,1,2,3 --size M
+	ops infra_digital_ocean droplet_create --playbooks k3s --name k2{} --range master,1,2,3 --size M
 
 - Same with selinux off (faster install), relative time and by thread indication:
 

@@ -2,6 +2,7 @@
 """
 Building Containers
 
+TODO: whiteout processing is here (sometimes .wh files present): https://github.com/larsks/undocker/blob/master/undocker.py
 
 Merging filesystem layers
 - either from dpull (oci compliant)
@@ -11,12 +12,14 @@ using tar -> copy over
 using union2 -> mount overlay(2)
 """
 
+
 import json
 import os
 import socket
 import time
 
 from devapp.app import FLG, app, run_app
+from devapp.tools import read_file, write_file
 from mdvl.tools import add_metas, struct_code_block
 
 exists = os.path.exists
@@ -187,8 +190,7 @@ def adapt_fs():
         if r:
             app.log.error('Could not set password. chpasswd utility missing')
     nrc = F.allow_pts_logins
-    with open(dt + '/etc/securetty') as fd:
-        s = fd.read().splitlines()
+    s = read_file('/etc/securetty', dflt='').splitlines()
     lines = [l for l in s if not 'pts' in l and not 'console' in l]
     for i in range(0, nrc):
         lines.insert(0, 'pts/%s' % i)
@@ -196,8 +198,7 @@ def adapt_fs():
     if F.allow_console_login:
         lines.insert(0, 'console')
         app.log.info('Adding console login')
-    with open(dt + '/etc/securetty', 'w') as fd:
-        fd.write('\n'.join(lines))
+    write_file('/etc/securetty', '\n'.join(lines))
 
 
 def find_files(d, match):

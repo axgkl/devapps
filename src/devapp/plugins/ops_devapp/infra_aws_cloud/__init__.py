@@ -15,7 +15,8 @@ dns_delete -n myhost.k3s.dev-xyz.mydomain.com
 
 import os
 from devapp.app import run_app, FLG, app
-from devapp.tools.infra import Actions, Flags, Provider, Api, Prov, fmt, rm
+from devapp.tools.infra import Provider, Api, Prov, fmt, rm, wait
+from devapp.tools.infra.actions import Actions, Flags, conv2classmethods
 import time
 import hmac, hashlib, requests, base64
 from operator import setitem
@@ -23,7 +24,7 @@ from devapp.tools import cache, write_file
 
 # Droplet list results are cached in tmp/droplets.json. We will read from here if recent.'
 # droplet_list_cache_max_age = int(os.environ.get('droplet_list_cache_max_age', 3))
-
+env = os.environ
 
 # only route53 action supported, remove all others:
 rma = lambda key, f: delattr(Actions, key) if callable(f) else 0
@@ -31,133 +32,131 @@ rma = lambda key, f: delattr(Actions, key) if callable(f) else 0
 
 
 def dotted(name, create=True):
-    name = name or FLG.name
+    name = name
     if not name.endswith('.'):
         name += '.'
-    FLG.name = name
-    Prov().assert_sane_name(name, create)
+    AWSProv.assert_sane_name(name, create)
     return name
 
 
 class Actions(Actions):
-    def dns_list(name=None, **kw):
-        return Prov().list_simple(name, Prov().dns, lister=zones.get, **kw)
+    class _cli:
+        dns_list = 'dnl', True
+        dns_create = 'dnc'
+        dns_delete = 'dnd'
+        domain_list = 'dol'
+        ttl = 'ttl'
+        rm = 'rm', False, 'Delete existing before create'
 
-    def domain_list(name=None):
-        return Prov().list_simple(name, Prov().domain, lister=get_domains)
+    def dns_list(A, name='*', **kw):
+        return AWSProv.list_simple(name, AWSProv.dns, lister=zones.get, **kw)
 
-    list = dns_list
+    def list(A):
+        return A.dns_list('*')
 
-    class kube_add_cert_manager:
-        class version:
-            d = '1.9.1'
+    def domain_list(A, name='*'):
+        return AWSProv.list_simple(name, AWSProv.domain, lister=get_domains)
+        #
+        # class version:
+        #     d = '1.9.1'
+        #
+        # class email:
+        #     d = 'me@mydomain.com'
+        #
+        # class zone:
+        #     d = 'mydomain.com'
+        #
+        # def run():
+        #
 
-        class email:
-            d = 'me@mydomain.com'
+    def kube_add_cert_manager(
+        A,
+        zone=env.get('domain', 'mydomain.com'),
+        email=env.get('email', 'me@mydomain.com'),
+        version='1.9.1',
+    ):
+        v, k = version, AWSProv.kubectl
+        url = f'https://github.com/cert-manager/cert-manager/releases/download/v{v}/cert-manager.yaml'
+        k.apply(url)   # creates ns
+        _ = {'secret-access-key': Api.secrets['aws_secret']}
+        k.add_secret(name='prod-route53-credentials-secret', ns='cert-manager', kv=_)
+        email = FLG.kube_add_cert_manager_email
+        zone = FLG.kube_add_cert_manager_zone
+        t = TCertMgr.format(email=email, zone=zone, id=Api.secrets['aws_key'])
+        _ = 'conf/cert_request.yaml'
+        f = lambda _=_: not bool(k.apply(_, body=t, on_err='report'))
+        app.info('Retry loop issuing cert request, will take a moment...')
+        wait.for_('cert request', f, 60, 3)
 
-        class zone:
-            d = 'mydomain.com'
+    def kube_add_ext_dns(
+        A, zone=env.get('domain', 'mydomain.com'), version='0.12.0', gw_api=False
+    ):
+        assert gw_api, 'Only GW API Support Supported'
+        k, S = AWSProv.kubectl, Api.secrets
+        D = 'external-dns'
+        k.add_namespace(D)
+        T = TINI.format(key=S['aws_key'], secret=S['aws_secret']).strip()
+        k.add_secret(f'{D}-aws', D, {'credentials': T})
+        k.apply('conf/ext_dns.yaml', TEXTDNS)
+        s = T_EXTDNS_DEPL.format(zone=zone, version=version, user=os.environ['USER'])
+        k.apply('conf/ext_dns_depl.yaml', s)
 
-        def run():
-            breakpoint()   # FIXME BREAKPOINT
-            v, k = FLG.kube_add_cert_manager_version, Prov().kubectl
-            url = f'https://github.com/cert-manager/cert-manager/releases/download/v{v}/cert-manager.yaml'
-            k.apply(url)   # creates ns
-            _ = {'secret-access-key': Api.secrets['aws_secret']}
-            k.add_secret(name='prod-route53-credentials-secret', ns='cert-manager', kv=_)
-            email = FLG.kube_add_cert_manager_email
-            zone = FLG.kube_add_cert_manager_zone
-            t = TCertMgr.format(email=email, zone=zone, id=Api.secrets['aws_key'])
-            for tries in range(10):
-                if not k.apply(
-                    'conf/cert_request.yaml',
-                    body=t,
-                ):
-                    return
-                app.info('retrying cert request', attempts=f'{tries}/10')
-                time.sleep(1)
+    def dns_create(A, name='', rm=False, ips=[], ttl=120, _c=[0]):
+        """we do it all here"""
 
-    class kube_add_ext_dns:
-        class gw_api:
-            n = 'Configure GatewayAPI'
-            d = False
+        name = dotted(name)
+        # we allow (and filter) empty start or end comma, simplifies bash scripts a lot in loops:
+        have = _c[0] or A.dns_list(name='*')['data']
+        me = [i for i in have if name == i['name']]
+        if me and me[0]['ips'] == ips:
+            app.info('Already present', ips=ips, name=name)
+            return 'present'
+        id = [i for i in have if name.endswith(i['domain'])]
+        if id:
+            if rm:
+                r = [i for i in have if i['name'] == name]
+                if r:
+                    A.dns_delete(name=name, force=True)
+            id = id[0]['zoneid']
+        else:
+            have = _c[0] or A.domain_list(name='*')
+            id = [i for i in have['data'] if name.endswith(i['name'])]
+            if len(id) != 1:
+                app.die('No matching domain', name=name, have=have['data'])
+            id = id[0]['id']
+        _c[0] = have
+        dns_modify('CREATE', ips=ips, name=name, ttl=ttl, zoneid=id)
+        return A.dns_list(name=name)
 
-        class zone:
-            d = 'mydomain.com'
-
-        class version:
-            d = '0.12.0'
-
-        def run():
-            assert FLG.kube_add_ext_dns_gw_api, 'Only GW API Support Supported'
-            k, S = Prov().kubectl, Api.secrets
-            D = 'external-dns'
-            k.add_namespace(D)
-            T = TINI.format(key=S['aws_key'], secret=S['aws_secret']).strip()
-            k.add_secret(f'{D}-aws', D, {'credentials': T})
-            k.apply('conf/ext_dns.yaml', TEXTDNS)
-            zone = FLG.kube_add_ext_dns_zone
-            version = FLG.kube_add_ext_dns_version
-            s = T_EXTDNS_DEPL.format(zone=zone, version=version, user=os.environ['USER'])
-            k.apply('conf/ext_dns_depl.yaml', s)
-
-    class dns_create:
-        class ips:
-            s = 'ips'
-            n = 'Adds A record. Set flag name to intended zone (domain must be present) and give a list of ips'
-            d = []
-
-        class ttl:
-            s = 'ttl'
-            d = 120
-
-        class rm:
-            s = 'rm'
-            n = 'delete any existing zone before creation'
-            d = False
-
-        class multi:
-            s = 'multi'
-            n = 'Provide host::ip1:ip2,host2:ip3 in one go. Ignores name and ips flags. ttl and rm is respected. If rm is set, we safe get roundtrips and just delete before creating when present.'
-            d = []
-
-        def run(name=None, ips=None, ttl=None, c=[0], multi=False):
-            """we do it all here"""
-            if not multi:
-                m = FLG.dns_create_multi
-                if m:
-                    return multi_create(m)
-
-            name = dotted(name)
-            # we allow (and filter) empty start or end comma, simplifies bash scripts a lot in loops:
-            ips = [i for i in ips or FLG.dns_create_ips if i]
-            ttl = ttl or FLG.dns_create_ttl
-            rm = FLG.dns_create_rm
-            have = c[0] or Actions.dns_list(name='*')['data']
-            me = [i for i in have if name == i['name']]
-            if me and me[0]['ips'] == ips:
-                app.info('Already present', ips=ips, name=name)
-                return 'present'
-            id = [i for i in have if name.endswith(i['domain'])]
-            if id:
-                if rm:
-                    r = [i for i in have if i['name'] == name]
-                    if r:
-                        Actions.dns_delete(name=name, force=True)
-                id = id[0]['zoneid']
-            else:
-                have = c[0] or Actions.domain_list(name='*')
-                id = [i for i in have['data'] if name.endswith(i['name'])]
-                if len(id) != 1:
-                    app.die('No matching domain', name=name, have=have['data'])
-                id = id[0]['id']
-            c[0] = have
-            dns_modify('CREATE', ips=ips, name=name, ttl=ttl, zoneid=id)
-            return Actions.dns_list(name=name)
-
-    def dns_delete(name=None, force=None):
+    def dns_delete(A, name='*', force=False):
         name = dotted(name, False)
-        return Prov().resource_delete(Prov().dns, force=force)
+        return AWSProv.resource_delete(name, AWSProv.dns, force=force)
+
+    def dns_multi_create(A, name_ip_pairs=[], rm=False, ttl=120):
+        zones.origget = zones.get
+        if rm:
+            # speed up:
+            zones.get = zones.get_cached
+        A.dns_list(name='*')
+        hosts = []
+        res = []
+        for hip in name_ip_pairs:
+            host, ips = hip.split('::', 1)
+            hosts.append(host + '.' if not host.endswith('.') else '')
+            ips = [i for i in ips.split(':') if i]
+            res.append(A.dns_create(name=host, ips=ips, rm=rm, ttl=ttl))
+        if not res == ['present', 'present']:
+            zones.get = zones.origget
+
+        def f(all, hosts=hosts):
+            return [i for i in all if i['name'] in hosts]
+
+        return A.dns_list(name='*', filtered=f)
+
+    # shcmd ops "$(dns_ops_plugin)" dns_create --dns_create_multi "k3s-api-ext-$zone::$ips_ext,k3s-api-int-$zone::$ips_int" --dns_create_rm &
+
+
+conv2classmethods(Actions)
 
 
 def dns_modify(action, ips, name, ttl, zoneid, **_):
@@ -173,28 +172,6 @@ def dns_modify(action, ips, name, ttl, zoneid, **_):
     return r
 
 
-def multi_create(m):
-    zones.origget = zones.get
-    if FLG.dns_create_rm:
-        # speed up:
-        zones.get = zones.get_cached
-    Actions.dns_list(name='*')['data']
-    hosts = []
-    res = []
-    for hip in m:
-        host, ips = hip.split('::', 1)
-        hosts.append(host + '.' if not host.endswith('.') else '')
-        ips = ips.split(':')
-        res.append(Actions.dns_create.run(name=host, ips=ips, multi=True))
-    if not res == ['present', 'present']:
-        zones.get = zones.origget
-
-    def f(all, hosts=hosts):
-        return [i for i in all if i['name'] in hosts]
-
-    return Actions.dns_list(name='*', filtered=f)
-
-
 class Flags(Flags):
     class aws_key:
         n = 'key or command to get it'
@@ -203,9 +180,6 @@ class Flags(Flags):
     class aws_secret:
         n = 'secret or command to get it'
         d = 'cmd: pass show AWS/pw'
-
-
-Flags._pre_init(Flags, Actions)
 
 
 _ = 'We will create default network, if not present yet'
@@ -238,10 +212,6 @@ class AWSProv(Provider):
         def prepare_delete(d):
             dns_modify(action='DELETE', **d)
             return fmt.flag_deleted
-
-
-Prov(init=AWSProv)
-main = lambda: run_app(Actions, flags=Flags)
 
 
 class AA:
@@ -467,6 +437,11 @@ TINI = """
 aws_access_key_id = {key}
 aws_secret_access_key = {secret}
 """
+
+Prov(init=AWSProv)
+Flags._pre_init(Flags, Actions)
+main = lambda: run_app(Actions, flags=Flags)
+
 
 if __name__ == '__main__':
     main()

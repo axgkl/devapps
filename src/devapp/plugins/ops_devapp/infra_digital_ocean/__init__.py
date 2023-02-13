@@ -8,7 +8,7 @@ E.g. when terraform destroy fails, you can delete droplets using this.
 
 ## Caution
 
-Most features are tested against a Fedora host filesystem (the default image)
+Most playbooks are tested against a Fedora host filesystem (the default image)
 
 ## Requirements
 - API Token

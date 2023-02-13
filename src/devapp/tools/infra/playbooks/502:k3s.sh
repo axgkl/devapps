@@ -3,40 +3,41 @@
 
 _='# Deploy a single server k3s.
   
-  - Server config for kubectl is put to ./conf/ks.yaml
-  - Locally we add the KUBECONFIG variable pointing to server config into a file "./environ"
-  
-  ## Conventions:
-  
-  Server must have "master" within its name.
-  
-  ## Env Parameters
-  
-  - selinux[=true]: When false, install without SELINUX context (install much faster)
-  
-  ## Examples
-  
-  - 4 Node server cluster:
-  
-  	ops infra_digital_ocean droplet_create --features k3s --name k2{} --range master,1,2,3 --size M
-  
-  - Same with selinux off (faster install), relative time and by thread indication:
-  
-  	selinux=false ops ido dc -f k3s -n k2{} -r master,1,2,3 -S M -ltf dt -latn
-  
-  
-  
-  ## Misc
-  
-  - https://github.com/DavidZisky/kloud3s/blob/master/digitalocean/cloud_manager/k3s_deployer_cloudmanag.sh
-  
-  '
+- Server config for kubectl is put to ./conf/ks.yaml
+- Locally we add the KUBECONFIG variable pointing to server config into a file "./environ"
+
+## Conventions:
+
+Server must have "master" within its name.
+
+## Env Parameters
+
+- selinux[=true]: When false, install without SELINUX context (install much faster)
+
+## Examples
+
+- 4 Node server cluster:
+
+	ops infra_digital_ocean droplet_create --playbooks k3s --name k2{} --range master,1,2,3 --size M
+
+- Same with selinux off (faster install), relative time and by thread indication:
+
+	selinux=false ops ido dc -f k3s -n k2{} -r master,1,2,3 -S M -ltf dt -latn
+
+
+
+## Misc
+
+- https://github.com/DavidZisky/kloud3s/blob/master/digitalocean/cloud_manager/k3s_deployer_cloudmanag.sh
+
+'
 
 source "%(feature:functions.sh)s"
 function define_vars_and_functions {
     set -a
     D="%(!$dir_project)s"
     api_base="%(!$infra_api_base)s"
+    app_namespaces="%($app_namespaces)s"
     dns_provider="%(!$dns_provider)s" # aws or digitialociean
     domain="%(!$domain)s"
     company="${domain#*.}" # foo.company.com -> company.com (for node labels)
@@ -51,6 +52,9 @@ function define_vars_and_functions {
     #k8s_service_node_port_range="32225-32767"
     k8s_service_node_port_range="30000-32767" # XT has a 32222 one but cilium tests are hardcoded on 31sth
     log_fmt=2                                 # colored term output also for devapp subprocessesut also for devapp subprocesses
+    private_registry="%($private_registry)s"  # only one at this time
+    region="%(!$region)s"
+    network_name="%($network_name)s"
     no_selinux="%($no_selinux)s"
     tools="%($tools|net-tools tcpdump tcpflow dnsutils lvm2 parted)s"
     ttl="%($ttl|120)s"
@@ -61,7 +65,6 @@ function define_vars_and_functions {
     v_k3s="%($k3s_version|v1.24.2+k3s2)s"
     zone="$cluster_name.$domain"
     set +a
-
     mkdir -p "$D/conf" # for stuff we want to keep
     mkdir -p "$D/tmp"  # for stuff we want to keep for debug
 }
@@ -75,9 +78,13 @@ function dns_ops_plugin {
     esac
 }
 
-do_ define_vars_and_functions
+do_ always define_vars_and_functions
 
 # part: ========================================================== name eq local
+
+function verify_registry_creds {
+    ops kubectl add_registry_auth --private_registry="$private_registry" --login_only
+}
 
 function generate_token {
     echo "Have all internal ips: %(wait:200:all.ip_priv)s" # we start when we have those
@@ -96,10 +103,11 @@ function configure_dns_to_k8s_api {
     test -z "$ips_ext" && die "No master node"
     # we have time for that, waiting for ssh access anyway on the remote side:
     # TODO: create multi for digitalocean:
-    shcmd ops "$(dns_ops_plugin)" dns_create --dns_create_multi "k3s-api-ext-$zone::$ips_ext,k3s-api-int-$zone::$ips_int" --dns_create_rm &
+    shcmd ops "$(dns_ops_plugin)" dns_multi_create --name_ip_pairs "k3s-api-ext-$zone::$ips_ext,k3s-api-int-$zone::$ips_int" --rm &
 }
 
-do_ generate_token
+do_ verify_registry_creds
+do_ always generate_token
 do_ configure_dns_to_k8s_api
 # part: ========================================================== name contains master
 set_fact is_master true
@@ -109,7 +117,8 @@ function double_check_priv_network_present {
     ip addr show | grep 'inet 10\.' || die "private iface missing"1
 }
 function install_tools {
-    type tcpflow && return "$SKIP_PRESENT"
+    info 'checking presence of tools and package mgr type'
+    type tcpflow 2>/dev/null && return "$SKIP_PRESENT"
     # shellcheck disable=SC2086
     pkg_inst ${tools}
 }
@@ -297,12 +306,17 @@ function install_hetzner_ccm {
     K -n kube-system get pods | grep hcloud-cloud-controller-manager && return "$SKIP_PRESENT"
     shcmd ops infra_hetzner_cloud kube_add_ccm \
         --kube_config="$(kubeconf)" \
-        --kube_add_ccm_network_name="%(flag.droplet_create_private_network)s" \
-        --kube_add_ccm_cidr="$k8s_cluster_cidr_v4" \
-        --kube_add_ccm_version="$v_hetzner_ccm"
+        --network_name="$network_name" \
+        --cidr="$k8s_cluster_cidr_v4" \
+        --version="$v_hetzner_ccm"
 }
 
 function install_cilium {
+    _='
+	  cilium status (cilium tool installed)
+	  kubectl -n kube-system attach  cilium-47jzs # see monitor OR 
+	  kubectl -n kube-system exec  cilium-47jzs -ti /bin/sh
+	  '
     K -n kube-system get pods | grep cilium && return "$SKIP_PRESENT"
     helm repo add cilium https://helm.cilium.io 2>/dev/null
     local fn="$D/conf/cilium_values.yaml"
@@ -310,7 +324,7 @@ function install_cilium {
     for n in $names; do
         if [[ $n =~ master ]]; then replicas=$((replicas + 1)); fi
     done
-    test $replicas == "1" || replicas=2 # default
+    test $replicas == "1" || replicas=2 # max, when > 1 set hard to 2
     info "Cilium replicas set to $replicas"
 
     deindent <<EOF >"$fn"
@@ -428,6 +442,8 @@ function install_cilium {
 EOF
     helm install cilium cilium/cilium --version "${v_cilium?}" --namespace kube-system --values "$fn"
     local c
+    info 'Waiting for cilium to be up...'
+    sleep 4
     for ((i = 1; i < 20; i++)); do
         sleep 1
         c="$(K -n kube-system get pods | grep cilium)"
@@ -439,23 +455,55 @@ EOF
 }
 
 function install_cert_mgr {
-    # K -n cert-manager get pods | grep cainjector && return "$SKIP_PRESENT"
+    K -n cert-manager get pods | grep cainjector && return "$SKIP_PRESENT"
     shcmd ops "$(dns_ops_plugin)" kube_add_cert_manager \
         --kube_config="$(kubeconf)" \
-        --kube_add_cert_manager_version="$v_certmgmr" \
-        --kube_add_cert_manager_email="$email" \
-        --kube_add_cert_manager_zone="$domain"
+        --version="${v_certmgmr?}" \
+        --email="$email" \
+        --zone="$domain"
 }
 
 function install_ext_dns {
     K -n external-dns get pods | grep external-dns && return "$SKIP_PRESENT"
     shcmd ops "$(dns_ops_plugin)" kube_add_ext_dns \
         --kube_config="$(kubeconf)" \
-        --kube_add_ext_dns_version="$v_ext_dns" \
-        --kube_add_ext_dns_zone="$domain" \
-        --kube_add_ext_dns_gw_api=true
+        --version="$v_ext_dns" \
+        --zone="$domain" \
+        --gw_api=true
 }
 
+function install_app_namespaces {
+    ops kubectl add_registry_auth --kube_config="$(kubeconf)" --private_registry="$private_registry" --namespaces="$app_namespaces"
+}
+function install_contour_gw_api {
+    local i
+    if [[ $api_base =~ hetzner ]]; then i="hetzner"; fi
+    if [[ $api_base =~ digitalocean ]]; then i="digitalocean"; fi
+    test -z "$i" && die "Can not determine infra name from $api_base"
+    shcmd ops kubectl --kube_config="$(kubeconf)" add_contour_gw_api --region="$region" --infra_name="$i"
+}
+function test_kube {
+    local pn
+    pn="$(K -n kube-system get pods | grep local-path | cut -f 1 -d ' ')"
+    test -z "$pn" && die "No pod: local-path-provisioner)"
+    shcmd K -n kube-system exec -ti "$pn" -- cat /etc/resolv.conf
+    shcmd K -n kube-system exec -ti "$pn" -- ping -c 1 google.com
+}
+
+do_ get_kubeconfig
+do_ rm_master_node_label
+if [[ $api_base =~ hetzner ]]; then do_ install_hetzner_ccm; fi
+if [[ $api_base =~ digitalocean ]]; then do_ install_digital_ocean_ccm; fi
+do_ install_cilium
+do_ install_cert_mgr
+do_ install_ext_dns
+if [[ -n "$app_namespaces" ]]; then do_ install_app_namespaces; fi
+do_ install_contour_gw_api
+do_ test_kube
+#do_ install_ext_dns
+#do_ install_dns_issuer
+
+# begin-archive
 # function install_ext_dns {
 #     function inst_ext_dns {
 #         HELM -n kube-system install external-dns \
@@ -496,12 +544,3 @@ function install_ext_dns {
 #         sleep 4
 #     done
 # }
-do_ get_kubeconfig
-do_ rm_master_node_label
-if [[ $api_base =~ hetzner ]]; then do_ install_hetzner_ccm; fi
-if [[ $api_base =~ digitalocean ]]; then do_ install_digital_ocean_ccm; fi
-do_ install_cilium
-do_ install_cert_mgr
-do_ install_ext_dns
-#do_ install_ext_dns
-#do_ install_dns_issuer
