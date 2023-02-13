@@ -10,8 +10,17 @@ mkdocs_port=2222
 nodejs="source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate nodejs && node" # for browser screenshots
 pyver="3.7"                                                                              # min version
 versioning=calver                                                                        # for git changelog
+environ_flags=true
+domain='dev-xyz.axiros.com'
+region='hel1'
+app_namespaces="default xt"
+private_registry="$(pass show reg/domain)"
+dns_provider='aws'
+email='g.k@ax.lc.net'
+no_selinux=true
+aws_key="$(pass show AWS/id)"
 set +a
 
-git config user.email "g_kl_es_sing_er@gmx.de"
+git config user.email "$email"
 source ./make -a # giving us make docs, make tests, .. -a activates venv
 echo "sourced ./make"

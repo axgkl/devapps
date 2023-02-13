@@ -1,4 +1,13 @@
 # FIXME
+from devapp.tools import tabulate, termwidth, action_flags, define_flags
+from absl import app, flags
+from xml.etree import ElementTree as ET
+from inspect import signature
+import textwrap
+import sys
+import os
+import io
+
 fixme = """
 Remove all this.
 If colors are important, use the xml output of --helpfull.
@@ -11,16 +20,6 @@ Remove the bloat sooner or later...
 """
 
 # TODO: Display use cases and detailled help attributes (see devapp/app.py flags)
-
-import io
-import os
-import sys
-import textwrap
-from inspect import signature
-from xml.etree import ElementTree as ET
-
-from absl import app, flags
-from devapp.tools import tabulate, termwidth, action_flags, define_flags
 
 
 def func_from_partial(f):
@@ -54,7 +53,8 @@ def call_doc(obj, level=2, render=False):
     return out
 
 
-deindent = lambda d: ('\n'.join([l.strip() for l in d.splitlines()]).strip()) + '\n'
+def deindent(d):
+    return ('\n'.join([l.strip() for l in d.splitlines()]).strip()) + '\n'
 
 
 def func_doc(obj, level=1):
@@ -235,15 +235,19 @@ def parse_xml_help(xml_help, match, cli_actions=None):
 
         def do_string(c, el):
             m = c['meaning']
-            c['meaning'] = m  #'\x1b[1;38;5;124m%(meaning)s\x1b[0;m' % c
+            c['meaning'] = m  # '\x1b1;38;5;124m%(meaning)s\x1b0;m' % c
 
         def do_comma_separated_list_of_strings(c, el):
             pass
 
         def do_string_enum(c, el):
             c['choices'] = [e.text for e in el]
-            c['opts'], c['meaning'] = c['meaning'].split('>: ', 1)
-            c['opts'] += '>'
+            opts = '|'.join([e.text for e in el if e.tag == 'enum_value'])
+            c['opts'] = f'<{opts}>'
+            m = c['meaning']
+            if '>:' in m:   # split off the opts if given in meaning, we have them in opts
+                m = m.split('>:', 1)[1]
+            c['meaning'] = m
 
         def do_multi_string_enum(c, el):
             return types.do_string_enum(c, el)
@@ -331,19 +335,23 @@ def get_argv_val(k, ign_val=''):
 
 
 # coloring themeable,i.e. only using the base colors which themes modify:
-ansi_col = lambda nr: '\033[%sm' % nr
-col = lambda c: ansi_col(
-    {
-        'name': '1;33',
-        'default': '0;31',
-        'meaning': '0;38;5;245',
-        'choices': '0;38',
-        'details': '0;38;5;241',
-        'short_name': '0;32',
-        'action': '0;33',
-        'default_action': '1;33',
-    }.get(c)
-)
+def ansi_col(nr):
+    return '\033[%sm' % nr
+
+
+def col(c):
+    return ansi_col(
+        {
+            'name': '1;33',
+            'default': '0;31',
+            'meaning': '0;38;5;245',
+            'choices': '0;38',
+            'details': '0;38;5;241',
+            'short_name': '0;32',
+            'action': '0;33',
+            'default_action': '1;33',
+        }.get(c)
+    )
 
 
 def color_usage(*a, main_module, full=None, **kw):

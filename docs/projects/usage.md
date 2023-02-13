@@ -13,15 +13,14 @@ environ activation in case of a pip(x) based install).
 Verification:
 
 ```bash lp fmt=xt_flat new_session=project asserts=devapps_py3 eval=always
-poetry debug
+poetry debug info
 ```
 
 Let's now create a (new) directory for the project:
 
-
 ```bash lp session='project', fmt='xt_flat'
 rm -rf $HOME/myproject # lp: silent
-mkdir $HOME/myproject && cd $HOME/myproject && ls -lta 
+mkdir $HOME/myproject && cd $HOME/myproject && ls -lta
 ```
 
 ## Resources
@@ -40,19 +39,15 @@ Here are the resources defined in `devapps`. They are required for running the t
 
     `devapps` based applications usually define more, e.g. databases, more tools or log targets.
 
-
 !!! hint "Batteries Included - but Replaceable"
 
     DevApps' resource management is only meant as a convenience machinery to quickly get up projects or dev setups up
     and running. In production you'll have more distributed setups anyway, installed e.g. via Ansible and/or Container
     Orchestrators.
 
-    Means:  
+    Means:
     You do not need to have those resources managed as shown below - we install "normal" versions, packaged as Conda
-    packages and use standard config options (see previous chapter why).  
-
-
-
+    packages and use standard config options (see previous chapter why).
 
 ## Project Init
 
@@ -65,7 +60,6 @@ Via the `--init_at` flag you set up a new project, within the given directory, p
 As you can see, we created start files in the `bin` subdirectory of the project directory, pointing to where the actual binaries
 had been installed. We did set a global `port_offset`, which affects any port of listening resources started.
 
-
 !!! hint "Controlling Resources Installation"
 
     There are few options regarding which resources are to be installed, where.
@@ -77,9 +71,8 @@ had been installed. We did set a global `port_offset`, which affects any port of
 
 !!! note "More CLI flags"
 
-    More control flags are only accessible via `--helpfull <match>` (`-hf`):  
+    More control flags are only accessible via `--helpfull <match>` (`-hf`):
     Try `ops p -hf log_level`, `ops p -hf port` (...)
-
 
 ??? example "Project initialization flags"
 
@@ -94,7 +87,6 @@ had been installed. We did set a global `port_offset`, which affects any port of
     If you need to re-parametrize the project (e.g. set different port offsets) then run `ops project --init_at` again
     and have new start wrappers created.
 
-
 ## Unit Files
 
 We do not try to manage the live cycle of services but leave that to systemd (available on all Linux major distributions).
@@ -103,7 +95,7 @@ The `--init_create_unit_files=<name of daemon resource>` will create a unit file
 
 !!! example "Creating a resource incl. unit file"
 
-    ```bash lp session=project 
+    ```bash lp session=project
     ops project --init_at=. --init_create_unit_files=redis-server --force
     ```
 
@@ -122,5 +114,3 @@ The `--init_create_unit_files=<name of daemon resource>` will create a unit file
 !!! hint
 
     In order to install unit files for *ALL* service type resources, you can  supply `--init_create_all_units`, alternatively.
-
-    

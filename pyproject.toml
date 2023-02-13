@@ -14,7 +14,6 @@ homepage = "https://axgkl.github.io/devapps"
 keywords = []
 
 packages = [
-    { include = "axlib",         from = "src" },
     { include = "ax",            from = "src" },
     { include = "devapp",        from = "src" },
     { include = "mdvl",          from = "src" },
@@ -104,13 +103,19 @@ docutools = "*"
 #pytest-xdist = "^2.1.0"
 
 [tool.poetry.scripts]
-ops = "devapp.plugin_tools:main"
-app = "devapp.plugin_tools:main"
-dev = "devapp.plugin_tools:main"
+ops = "devapp.tools.plugin:main"
+app = "devapp.tools.plugin:main"
+dev = "devapp.tools.plugin:main"
+fui = "interactive.cli:main"
 
-[tool.black]
+[tool.blue]
 line-length = 90
 exclude = "tests/fixtures"
+
+[tool.ruff]
+#cache-dir = "/tmp/ruff1"
+line-length = 90
+ignore-init-module-imports = true
 
 [tool.isort]
 line_length = 90

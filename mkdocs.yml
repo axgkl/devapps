@@ -14,7 +14,7 @@ nav:
       - Python: install/python.md
       - DevApps Packages: install/prod_inst.md
       - Installing A Development Version: install/dev_inst.md
-      - "Setting up CI/CI": install/cicd.md
+      - "Setting up CI/CD": install/cicd.md
   - Features:
       - Projects:
           - About: projects/index.md
