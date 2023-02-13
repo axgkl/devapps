@@ -6,9 +6,6 @@ Here is how you create or extend tools with plugins, callable like `<toolname> <
 
     In this terminology, "git" would be the name of the tool, "checkout" would be the name of the plugin.
 
-
-
-
 ## Defining a **New** Tool
 
 In your `pyproject.toml` add the name of the tool within the `scripts` section like so:
@@ -17,7 +14,7 @@ In your `pyproject.toml` add the name of the tool within the `scripts` section l
 from devapp.tools import read_file, write_file
 
 fn, sect = 'pyproject.toml', '[tool.poetry.scripts]'
-app = '\nmyapp = "devapp.plugin_tools:main"'
+app = '\nmyapp = "devapp.tools.plugin:main"'
 s = read_file(fn)
 if not app in s:
     s = s.replace(sect, sect + app)
@@ -33,7 +30,7 @@ This makes the tool available, with no plugins yet:
 
 We are ready to create plugins:
 
-Plugins must reside within `<package>/plugins/<tool_name>_<package_name>/` subdirectory of packages of the current repo. 
+Plugins must reside within `<package>/plugins/<tool_name>_<package_name>/` subdirectory of packages of the current repo.
 
 The package name at the end is to allow "higher order repos" to supply plugins with same name but changed behaviour.
 
@@ -77,13 +74,12 @@ def run():
 
 main = partial(run_app, run, flags=Flags)
 ```
- 
+
 The plugin is now available:
 
 ```bash lp fmt=xt_flat asserts="Hey, Joe"
 ['myapp -h', 'myapp sh -lf 2 -gn Joe']
 ```
-
 
 - Further plugins for our `myapp` tool are now simply added into this directory
 
@@ -98,9 +94,8 @@ Means: A package "foo" depending on devapp may add a
 
 so that the `myapp` tool has a better/more specialized greeter plugin.
 
-Derived package foo may also *change* the behaviour of the "say_hello" plugin of "myapp" by
+Derived package foo may also _change_ the behaviour of the "say_hello" plugin of "myapp" by
 providing this module as well.
-
 
 Here is how you "patch" a given module, e.g. the `project` plugin of the `ops` tool, from a devapps
 derived package (here `lc-python`):
@@ -123,24 +118,13 @@ main = lambda: run_app(run, flags=Flags)
 .
 
 ```python lp silent=True mode=python
-# cleaning up: 
+# cleaning up:
 from devapp.tools import read_file, write_file
 fn = 'pyproject.toml'
 app = '\nmyapp = "devapp.plugin_tools:main"'
 write_file(fn, read_file(fn).replace(app, ''))
 ```
 
-
 ```bash lp  silent=True
 /bin/rm -rf "src/devapp/plugins/myapp_devapp"
 ```
-
-
-
-
-
-
-
-
-
-
