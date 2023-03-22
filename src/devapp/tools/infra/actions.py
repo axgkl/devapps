@@ -24,7 +24,8 @@ from devapp.tools.flag import build_action_flags, set_action_func_param_values
 from devapp.tools.times import times
 
 
-droplet = lambda name: Actions.droplet_list(name=name)
+def droplet(name):
+    return Actions.droplet_list(name=name)
 
 
 class Flags:
@@ -320,7 +321,7 @@ class Actions:
         cmd, a = '', list(sys.argv)
         if '--' in a:
             p = a.index('--')
-            cmd = ' '.join([f'{i}' for i in a[p + 1 :]])
+            cmd = ' '.join([f'{i}' for i in a[p + 1:]])
             a = a[:p]
         # convenience: he ssh <name> or he ssh <nr in list>
         if not name:
@@ -468,7 +469,9 @@ class Actions:
             ['Descr', {'style': 'cyan'}],
         ]
 
-        s = lambda l: reversed(sorted(l, key=lambda x: x[fmt.key_price_monthly]))
+        def s(l):
+            return reversed(sorted(l, key=lambda x: x[fmt.key_price_monthly]))
+
         return list_simple(name, Prov().sizes, headers=h, sorter=s)
 
     def images_list(A, name='*'):
@@ -511,7 +514,10 @@ def get_network(A, name, ip_range):
     if not name in netw_have:
         A.network_create(name, ip_range)
         # def for_(why, waiter, tmout=60, dt=3):
-        f = lambda: A.network_list() and name in Prov().NETWORKS
+
+        def f():
+            return A.network_list() and name in Prov().NETWORKS
+
         wait.for_(f'network {name}', f, 40, 1)
         # while not name in Prov().NETWORKS:
         #     app.info(f'waiting for network: {name}', ip_range=ip_range)

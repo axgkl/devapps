@@ -24,7 +24,8 @@ Most playbooks are tested against a Fedora host filesystem (the default image)
 
 ### Creation
 - ops ihc dc -n mydroplet                             # create a minimal droplet
-- ops ihc dc -n mydroplet -sac -f k3s -s m-2vcpu-16gb # create a droplet with this size, name foo, with k3s feature
+- ops ihc dc -n mydroplet -f k3s -S M                 # create a droplet with this size, name foo, with k3s feature
+- ops ihc cc --name=mycluster --nodes=master,n1,2     # cluster
 
 ### Deletion
 - ops ihc dd --since 1h # delete all created within the last hour (-f skips confirm)
@@ -47,7 +48,7 @@ from devapp.tools import write_file, os
 
 class Actions(Actions):
     class _cli(Actions._cli):
-        image = 'i', 'fedora-36'   # 'fedora-36-x64'
+        image = 'i', 'fedora-37'   # 'fedora-36-x64'
         region = 'w', 'hel1', '*w*here to create the resource'
         network_name = 'nn', '', 'name of subnet this cluster is within'
 
@@ -108,15 +109,16 @@ def fmt_region(key, d, into):
     into['region'] = l['name']
 
 
-fmt_tags = lambda key, d, into: setitem(
-    into, 'tags', [f'{k}:{v}' for k, v in d['labels'].items()]
-)
-fmt_ip_ranges = lambda key, d, into: setitem(
-    into, 'iprange', [i['ip_range'] for i in d[key]]
-)
+def fmt_tags(key, d, into):
+    return setitem(into, 'tags', [f'{k}:{v}' for k, v in d['labels'].items()])
 
 
-fmt_net = lambda key, d, into: setitem(into, key, d['ip_range'])
+def fmt_ip_ranges(key, d, into):
+    return setitem(into, 'iprange', [i['ip_range'] for i in d[key]])
+
+
+def fmt_net(key, d, into):
+    return setitem(into, key, d['ip_range'])
 
 
 def fmt_ips(key, d, into):
@@ -248,7 +250,10 @@ class HProv(Provider):
 
     class network:
         endpoint = 'networks'
-        default = lambda: 'default'
+
+        def default():
+            return 'default'
+
         normalize = [['subnets', fmt_ip_ranges], ['net', fmt_net]]
 
         def create_data(d):
@@ -318,7 +323,9 @@ class HProv(Provider):
             Api.req(f'volumes/{id}/actions/detach', 'post', data={})
 
 
-main = lambda: run_app(Actions, flags=Flags)
+def main():
+    return run_app(Actions, flags=Flags)
+
 
 TCCM = """
 ---
