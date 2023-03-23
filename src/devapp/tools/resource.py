@@ -520,17 +520,27 @@ class Install:
 
             env = g(rsc, 'conda_env', rsc.name)
             ctx = dict(D=D, name=env, yes=interactive())
-            # source is not working for $0 = sh:
-            cmd = [
-                '. "%(D)s/etc/profile.d/conda.sh"',
-                'conda create %(yes)s -n "%(name)s"',
-                'conda activate "%(name)s"',
-            ]
+            mamba = os.environ.get('MAMBA_EXE')
+            if mamba:
+                ctx['conda'] = mamba
+                # FIXME: The activate during docker build is a problem in micromamba which runs as subprocess
+                # Better create the env via micromamba create -n foo -f <yaml file> first
+                cmd = [
+                    '%(conda)s create %(yes)s -n "%(name)s"',
+                    'eval "$(%(conda)s shell hook --shell=dash)"',
+                    '%(conda)s activate "%(name)s"',
+                ]
+            else:
+                cmd = [
+                    'test -e "%(D)s/etc/profile.d/conda.sh" && . "%(D)s/etc/profile.d/conda.sh" || true',
+                    '%(conda)s create %(yes)s -n "%(name)s"',
+                    '%(conda)s activate "%(name)s"',
+                ]
             pth = '%(D)s/envs/%(name)s/bin/' % ctx
 
             if g(rsc, 'typ') == 'pip':
                 ctx['cmd'] = rsc.cmd
-                cmd += ['conda install python; %p/pip install %%(cmd)s' % pth]
+                cmd += ['%(conda)s install -c conda-forge python; %p/pip install %%(cmd)s' % pth]
             else:
                 icmd = g(rsc, 'conda_inst', '')
                 if icmd:
@@ -542,9 +552,14 @@ class Install:
                         chan = '-c ' + chan
                     ctx['chan'] = chan
                     ctx['pkg'] = p
-                    cmd += ['conda install %(yes)s %(chan)s %(pkg)s']
+                    cmd += ['%(conda)s install %(yes)s -c conda-forge %(chan)s %(pkg)s']
             cmd = ' && '.join(cmd) % ctx
             rsc.path = g(rsc, 'path') or pth
+
+            #app.info('cmd', cmd=cmd)
+            # import subprocess
+            # s = subprocess.run(cmd, shell=True, executable='/bin/bash')
+            # will run under dash, sh, bash -> problem e.g. for conda activate
             return do(system, cmd)
 
         def base(location):

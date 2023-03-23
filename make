@@ -1,4 +1,4 @@
-# vim: syntax=on filetype=sh
+# vim: ft=bash
 about='
 Development Shortcuts
 
@@ -26,7 +26,7 @@ set -a
 M="\x1b[1;32m"
 O="\x1b[0m"
 T1="\x1b[48;5;255;38;5;0m"
-T2="\x1b[48;5;93;38;5;255m"
+T2="\x1b[48;5;124;38;5;255m"
 XDG_RUNTIME_DIR=/run/user/$UID # for systemd --user mode
 TERMINAL="${TERMINAL:-st}"
 VERSION_MAKE="1"
@@ -116,8 +116,7 @@ set_version() {
     nfo "Say ./make release <version>"
     return 1
 }
-
-conda_root () { echo "$HOME/miniconda3"; }
+conda_root () { echo "$HOME/${conda_root:-miniconda3}"; }
 
 conda_src () {
     source "$(conda_root)/etc/profile.d/conda.sh";
@@ -202,7 +201,7 @@ function docs-serve {
 function tests {
     test -z "$1" && {
         rm -f .coverage.pytest*
-        $CONDA_PREFIX/bin/pytest -vvxs tests  -p no:randomly -c config/pytest.ini tests
+        $CONDA_PREFIX/bin/pytest -vvxs tests -p no:randomly -c config/pytest.ini tests
         return $?
     }
     test -n "$1" && sh pytest "$@"
