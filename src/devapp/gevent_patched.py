@@ -15,7 +15,7 @@ fn_backd = lambda: os.environ['var_dir'] + '/proc_enter.sock'
 
 
 def start_pywsgi_server(application, bind=None, with_backdoor=None):
-    """Normal way to start a gevent wsgi server """
+    """Normal way to start a gevent wsgi server"""
     import gevent
     from devapp.app import FLG, app
     from devapp.tools import host_port
