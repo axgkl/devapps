@@ -70,6 +70,10 @@ class flags(stacktrace.flags):
         d = 'json,payload'
         t = list
 
+    class log_thread_local_names:
+        n = 'Prefer thread local logger_name, when set'
+        d = False
+
     class log_dev_coljson_style:
         n = 'Pygments style for colorized json. To use the 16 base colors and leave it '
         n += 'to the terminal palette how to render choose light or dark'
@@ -251,10 +255,18 @@ def censor_passwords(_, __, ev, _censored=censored):
     return ev
 
 
+try:
+    import gevent
+except:
+    gevent = None
+
+
 def add_logger_name(logger, _, ev):
-    # TODO parametrizeable frame info extraction.
-    # ev.pop('_frame_')
-    ev['logger'] = ev.get('logger') or logger.name
+    n = ev.get('logger') or logger.name
+    if FLG.log_thread_local_names:
+        if gevent:
+            n = getattr(gevent.getcurrent(), 'logger_name', n)
+    ev['logger'] = n
     return ev
 
 
