@@ -23,8 +23,12 @@ env = os.environ
 py_env = load.py_env
 
 
-def kvmsg(kw): return '  ' + '\n  '.join(['%s: %s' % (k, str(v)) for k, v in kw.items()])
-def kvprint(l, msg, kw): return print('[%s] %s\n%s' % (l, msg, kvmsg(kw)))
+def kvmsg(kw):
+    return '  ' + '\n  '.join(['%s: %s' % (k, str(v)) for k, v in kw.items()])
+
+
+def kvprint(l, msg, kw):
+    return print('[%s] %s\n%s' % (l, msg, kvmsg(kw)))
 
 
 notifier = [None]
@@ -156,7 +160,8 @@ def set_dirs():
     # return d
 
 
-def command_name(): return sys.argv[0].rsplit('/', 1)[-1].replace('.py', '')
+def command_name():
+    return sys.argv[0].rsplit('/', 1)[-1].replace('.py', '')
 
 
 def set_app(name, log):
@@ -242,10 +247,8 @@ def run_app(
         # certain tests require starting the app when already an app is running:
         if call_main_when_already_running:
             return main()
-        app.die(
-            'Repeated call of app.run_app',
-            hint='Should call only once per proc.',
-        )
+        _ = 'Repeated call of app.run_app'
+        app.die(_, hint='Should call only once per proc.')
 
     running[0] = True
 
@@ -372,7 +375,8 @@ class DieNow(Exception):
 
 
 class dev_app_exc_handler(abslapp.ExceptionHandler):
-    def wants(self, exc): return True
+    def wants(self, exc):
+        return True
 
     def handle(self, exc):
         if type(exc) == DieNow:
