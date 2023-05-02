@@ -3,7 +3,6 @@
 Tool to quickly build and app with plugins.
 
 Usage: See lc.py
-
 """
 import os
 import sys
@@ -17,7 +16,7 @@ def get_docstr(app=None):
     if not app:
         app = sys.argv[0]
 
-    D = '''
+    D = """
 Usage: %(app)s ACTION [--flag[=value] ...]
 
 Available Plugins:
@@ -33,7 +32,7 @@ Note:
 
 Example:
     %(app)s %(exmpl)s -hf log # all flags about logging
-    '''
+    """
     D = D % {'app': os.path.basename(app), 'exmpl': example[0]}
     return D
 
@@ -89,7 +88,9 @@ def main(argv=None):
         plug = import_module(plug)
 
     sys_argv_rm_minus_h_for_hf(argv, plug, plugname)
+    from devapp import app
 
+    app.plugin[0] = plugin   # for logging
     plug.main()
 
 

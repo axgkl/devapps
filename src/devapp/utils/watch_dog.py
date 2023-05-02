@@ -6,24 +6,33 @@ ground process - this one.
 
 Usage:
     See devapp.app.py, search dirwatch
-
 """
-
+signal_handled = 1   # here app will continue
 import os
 import sys
 import time
 from fnmatch import fnmatch
 from functools import partial
+import signal
 
 WD = 'WATCHDOG: '
 
 out = partial(print, file=sys.stderr)
 die = [0]
+now = time.time
+
+
+def last(c=[0]):
+    t0 = c[0]
+    c[0] = now()
+    return t0
 
 
 def start_dir_watch(dir_pid_match_rec):
-    dir, pid, match, recursive = dir_pid_match_rec.split(':')
+    dir, pid, match, recursive, sig, freq = dir_pid_match_rec.split(':')
     recursive = bool(recursive)
+    sig = int(sig or signal_handled)
+    freq = int(freq or 1)
     pid = int(pid)
     if not '*' in match:
         match = ('*' + match + '*').replace('**', '*')
@@ -36,17 +45,22 @@ def start_dir_watch(dir_pid_match_rec):
 
     class H(FileSystemEventHandler):
         def on_modified(self, event, pid=pid):
-            out(WD + f'event: {event.event_type}  path : {event.src_path}')
             # out(WD + 'match' + self.match + '.')
             if self.match:
                 if not fnmatch(event.src_path, self.match):
                     return
-            out(WD + 'match => Sending reload')
+            if now() - last() < freq:
+                return
+            time.sleep(0.1)   # give app time to finish write
+            _ = f' => Sending signal {sig}!'
+            out(WD + f'Matching event: {event.event_type}  path : {event.src_path} {_}')
             try:
-                os.kill(int(pid), 1)
+                os.kill(int(pid), sig)
             except:
                 pass
-            die[0] = 1
+            if sig != signal_handled:
+                out(WD + 'Exitting watchdog')
+                sys.exit(0)
 
     o, h = Observer(), H()
     if isinstance(match, str):

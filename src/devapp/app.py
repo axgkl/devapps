@@ -142,26 +142,13 @@ def set_dirs():
         p = os.environ['PATH']
         if not db + ':' in p:
             os.environ['PATH'] = db + ':' + p
-    # e = env.get
-    # p = 'DA_DIR_'
-    # d = dict(
-    #    [
-    #        ('%s_dir' % k.split(p, 1)[1].lower(), e(k) + '/' + app_name)
-    #        for k in env
-    #        if k.startswith(p)
-    #    ]
-    # )
-    # an app (like build may allow to set --da_dir, overruling env:
-    # d['da_dir'] = getattr(FLG, 'da_dir', env.get('DA_DIR', '.'))
-    # we are used e.g. at construct/prepare.sh w/o DA:
-    # c = 'CONDA_PREFIX'
-    # breakpoint()
-    # d['pkgs_dir'] = env.get(c + '_1') or env.get(c) + '/pkgs'
-    # return d
+
+
+plugin = ['']
 
 
 def command_name():
-    return sys.argv[0].rsplit('/', 1)[-1].replace('.py', '')
+    return plugin[0] or sys.argv[0].rsplit('/', 1)[-1].replace('.py', '')
 
 
 def set_app(name, log):
@@ -216,6 +203,7 @@ def init_app_parse_flags(*args):
     tools.set_flag_vals_from_env()
     kw_log = {}
     sl.setup_logging(**kw_log)
+    breakpoint()   # FIXME BREAKPOINT
     log = sl.get_logger(name)
     set_app(name, log)
 
@@ -406,7 +394,11 @@ class Reloaded(Exception):
     pass
 
 
+reload_signal = 1
+
+
 def reload_handler(signum, frame):
+    app.warn('Reload!', signal=reload_signal)
     raise Reloaded('signal')
 
 
@@ -493,12 +485,16 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         # ps wwwax |grep python |grep app | grep client | xargs kill
 
         # test if tools present:
-        d, match, rec = (FLG.dirwatch + '::').split(':')[:3]
+        d, match, rec, sig, freq = (FLG.dirwatch + ':::::').split(':')[:5]
+        if not sig:
+            sig = str(reload_signal)
         d = os.path.abspath(d)
         if not os.path.isdir(d):
-            app.die('No directory:', d=d, nfo='Use <dir>:<match>:[r]')
+            app.die('No directory:', d=d, nfo='Use <dir>:<match>[:r[:sig[:freq]]]')
         w = os.path.dirname(os.path.abspath(__file__)) + '/utils/watch_dog.py'
-        cmd = [w, ':'.join([d, str(os.getpid()), match, rec])]
+        cmd = [w, ':'.join([d, str(os.getpid()), match, rec, sig, freq])]
+        # print('pid', os.getpid())
+        app.info('watcher', cmd=' '.join(cmd))
         watcher_pid = subprocess.Popen(cmd).pid
 
     res = post = None
@@ -509,11 +505,13 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
             # so that everybody knows what is running. informational
             app._app_func = main
             # main = lambda: run_app(Action, flags=Flags, wrapper=cleanup)
+            if FLG.dirwatch:
+                signal.signal(reload_signal, reload_handler)
             res = wrapper(main) if wrapper else main()
             if FLG.dirwatch:
                 app.info('Keep running, dirwatch is set')
-                signal.signal(1, reload_handler)
                 while 1:
+                    # wait for receiving watchdog signal
                     time.sleep(10)
         except DieNow as ex:
             app.error(ex.msg, exc=ex, **ex.kw)

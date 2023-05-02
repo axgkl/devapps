@@ -1652,12 +1652,23 @@ class appflags:
     ]
 
     class dirwatch:
-        n = 'Spawning helper process, sending reload, monitoring changes in given directory. '
-        n += 'The app itself keeps running normally, with full access at stdin,out, err. '
-        n += 'You may deliver a match spec, colon seperated.\n'
+        '''Spawning helper process, sending reload, monitoring changes in given directory.
+        The app itself keeps full access at stdin, out, err, unlike using tools e.g. `entr`.
+
+        You may deliver a match spec, colon seperated.
+
+        Format: <dir>[:match[:r[:sig[:freq]]]].
+        - match: w/o * will be enclosed in *, left and right.
+        - r: recursive scan
+        - sig: 1(default) is reload, 15 is kill app
+        - freq: min frequency, default  1 (sec)
+
+        Examples:
+        myapp -dw .:.py # reloads app on every python file change
+        while true; do myapp -dw .:.py:1:15:2; done # kills app every 2 secs, scans recursively
+        '''
+        n = 'Restart or reload application on file changes'
         d = ''
-        n += 'Format: <dir>[:match[:r]]. r for recursive. match w/o * will be enclosed in *, left and right.\n'
-        n += 'Example: while true; do bin/client -dw .:.py:1; done'
         s = 'dw'
 
     class redir_stderr:
