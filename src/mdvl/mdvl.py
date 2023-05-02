@@ -54,7 +54,7 @@ class Cfg:
     _parms = None  # our (relevant) keys and values
 
     def setup(self, kw):
-        """ find all our key value defaults and override with env and **kw"""
+        """find all our key value defaults and override with env and **kw"""
         self._parms = []
         kv = [(k, getattr(self, k)) for k in dir(self) if not k.startswith('_')]
         self._parms = [(k, v) for k, v in kv if not hasattr(v, '__code__')]
@@ -106,7 +106,7 @@ class Colors(Cfg):
 
 
 class Facts(Cfg):
-    """ features config """
+    """features config"""
 
     debug = False
     term_width = 80
@@ -151,7 +151,7 @@ def get_subseq_light_table_indent(l0):
 
 
 def block_quote_status(l, g):
-    'blockquote'
+    """blockquote"""
     if not l.startswith('>'):
         return 0, l, ''
     _ = l.split(' ', 1)
@@ -361,7 +361,9 @@ def _main(md, f):
     # INLINE MARKUP, *, **, backticks
     # Alternating replacements, e.g. code, emph. requires a first space char:
     altern = lambda s, c, r: re.sub(
-        r'([^{c}]+){c}([^{c}]+){c}?'.format(c=c), r'\1%s\2%s' % (r, g[cur_colr]), ' ' + s,
+        r'([^{c}]+){c}([^{c}]+){c}?'.format(c=c),
+        r'\1%s\2%s' % (r, g[cur_colr]),
+        ' ' + s,
     )[
         1:
     ]  # removing space again
@@ -409,7 +411,7 @@ def _main(md, f):
 
 
 def strip_it(out, rst):
-    'clumsy way to strip at start at end, including color resets'
+    """clumsy way to strip at start at end, including color resets"""
     sc = {' ': 1, rst: len(rst), '\n': 1}
     while 1:
         m = False
