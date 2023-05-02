@@ -361,6 +361,12 @@ def color_usage(*a, main_module, full=None, **kw):
     ret = []
     d = main_module.__doc__
     if d:
+        if d.lstrip().startswith('# '):
+            from mdvl import mdvl
+
+            d = mdvl.render(
+                d, no_print=True, header_numbering=True, header_numb_level_min=2
+            )
         ret.append('\n' + d.strip() + '\n\n')
     add = lambda s, end='\n', ret=ret: ret.append(s + end)
     # catch the original output:
@@ -403,8 +409,8 @@ def color_usage(*a, main_module, full=None, **kw):
     j['match'] = '[matching %s]' % match_hilite if match else ''
 
     if match:
-        n, n1 = ('All supported', '') if full else ('Main', ' (-hf for all flags)')
-        add('%s command line flags %s%s:' % (n, j['match'], n1))
+        n = 'All supported' if full else 'Main'
+        add('%s command line flags %s:' % (n, j['match']))
     if hof != 'terminal':
         r = tabulate()
 
@@ -431,6 +437,10 @@ def color_usage(*a, main_module, full=None, **kw):
         do('actions', flgs=j['actions'])
 
     # show main module's flags last - always:
+    if not full:
+        add(
+            '\n\x1b[36m-hf [match string]\x1b[0m: List \x1b[36;1mALL\x1b[0m (matching) flags. E.g. -hf or -hf log.'
+        )
     add('\033[0m')
     return ret
 
