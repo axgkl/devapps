@@ -536,6 +536,7 @@ class Install:
                     '%(conda)s create %(yes)s -n "%(name)s"',
                     '%(conda)s activate "%(name)s"',
                 ]
+            ctx['conda'] = ctx.get('conda', 'conda')
             pth = '%(D)s/envs/%(name)s/bin/' % ctx
 
             if g(rsc, 'typ') == 'pip':
