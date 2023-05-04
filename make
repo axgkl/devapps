@@ -168,7 +168,7 @@ function ci-conda-root-env { # creates the root conda env if not present yet
     source scripts/conda.sh && make_conda_root_env "$@"
 }
 
-function ci-conda-py-env { # creates the venv for the project and poetry installs
+function ci-conda-py-env {   # creates the venv for the project and poetry installs
     source scripts/conda.sh && make_conda_py_env "$@"
 }
 

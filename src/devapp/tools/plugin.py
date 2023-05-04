@@ -19,7 +19,7 @@ def get_docstr(app=None):
     D = """
 Usage: %(app)s ACTION [--flag[=value] ...]
 
-Available Plugins:
+Available Action Plugins:
 <PLUGINS>
 
 Help:
