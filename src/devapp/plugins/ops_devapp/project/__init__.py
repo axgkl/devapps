@@ -6,10 +6,9 @@ By providing the --init_at <project dir> switch we will (re-)initialize a projec
 
 - Installing available resources, like databases and tools within a given directory (conda_prefix)
 - Creating resource start wrappers in <project_dir>/bin
-- Creating a 
+- Creating a
 
 Privilege escalation is not required for any of these steps, your system remains unchanged, except <project_dir> and <conda_prefix>
-
 """
 # Could be done far smaller.
 from re import match
@@ -63,7 +62,8 @@ class Flags(api.CommonFlags):
         d = False
 
     class init_create_unit_files:
-        'Valid: Entries in rsc.provides, rsc.cmd or rsc.exe (i.e. the filename of the wrapper in bin dir). Not: rsc.name.'
+        """Valid: Entries in rsc.provides, rsc.cmd or rsc.exe (i.e. the filename of the wrapper in bin dir). Not: rsc.name."""
+
         n = 'List service unit files you want to have created for systemctl --user.'
         d = []
 
@@ -77,7 +77,7 @@ class Flags(api.CommonFlags):
 
     class add_post_process_cmd:
         n = 'Add this to all commands which have systemd service units. Intended for output redirection. Not applied when stdout is a tty.\n'
-        n += '''Example: -appc='2>&1 | rotatelogs -e -n1 "$logfile" 1M' ($logfile defined in wrapper -> use single quotes).\n'''
+        n += """Example: -appc='2>&1 | rotatelogs -e -n1 "$logfile" 1M' ($logfile defined in wrapper -> use single quotes).\n"""
         n += 'Tip: Use rotatelogs only on powers of 10 - spotted problems with 200M. Use 100M or 1G in that case.'
         d = ''
 
@@ -209,8 +209,18 @@ def get_matching_resources():
     r = api.find_resource_defs()
     rscs = S.rscs_defined
     api.add_install_state(rscs)
-    matches = lambda r: any([_ in str(api.to_dict(r)) for _ in m])
-    rscs = [r for r in rscs if not m or matches(r)]
+    # matches = lambda r: any([_ in str(api.to_dict(r)) for _ in m])
+    def matches(rsc, m):
+        r = api.to_dict(rsc)
+        for _ in m:
+            if (
+                str(r.get('systemd')) == _
+                or str(r.get('cmd')).startswith(_)
+                or str(r.get('name')).startswith(_)
+            ):
+                return True
+
+    rscs = [r for r in rscs if not m or matches(r, m)]
     if negates:
         n = negates
         rscs = [r for r in rscs if not any([_ in str(api.to_dict(r)) for _ in n])]
@@ -300,7 +310,7 @@ def run():
 
 # https://serverfault.com/a/1026914 - this is really relevant,
 # since RH and drives deployers crazy on first command!
-T_SDU_SVD = '''
+T_SDU_SVD = """
 We are using the systemd **user** service to manage processes. This means there is a systemd process that runs as unprivileged user. 
 The systemd user service is not used as commonly as the normal systemd process manager.
 For example Red Hat disabled the systemd user service in RHEL 7 (and thereby all distros that come from RHEL, like CentOS, Oracle Linux 7, Amazon Linux 2).
@@ -349,7 +359,7 @@ ________________________________________________________________________________
 Then enable and start the unit.
 
 Run `ps -fww $(pgrep -f "systemd --user")` to verify success, then try re-init the project.
-'''
+"""
 
 T_SDU_SVD = T_SDU_SVD.replace('_UID_', str(os.getuid()))
 

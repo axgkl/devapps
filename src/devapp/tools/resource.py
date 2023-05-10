@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
 Common API for all resources
-
 """
 # FIXME Do this as state table! Its crying for that
 
@@ -24,7 +23,7 @@ from devapp.tools import (
     read_file,
 )
 
-T_unit = '''
+T_unit = """
 [Unit]
 Description      = %(descr)s %(name)s
 Wants            = network-online.target
@@ -46,7 +45,7 @@ SyslogIdentifier = %(name)s
 WantedBy = default.target
 
 # _MATCH_ (auto created %(ctime)s) 
-'''
+"""
 unit_match = 'DevApp Unit'
 T_unit = T_unit.replace('_MATCH_', unit_match)
 
@@ -101,7 +100,7 @@ def set_conda_prefix():
     - local|l: <project_dir>/conda
     - default|d: $HOME/miniconda3 (default path of conda)
     - current|c: Any current conda_prefix set when running.
-    
+
     Note: Installing resources outside the project keeps the project relocatable and resources reusable for other products.
     """
 
@@ -424,7 +423,7 @@ class Install:
             if any([u for u in units if u == cmd]):
                 has_unit = True
                 n_svc = Install.write_unit_file(cmd, fn, rsc)
-                s = '''
+                s = """
 
                 case "${1:-}" in
                     start|restart|stop|status)
@@ -432,7 +431,7 @@ class Install:
                         exit $?
                         ;;
                 esac
-                '''
+                """
                 add(deindent(s % n_svc))
 
             # env['PATH'] = '%s:$PATH' % g(rsc, 'path')
@@ -541,7 +540,10 @@ class Install:
 
             if g(rsc, 'typ') == 'pip':
                 ctx['cmd'] = rsc.cmd
-                cmd += ['%(conda)s install -c conda-forge python; %p/pip install %%(cmd)s' % pth]
+                cmd += [
+                    '%(conda)s install -c conda-forge python; %p/pip install %%(cmd)s'
+                    % pth
+                ]
             else:
                 icmd = g(rsc, 'conda_inst', '')
                 if icmd:
@@ -557,7 +559,7 @@ class Install:
             cmd = ' && '.join(cmd) % ctx
             rsc.path = g(rsc, 'path') or pth
 
-            #app.info('cmd', cmd=cmd)
+            # app.info('cmd', cmd=cmd)
             # import subprocess
             # s = subprocess.run(cmd, shell=True, executable='/bin/bash')
             # will run under dash, sh, bash -> problem e.g. for conda activate
