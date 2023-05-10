@@ -49,7 +49,7 @@ class rsc:
         provides = ['redis-server', 'redis-cli']
         cmd = 'redis-server'
         run = redis_server
-        pkg = 'redis'
+        pkg = 'redis-server'
         port = 6379
         systemd = 'redis-server'
 

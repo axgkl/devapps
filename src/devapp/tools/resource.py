@@ -23,6 +23,11 @@ from devapp.tools import (
     read_file,
 )
 
+# mamba support hack
+os.environ['CONDA_PREFIX'] = os.environ.get(
+    'CONDA_PREFIX', os.environ.get('MAMBA_ROOT_PREFIX')
+)
+
 T_unit = """
 [Unit]
 Description      = %(descr)s %(name)s
@@ -544,13 +549,25 @@ class Install:
             env = g(rsc, 'conda_env', rsc.name)
             ctx = dict(D=D, name=env, yes=interactive())
             mamba = os.environ.get('MAMBA_EXE')
-            if mamba:
+            # if os.system('type micromamba') == 0 or 1:
+            if mamba and os.environ.get('MAMBA_ROOT_PREFIX'):
+                ctx['conda'] = mamba
+                # FIXME: The activate during docker build is a problem in micromamba which runs as subprocess
+                # Better create the env via micromamba create -n foo -f <yaml file> first
+                f = os.environ.get('MAMBA_ROOT_PREFIX')
+                cmd = [
+                    '%(conda)s create %(yes)s -n "%(name)s"',
+                    f'. "{f}/etc/profile.d/micromamba.sh"',
+                    'micromamba activate "%(name)s"',
+                ]
+
+            elif mamba:
                 ctx['conda'] = mamba
                 # FIXME: The activate during docker build is a problem in micromamba which runs as subprocess
                 # Better create the env via micromamba create -n foo -f <yaml file> first
                 cmd = [
                     '%(conda)s create %(yes)s -n "%(name)s"',
-                    'eval "$(%(conda)s shell hook --shell=dash)"',
+                    'eval "$(%(conda)s shell hook --shell=bash)"',
                     '%(conda)s activate "%(name)s"',
                 ]
             else:
