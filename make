@@ -17,6 +17,8 @@ Modifying Parameters, Adding Functionality:
 
 '
 
+VERSION_MAKE="2"
+
 me="${BASH_SOURCE[0]:-${(%):-%x}}" # bash and zsh/ksh compliant
 builtin cd "$(dirname "$me")"
 here="$(pwd)"
@@ -28,8 +30,6 @@ O="\x1b[0m"
 T1="\x1b[48;5;255;38;5;0m"
 T2="\x1b[48;5;124;38;5;255m"
 XDG_RUNTIME_DIR=/run/user/$UID # for systemd --user mode
-TERMINAL="${TERMINAL:-st}"
-VERSION_MAKE="1"
 mkdocs_path="${mkdocs_path:-$PROJECT}"
 mkdocs_port="${mkdocs_port:-8000}"
 d_cover_html="${d_cover_html:-build/coverage/overall}"
@@ -160,7 +160,22 @@ function help {
 }
 
 function self-update {
-    source scripts/self_update
+
+    url_make="https://raw.githubusercontent.com/axiros/docutools/master/make"
+    h1 "Updating to: $url_make"
+    
+
+    function run_self_update {
+        # Right now we only update make. in post_self_update one could do other stuff
+        test -e make || return 1
+        rm -f make.orig
+        mv make make.orig
+        curl -s "$url_make" > './make'
+        diff make make.orig && { echo "Already up to date (ver $VERSION_MAKE)"; rm -f make.orig; return 0; }
+        # updates
+        rm -f scripts/self_update
+        . make post_self_update && echo "Updated make (ver $VERSION_MAKE)"
+    }
     run_self_update "$@"
 }
 

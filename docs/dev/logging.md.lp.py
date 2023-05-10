@@ -15,7 +15,7 @@
                                               '(conda_prefix)\n'
                                               '- Creating resource start '
                                               'wrappers in <project_dir>/bin\n'
-                                              '- Creating a \n'
+                                              '- Creating a\n'
                                               '\n'
                                               'Privilege escalation is not '
                                               'required for any of these '
