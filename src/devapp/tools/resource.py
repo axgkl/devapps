@@ -31,7 +31,7 @@ StopWhenUnneeded = false
 
 [Service]
 Type             = simple
-
+Environment      = INSTANCE=%(env_instance)s
 ExecStart        = %(exec_start)s
 KillSignal       = SIGTERM
 PrivateTmp       = true
@@ -308,6 +308,12 @@ class Run:
         return cmd, spec
 
 
+def get_instances(rsc):
+    n = rsc.name
+    i = int(os.environ.get(f'{n}_instances', '0'))
+    return i
+
+
 class Install:
     """Install methods"""
 
@@ -353,19 +359,22 @@ class Install:
             s = '--skip_filesystem_adaptions'
             system('ops container_build --dirs "%s.img" --target_dir "%s" %s' % (d, d, s))
 
-    def write_unit_file(name, fn, rsc):
+    def write_unit_file(name, fn, rsc, instance):
         pn = project.root().rsplit('/', 1)[-1]
+        inst_name = f'{name}-{instance}' if instance else name
         m = {
-            'name': name,
-            'descr': '%s %s ' % (g(rsc, 'n', name), pn),
+            'name': inst_name,
+            'descr': '%s %s ' % (g(rsc, 'n', inst_name), pn),
             'ctime': time.ctime(),
             'exec_start': fn,
+            'env_instance': instance if instance else '',
         }
         d = os.environ['HOME'] + '/.config/systemd/user'
         if not exists(d):
             app.info('creating systemd user dir', dir=d)
             os.makedirs(d)
-        n_svc = '%s-%s.service' % (name, pn)
+
+        n_svc = '%s-%s.service' % (inst_name, pn)
         sfn = d + '/' + n_svc
         unit = T_unit % m
         have = read_file(sfn, dflt='')
@@ -381,7 +390,7 @@ class Install:
         env['d_conf'] = project.root() + '/conf'
         env['d_bin'] = project.root() + '/bin'
 
-        def write(cmd, fcmd, spec):
+        def write(cmd, fcmd, spec, instance=0, scmds=[]):
             # if cmd == 'dot':
             #    breakpoint()  # FIXME BREAKPOINT
             if isinstance(spec, str):
@@ -422,22 +431,31 @@ class Install:
             has_unit = False
             if any([u for u in units if u == cmd]):
                 has_unit = True
-                n_svc = Install.write_unit_file(cmd, fn, rsc)
+                n_svc = Install.write_unit_file(cmd, fn, rsc, instance)
+                scmd = f'systemctl --user --no-pager "$1" "{n_svc}"'
+                if instances:
+                    _ = f'\n        systemctl --user --no-pager "$1" "{n_svc}" '
+                    scmds.append(_)
+                    scmd = ''.join(scmds)
                 s = """
 
                 case "${1:-}" in
                     start|restart|stop|status)
-                        systemctl --user --no-pager $1 "%s"
+                        set -x
+                        _CMD_
                         exit $?
                         ;;
                 esac
                 """
-                add(deindent(s % n_svc))
+                s = s.replace('_CMD_', scmd)
+                add(deindent(s))
 
             # env['PATH'] = '%s:$PATH' % g(rsc, 'path')
             add('')
             add("H='__HOME__'")
             add('export PROJECT_ROOT="%s"' % project.root())
+            add('# set e.g. in unit files:')
+            add('test -n "$INSTANCE" && inst_postfix="-$INSTANCE" || inst_postfix=""')
             add('')
             add('# Resource settings:')
             # for whoever needs that:
@@ -455,7 +473,7 @@ class Install:
             if 'logdir' not in allk:
                 add('export logdir="$PROJECT_ROOT/log"')
             if 'logfile' not in allk:
-                add('export logfile="$logdir/%s.log"' % cmd)
+                add('export logfile="$logdir/%s$inst_postfix.log"' % cmd)
 
             add('')
             # only for services. Tools not: (e.g. cd mydir && git status -> bum, differentdir)
@@ -496,7 +514,13 @@ class Install:
         for cmd in rsc_cmds(rsc):
             fcmd, spec = Run.get_full_cmd(rsc, cmd)
             cmd = cmd.rsplit('/', 1)[-1]  # /usr/bin/seagull -> bin/seagull
-            write(cmd, fcmd, spec)
+            instances = get_instances(rsc)
+            if not instances:
+                write(cmd, fcmd, spec)
+            else:
+                scmds = []
+                for i in range(instances):
+                    write(cmd, fcmd, spec, instance=i + 1, scmds=scmds)
 
     def requirements(req):
         if not req:
