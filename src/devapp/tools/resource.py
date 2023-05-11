@@ -24,9 +24,9 @@ from devapp.tools import (
 )
 
 # mamba support hack
-os.environ['CONDA_PREFIX'] = os.environ.get(
-    'CONDA_PREFIX', os.environ.get('MAMBA_ROOT_PREFIX')
-)
+MRP = os.environ.get('MAMBA_ROOT_PREFIX')
+os.environ['CONDA_PREFIX'] = os.environ.get('CONDA_PREFIX', MRP or '')
+
 
 T_unit = """
 [Unit]
@@ -91,7 +91,8 @@ environ = os.environ
 
 
 def cur_prefix():
-    cli = os.environ.get('CONDA_PREFIX', '').split('/envs/', 1)[0]
+    m = MRP
+    cli = os.environ.get('CONDA_PREFIX', m).split('/envs/', 1)[0]
     if not cli:
         app.die('No $CONDA_PREFIX currently set')
     return cli
@@ -142,7 +143,9 @@ def set_fs_dir():
     S.fs_dir = cli
 
 
-conda_prefix = lambda: S.conda_prefix or [set_conda_prefix(), S.conda_prefix][1]
+conda_prefix = (
+    lambda: S.conda_prefix or [set_conda_prefix(), S.conda_prefix][1]
+)
 
 
 class CommonFlags:
@@ -154,7 +157,7 @@ class CommonFlags:
 
     class conda_prefix:
         n = set_conda_prefix.__doc__
-        d = 'default'
+        d = MRP or 'default'
 
     class fs_dir:
         n = set_fs_dir.__doc__
@@ -239,7 +242,9 @@ def dir_rsc_cfg(rsc):
     elif is_fs(rsc):
         return S.fs_dir + '/' + rsc.name
     else:
-        return S.conda_prefix + '/envs/%s/bin' % (g(rsc, 'conda_env', rsc.name))
+        return S.conda_prefix + '/envs/%s/bin' % (
+            g(rsc, 'conda_env', rsc.name)
+        )
 
 
 def rsc_path(rsc, verify_present=False):
@@ -362,7 +367,10 @@ class Install:
             img = rsc.pkg.split('layers:', 1)[1]
             system('ops container_pull --repo "%s" --dir "%s.img"' % (img, d))
             s = '--skip_filesystem_adaptions'
-            system('ops container_build --dirs "%s.img" --target_dir "%s" %s' % (d, d, s))
+            system(
+                'ops container_build --dirs "%s.img" --target_dir "%s" %s'
+                % (d, d, s)
+            )
 
     def write_unit_file(name, fn, rsc, instance):
         pn = project.root().rsplit('/', 1)[-1]
@@ -460,7 +468,9 @@ class Install:
             add("H='__HOME__'")
             add('export PROJECT_ROOT="%s"' % project.root())
             add('# set e.g. in unit files:')
-            add('test -n "$INSTANCE" && inst_postfix="-$INSTANCE" || inst_postfix=""')
+            add(
+                'test -n "$INSTANCE" && inst_postfix="-$INSTANCE" || inst_postfix=""'
+            )
             add('')
             add('# Resource settings:')
             # for whoever needs that:
@@ -550,14 +560,13 @@ class Install:
             ctx = dict(D=D, name=env, yes=interactive())
             mamba = os.environ.get('MAMBA_EXE')
             # if os.system('type micromamba') == 0 or 1:
-            if mamba and os.environ.get('MAMBA_ROOT_PREFIX'):
+            if mamba and MRP:
                 ctx['conda'] = mamba
                 # FIXME: The activate during docker build is a problem in micromamba which runs as subprocess
                 # Better create the env via micromamba create -n foo -f <yaml file> first
-                f = os.environ.get('MAMBA_ROOT_PREFIX')
                 cmd = [
                     '%(conda)s create %(yes)s -n "%(name)s"',
-                    f'. "{f}/etc/profile.d/micromamba.sh"',
+                    f'. "{MRP}/etc/profile.d/micromamba.sh"',
                     'micromamba activate "%(name)s"',
                 ]
 
@@ -590,13 +599,19 @@ class Install:
                 if icmd:
                     cmd += [icmd]
                 else:
-                    p = g(rsc, 'conda_pkg') or g(rsc, 'pkg') or ' '.join(rsc.provides)
+                    p = (
+                        g(rsc, 'conda_pkg')
+                        or g(rsc, 'pkg')
+                        or ' '.join(rsc.provides)
+                    )
                     chan = g(rsc, 'conda_chan', '')
                     if chan:
                         chan = '-c ' + chan
                     ctx['chan'] = chan
                     ctx['pkg'] = p
-                    cmd += ['%(conda)s install %(yes)s -c conda-forge %(chan)s %(pkg)s']
+                    cmd += [
+                        '%(conda)s install %(yes)s -c conda-forge %(chan)s %(pkg)s'
+                    ]
             cmd = ' && '.join(cmd) % ctx
             rsc.path = g(rsc, 'path') or pth
 
@@ -743,7 +758,11 @@ def complete_attrs(rsc, fn):
     rsc.host_conf_dir = '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/' + rsc.name
     rsc.disabled = g(rsc, 'disabled', g(rsc, 'd', False))
     rsc.installed = g(rsc, 'installed', False)
-    [repl_callable(rsc, k, getattr(rsc, k)) for k in dir(rsc) if not k.startswith('_')]
+    [
+        repl_callable(rsc, k, getattr(rsc, k))
+        for k in dir(rsc)
+        if not k.startswith('_')
+    ]
 
 
 def to_str(rsc):
@@ -841,3 +860,4 @@ def find_resource_defs(_have_mod={}):
         app.debug(k.name, **to_dict(k))
     S.rscs_defined = rscs
     return rscs
+
