@@ -210,7 +210,7 @@ def get_matching_resources():
     rscs = S.rscs_defined
     api.add_install_state(rscs)
     # matches = lambda r: any([_ in str(api.to_dict(r)) for _ in m])
-    def matches(rsc, m):
+    def matches(rsc, m=m):
         r = api.to_dict(rsc)
         for _ in m:
             if (
