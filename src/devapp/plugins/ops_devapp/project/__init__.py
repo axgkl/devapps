@@ -51,7 +51,7 @@ class Flags(api.CommonFlags):
 
     class init_at:
         n = 'Set up project in given directory. env vars / relative dirs supported.'
-        d = ''
+        d = '.'
 
     class dev_install:
         n = 'Set the project up in developer mode - incl. make and poetry file machinery'
@@ -250,10 +250,7 @@ def run():
     # the project directory:
     d = FLG.init_at
     if not d:
-        if FLG.dev_install:
-            FLG.init_at = d = '.'
-        else:
-            return app.error('No project dir given')
+        return app.error('No project dir given')
 
     d = repl_dollar_var_with_env_val(d)
     d = os.path.abspath(d)
