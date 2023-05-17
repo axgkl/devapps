@@ -25,7 +25,11 @@ from devapp.tools import (
 
 # mamba support hack
 MRP = os.environ.get('MAMBA_ROOT_PREFIX')
-os.environ['CONDA_PREFIX'] = os.environ.get('CONDA_PREFIX', MRP or '')
+CP = os.environ.get('CONDA_PREFIX', '').split('/envs/')[0]
+if CP:
+    MRP = CP
+
+os.environ['CONDA_PREFIX'] = CP
 
 
 T_unit = """
@@ -143,9 +147,7 @@ def set_fs_dir():
     S.fs_dir = cli
 
 
-conda_prefix = (
-    lambda: S.conda_prefix or [set_conda_prefix(), S.conda_prefix][1]
-)
+conda_prefix = lambda: S.conda_prefix or [set_conda_prefix(), S.conda_prefix][1]
 
 
 class CommonFlags:
@@ -242,9 +244,7 @@ def dir_rsc_cfg(rsc):
     elif is_fs(rsc):
         return S.fs_dir + '/' + rsc.name
     else:
-        return S.conda_prefix + '/envs/%s/bin' % (
-            g(rsc, 'conda_env', rsc.name)
-        )
+        return S.conda_prefix + '/envs/%s/bin' % (g(rsc, 'conda_env', rsc.name))
 
 
 def rsc_path(rsc, verify_present=False):
@@ -367,10 +367,7 @@ class Install:
             img = rsc.pkg.split('layers:', 1)[1]
             system('ops container_pull --repo "%s" --dir "%s.img"' % (img, d))
             s = '--skip_filesystem_adaptions'
-            system(
-                'ops container_build --dirs "%s.img" --target_dir "%s" %s'
-                % (d, d, s)
-            )
+            system('ops container_build --dirs "%s.img" --target_dir "%s" %s' % (d, d, s))
 
     def write_unit_file(name, fn, rsc, instance):
         pn = project.root().rsplit('/', 1)[-1]
@@ -468,9 +465,7 @@ class Install:
             add("H='__HOME__'")
             add('export PROJECT_ROOT="%s"' % project.root())
             add('# set e.g. in unit files:')
-            add(
-                'test -n "$INSTANCE" && inst_postfix="-$INSTANCE" || inst_postfix=""'
-            )
+            add('test -n "$INSTANCE" && inst_postfix="-$INSTANCE" || inst_postfix=""')
             add('')
             add('# Resource settings:')
             # for whoever needs that:
@@ -599,19 +594,13 @@ class Install:
                 if icmd:
                     cmd += [icmd]
                 else:
-                    p = (
-                        g(rsc, 'conda_pkg')
-                        or g(rsc, 'pkg')
-                        or ' '.join(rsc.provides)
-                    )
+                    p = g(rsc, 'conda_pkg') or g(rsc, 'pkg') or ' '.join(rsc.provides)
                     chan = g(rsc, 'conda_chan', '')
                     if chan:
                         chan = '-c ' + chan
                     ctx['chan'] = chan
                     ctx['pkg'] = p
-                    cmd += [
-                        '%(conda)s install %(yes)s -c conda-forge %(chan)s %(pkg)s'
-                    ]
+                    cmd += ['%(conda)s install %(yes)s -c conda-forge %(chan)s %(pkg)s']
             cmd = ' && '.join(cmd) % ctx
             rsc.path = g(rsc, 'path') or pth
 
@@ -758,11 +747,7 @@ def complete_attrs(rsc, fn):
     rsc.host_conf_dir = '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/' + rsc.name
     rsc.disabled = g(rsc, 'disabled', g(rsc, 'd', False))
     rsc.installed = g(rsc, 'installed', False)
-    [
-        repl_callable(rsc, k, getattr(rsc, k))
-        for k in dir(rsc)
-        if not k.startswith('_')
-    ]
+    [repl_callable(rsc, k, getattr(rsc, k)) for k in dir(rsc) if not k.startswith('_')]
 
 
 def to_str(rsc):
@@ -860,4 +845,3 @@ def find_resource_defs(_have_mod={}):
         app.debug(k.name, **to_dict(k))
     S.rscs_defined = rscs
     return rscs
-
