@@ -1,14 +1,32 @@
 #!/usr/bin/env python
 """
-Devapp Project Creation
+# Creating A Project With Resources
 
-By providing the --init_at <project dir> switch we will (re-)initialize a project directory there, incl:
+This plugin is helper for creating a project directory, incl. required local resources.
+Your system remains unchanged, except <project_dir> and <conda_prefix>.
+
+It provides an `install` action (implicitely by providing the --init_resource_match or --init_at switch)
+
+Default action is: `list` (show installable resources, -m <match> filters).
+
+At install we will (re-)initialize a "project_dir", at location given with --init_at (default: '.'), incl:
 
 - Installing available resources, like databases and tools within a given directory (conda_prefix)
-- Creating resource start wrappers in <project_dir>/bin
-- Creating a
 
-Privilege escalation is not required for any of these steps, your system remains unchanged, except <project_dir> and <conda_prefix>
+- Creating resource start wrappers in <project_dir>/bin
+
+- Generating default config when required
+
+- Optionally generating systemd unit files (e.g. via: --init_create_all_units)
+
+- Instances support: export <name>_instances=x before running and you'll get x systemd units created, for startable commands.
+    Example: export client_instances=10; ops p -irm client -icau
+    (Name of a resource: ops p [-m <match>])
+
+- Any other parametrization: Via environ variables
+  Check key environ vars in list output and also doc text.
+
+Privilege escalation is not required for any of these steps.
 """
 # Could be done far smaller.
 from re import match
@@ -50,7 +68,7 @@ class Flags(api.CommonFlags):
         d = False
 
     class init_at:
-        n = 'Set up project in given directory. env vars / relative dirs supported.'
+        n = 'Set up project in given directory. env vars / relative dirs supported. Sets install action implicitly'
         d = '.'
 
     class dev_install:
@@ -67,13 +85,14 @@ class Flags(api.CommonFlags):
         n = 'List service unit files you want to have created for systemctl --user.'
         d = []
 
-    class init_resource_match:
-        n = 'Install only matching resources. Examples: -irm "redis, hub" or -irm \'!mysql, !redis\' (! negates).'
+    class resource_match:
+        s = 'm'
+        n = 'Provide a match string for actions. Examples: -irm "redis, hub" or -irm \'!mysql, !redis\' (! negates).'
         d = []
 
-    class list_resources_files:
-        n = 'Show available definition files.'
-        d = False
+    class init_resource_match:
+        n = 'Like resource match but implies install action'
+        d = []
 
     class add_post_process_cmd:
         n = 'Add this to all commands which have systemd service units. Intended for output redirection. Not applied when stdout is a tty.\n'
@@ -88,6 +107,18 @@ class Flags(api.CommonFlags):
     class delete_all_matching_service_unit_files:
         n = 'This removes all matching unit files calling devapp service wrappers. Say "service" to match all'
         d = ''
+
+    class Actions:
+        class list:
+            n = 'Show available definition files.'
+            d = True
+
+        class list_resources_files:
+            n = 'Alias for list action'
+            d = False
+
+        class install:
+            d = False
 
 
 S = api.S
@@ -201,6 +232,7 @@ class disabled:
 
 def get_matching_resources():
     m = FLG.init_resource_match
+    m.extend(FLG.resource_match)
     negates = []
     for u in list(m):
         if u.startswith('!'):
@@ -234,8 +266,12 @@ def get_matching_resources():
 
 
 def run():
+    if FLG.init_resource_match or FLG.init_at:
+        # backwards compat
+        FLG.list = False
+        FLG.install = True
 
-    if FLG.list_resources_files:
+    if FLG.list_resources_files or FLG.list:
         rscs = get_matching_resources()
         app.info('Listing Defined Resources')
         app.info('details', json=rscs_dicts(rscs))
@@ -255,10 +291,11 @@ def run():
     d = repl_dollar_var_with_env_val(d)
     d = os.path.abspath(d)
     d = d[:-1] if d.endswith('/') else d
-    if exists(d):
-        do(os.chdir, d)
-        d = FLG.init_at = os.path.abspath('.')
-        project.set_project_dir(dir=d)
+    if not exists(d):
+        app.die('Not exists', dir=d)
+    do(os.chdir, d)
+    d = FLG.init_at = os.path.abspath('.')
+    project.set_project_dir(dir=d)
 
     rscs = get_matching_resources()
     project.set_project_dir(dir=d)
