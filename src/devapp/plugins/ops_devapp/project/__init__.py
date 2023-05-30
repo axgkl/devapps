@@ -69,7 +69,6 @@ class Flags(api.CommonFlags):
 
     class init_at:
         n = 'Set up project in given directory. env vars / relative dirs supported. Sets install action implicitly'
-        d = '.'
 
     class dev_install:
         n = 'Set the project up in developer mode - incl. make and poetry file machinery'
@@ -266,8 +265,10 @@ def get_matching_resources():
 
 
 def run():
-    if FLG.init_resource_match or FLG.init_at:
+
+    if FLG.install or FLG.init_resource_match or FLG.init_at:
         # backwards compat
+        FLG.init_at = FLG.init_at or '.'
         FLG.list = False
         FLG.install = True
 
@@ -276,6 +277,7 @@ def run():
         app.info('Listing Defined Resources')
         app.info('details', json=rscs_dicts(rscs))
         return [r for r in rscs]
+
     m = FLG.delete_all_matching_service_unit_files
     if m:
         return do(delete_all_matching_service_unit_files, match=m)
