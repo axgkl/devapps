@@ -23,10 +23,26 @@ from devapp.tools import (
     read_file,
 )
 
+
+class S:
+    """state"""
+
+    is_mamba = True
+    rscs_defined = None  # from resource_list
+    pkg_cmd = None
+    rsc_modified = False
+    name_to_func = {}
+    conda_prefix = None  # env vars replaced
+    fs_dir = None  # filesystem install dest
+    constants = {}
+    rsc_dirs = {}
+
+
 # mamba support hack
 MRP = os.environ.get('MAMBA_ROOT_PREFIX')
 CP = os.environ.get('CONDA_PREFIX', '').split('/envs/')[0]
 if CP:
+    S.is_mamba = CP == MRP
     MRP = CP
 
 os.environ['CONDA_PREFIX'] = CP
@@ -57,19 +73,6 @@ WantedBy = default.target
 """
 unit_match = 'DevApp Unit'
 T_unit = T_unit.replace('_MATCH_', unit_match)
-
-
-class S:
-    """state"""
-
-    rscs_defined = None  # from resource_list
-    pkg_cmd = None
-    rsc_modified = False
-    name_to_func = {}
-    conda_prefix = None  # env vars replaced
-    fs_dir = None  # filesystem install dest
-    constants = {}
-    rsc_dirs = {}
 
 
 def add_const(key, val, skip_exists=True):
@@ -546,6 +549,7 @@ class Install:
 
             # return False if not dp else all([exists(dp + '/' + p) for p in rsc.provides])
             if not exists(D + '/bin/'):
+                app.warn('Conda base not fully installed')
                 do(Install.Conda.base, location=D)
 
             if str(rsc.path).startswith(D):
@@ -555,7 +559,7 @@ class Install:
             ctx = dict(D=D, name=env, yes=interactive())
             mamba = os.environ.get('MAMBA_EXE')
             # if os.system('type micromamba') == 0 or 1:
-            if mamba and MRP:
+            if S.is_mamba and mamba and MRP:
                 ctx['conda'] = mamba
                 # FIXME: The activate during docker build is a problem in micromamba which runs as subprocess
                 # Better create the env via micromamba create -n foo -f <yaml file> first
@@ -565,7 +569,7 @@ class Install:
                     'micromamba activate "%(name)s"',
                 ]
 
-            elif mamba:
+            elif S.is_mamba and mamba:
                 ctx['conda'] = mamba
                 # FIXME: The activate during docker build is a problem in micromamba which runs as subprocess
                 # Better create the env via micromamba create -n foo -f <yaml file> first
