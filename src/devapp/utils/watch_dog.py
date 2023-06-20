@@ -60,6 +60,7 @@ def start_dir_watch(dir_pid_match_rec):
                 pass
             if sig != signal_handled:
                 out(WD + 'Exitting watchdog')
+                die[0] = 1
                 sys.exit(0)
 
     o, h = Observer(), H()
