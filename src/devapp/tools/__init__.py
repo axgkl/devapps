@@ -667,6 +667,9 @@ def download_file(url, local_filename, auto_extract=True):
     """
     import requests
     from devapp.app import app
+    local_filename = abspath(local_filename)
+    d = dirname(local_filename)
+    os.makedirs(d, exist_ok=True)
 
     app.info('Downloading', url=url, to=local_filename)
     r = requests.get(url, stream=True)
@@ -1355,7 +1358,7 @@ class project:
 
     config, dir_home, fn_cfg = {}, None, None
 
-    def root(no_fail=False):
+    def root(no_fail=False)->str:
         # r = FLG.project_directory or os.environ.get('project_directory')
         # if r:
         #     if not exists(r):
