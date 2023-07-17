@@ -374,6 +374,8 @@ class Install:
 
     def write_unit_file(name, fn, rsc, instance):
         pn = project.root().rsplit('/', 1)[-1]
+        name = exported_name(rsc, name)
+
         inst_name = f'{name}-{instance}' if instance else name
         m = {
             'name': inst_name,
@@ -411,7 +413,8 @@ class Install:
             app.debug('writing bin/' + cmd, cmd=fcmd)
             pre_exec = spec.pop('pre_exec', '')
             spec_env = spec.pop('env', {})
-            fn = project.root() + '/bin/%s' % cmd
+            fn_name = exported_name(rsc, cmd)
+            fn = project.root() + '/bin/%s' % fn_name
             have = read_file(fn, '')
             marker = '-AUTOCREATED- '
             if have and len(have.split('\n' + marker, 1)[0].splitlines()) > 8:
@@ -426,6 +429,7 @@ class Install:
                 call = call.rsplit('/', 1)[-1] + ' ' + args
             else:
                 call = call + '\\\n' + args
+            i = rsc
             r = [
                 '#!/usr/bin/env bash',
                 '',
@@ -744,14 +748,20 @@ def complete_attrs(rsc, fn):
 
     rsc.doc = rsc.__doc__ or ''
     rsc.name = rsc.__name__
+    rsc.bin_name = exported_name(rsc)
     rsc.module = rsc.__module__.replace('.operations.resources', '')
     rsc.__repr__ = lambda r: str(to_dict(r))
     rsc.__str__ = lambda r: to_str(r)
     rsc.module_dir = S.rsc_dirs[fn]
-    rsc.host_conf_dir = '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/' + rsc.name
+    rsc.host_conf_dir = '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/' + exported_name(rsc)
     rsc.disabled = g(rsc, 'disabled', g(rsc, 'd', False))
     rsc.installed = g(rsc, 'installed', False)
     [repl_callable(rsc, k, getattr(rsc, k)) for k in dir(rsc) if not k.startswith('_')]
+
+
+exported_name = lambda rsc, d=None: os.environ.get(
+    f'{rsc.name}_name', d if d else rsc.name
+)
 
 
 def to_str(rsc):
