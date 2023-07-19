@@ -63,6 +63,10 @@ class Flags(api.CommonFlags):
     #     class skip_inst_when_found:
     #         n = 'Do not install resources which are present on the host already'
     #         d = False
+    class system:
+        n = 'Set to a server for system mode API (e.g. lc hub(s))'
+        d = ''
+
     class force_reinstall:
         n = 'Do not only install resources detected uninstalled but reinstall all'
         d = False
