@@ -5,47 +5,53 @@ Installs Developer Tools
 The tools currently work only on Linux, i.e. intended for server setups
 """
 
-from devapp.tools import confirm, FLG, exists, abspath, download_file
+from devapp.tools import write_file, confirm, FLG, exists, abspath, download_file
 from devapp.app import app, run_app, do, system
-from importlib import import_module
+from time import ctime
 import os
 
 # Could be done far smaller.
+H = os.environ.get('HOME', '')
+_ = lambda i: i if isinstance(i, list) else [i, i]
+mamba_pkgs = [
+    _(i)
+    for i in [
+        ['rg', 'ripgrep'],
+        'lazygit',
+        ['fd', 'fd-find'],
+        'fzf',
+        ['npm', 'nodejs'],
+        'unzip',
+        'gcc',
+        'zig',
+    ]
+]
 
 
 class Flags:
-    """Install a PDS
-
-    We only offer nvim + AstroVim + some custom stuff at this time
-    """
+    """Install a PDS"""
 
     autoshort = ''
 
-    class kv:
-        t = 'multi_string'
-
-    class tool:
-        t = ['none']
-        d = 'none'
+    class nvim_config_repo:
+        n = 'Repo to nvim config. GH url may be omitted. E.g. AXGKl/pds_lazy'
+        d = 'LazyVim/starter'
 
     class Actions:
         class status:
             d = True
 
         class install:
-            n = 'Installs tool'
+            n = (
+                'Installs neovim as appimage into ~/.local/bin/vi and into (activated) micromamba or conda: '
+                + ', '.join([i[0] for i in mamba_pkgs])
+            )
 
             class force:
                 d = False
 
 
-H = os.environ.get('HOME', '')
-from time import ctime
-
-
 class tools:
-    _url_nvim = 'https://github.com/neovim/neovim/releases/download/stable/nvim.appimage'
-
     class lazyvim:
         @classmethod
         def doc(t):
@@ -57,74 +63,73 @@ class tools:
                 'Example: dev pds i -t lazyvim -k AXGKl/pds_lazy.git',
             ]
 
-        d = H + '/.local/bin'
-        vi = d + '/vi'
 
-        @classmethod
-        def status(t):
-            return {
-                'installed': exists(t.vi),
-                'exe': t.vi,
-                'tool': t.__name__,
-                'doc': t.doc(),
-            }
+class nvim:
+    url_nvim = 'https://github.com/neovim/neovim/releases/download/stable/nvim.appimage'
+    d = H + '/.local/bin'
+    vi = d + '/vi'
 
-        @classmethod
-        def install(t):
-            if not t.status()['installed']:
-                conf = FLG.kv[0] if (FLG.kv and FLG.kv[0]) else 'LazyVim/starter'
-                if not conf.startswith('http'):
-                    conf = 'https://github.com/' + conf
-                app.info('Using config', repo=conf)
-                d = H + '/.config/nvim'
-                if os.path.exists(d):
-                    app.warn('config exists', d=d)
-                    do(system, f'mv "{d}" "{d}.backup.{ctime()}"')
-                do(system, f'git clone "{conf}" "{d}"')
-                os.makedirs(t.d, exist_ok=True)
-                os.chdir(t.d)
-                os.system('rm -rf squashfs-root vi nvim.appimage')
-                download_file(tools._url_nvim, 'nvim.appimage', auto_extract=False)
-                os.system('chmod u+x nvim.appimage && ./nvim.appimage --appimage-extract')
-                os.symlink(t.d + '/squashfs-root/usr/bin/nvim', t.d + '/vi')
-            return t.status()
+    @classmethod
+    def status(t):
+        return {
+            'installed': exists(t.vi),
+            'exe': t.vi,
+        }
+
+    @classmethod
+    def install(t):
+        if not t.status()['installed']:
+            conf = FLG.nvim_config_repo
+            if not conf.startswith('http'):
+                conf = 'https://github.com/' + conf
+            app.info('Using config', repo=conf)
+            d = H + '/.config/nvim'
+            if os.path.exists(d):
+                app.warn('nvim config exists, moving away', d=d)
+                do(system, f'mv "{d}" "{d}.backup.{ctime()}"')
+            do(system, f'git clone "{conf}" "{d}"')
+            os.makedirs(t.d, exist_ok=True)
+            os.chdir(t.d)
+            os.system('rm -rf squashfs-root vi nvim.appimage')
+            download_file(t.url_nvim, 'nvim.appimage', auto_extract=False)
+            os.system('chmod u+x nvim.appimage && ./nvim.appimage --appimage-extract')
+            # zig is the better compiler. E.g.
+            s = f'#!/usr/bin/env bash\nexport CC=zig\n{t.d}/squashfs-root/usr/bin/nvim "$@"'
+            write_file(t.vi, s, chmod=0o755)
+        app.info(f'{t.vi} present')
+        return {'nvim': t.status()}
 
 
-Flags.tool.t.extend([getattr(tools, i).__name__ for i in dir(tools) if i[0] != '_'])
-import sys
+have = lambda cmd: system(f'type "{cmd}"', no_fail=True) == 0
+
+
+class mamba_tools:
+    def status():
+        return {k[0]: have(k[0]) for k in mamba_pkgs}
+
+    def install():
+        ret = []
+        for cmd, pkg in mamba_pkgs:
+            if not have(cmd):
+                ret.append(pkg)
+        if ret:
+            mamba = None
+            for mamba in 'micromamba', 'mamba', 'conda':
+                if have(mamba):
+                    break
+            if not mamba:
+                app.die('No mamba')
+
+            do(system, f'{mamba} install -y {" ".join(ret)}')
+        return {'tools': {'installed': ret, 'have': [i[0] for i in mamba_pkgs]}}
 
 
 class Action:
     def status():
-        all = []
-        if FLG.tool == 'none':
-            all = Flags.tool.t
-            all.remove('none')
-        else:
-            all = [FLG.tool]
-        return [getattr(tools, t).status() for t in all]
+        return {'nvim': nvim.status(), 'tools installed': mamba_tools.status()}
 
     def install():
-        if FLG.tool == 'none':
-            sys.exit(app.error('no tool chosen') or 1)
-        t = getattr(tools, FLG.tool)
-        return t.install()
-        # breakpoint()   # FIXME BREAKPOINT
-        # cmds = [
-        #     "wget 'https://raw.githubusercontent.com/AXGKl/pds/master/setup/pds.sh'",
-        #     'chmod +x pds.sh',
-        #     './pds.sh install',
-        #     'rm -rf "$HOME/pds/pkgs"',
-        # ]
-        # if not FLG.install_force:
-        #     app.info('Will run', json=cmds)
-        #     confirm('Go?')
-        #
-        # for c in cmds:
-        #     app.info(f'{c}')
-        #     if os.system(c):
-        #         app.die(f'Failed {c}')
-        # app.info('pds is installed - restart your shell')
+        return [nvim.install(), mamba_tools.install()]
 
 
 def main():

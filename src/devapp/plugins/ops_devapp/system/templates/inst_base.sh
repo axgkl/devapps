@@ -10,7 +10,7 @@ pip_to_install="%(pip_to_install)s"
 PATH="$HOME/.local/bin:$PATH"
 copied_dirs="%(copied_dirs)s"
 inst_ops="%(inst_ops)s"
-inst_nvim="%(inst_nvim)s"
+inst_pds="%(inst_pds)s"
 set +a
 
 # anything we copied here before is exe:
@@ -67,11 +67,16 @@ function ensure_base_tools {
     local pkgs=""
     micromamba list >pkgs
     tools="python $app_libs"
-    test -n "$inst_nvim" && tools="$tools make npm unzip"
-    for t in git curl gcc jq fzf; do type "$t" || tools="$tools $t"; done
+    for t in git curl gcc jq fzf; do
+        echo "Have $t?"
+        type "$t" || tools="$tools $t"
+    done
     for t in $tools; do grep "$t" <pkgs || pkgs="$t $pkgs"; done
     test -n "$pkgs" || return 0
-    sh micromamba install --quiet -y "$pkgs" && return 0
+    test -z "$pkgs" || {
+        echo "Installing $pkgs..."
+        sh micromamba install --quiet -y "$pkgs" && return 0
+    }
     die "failure pkgs install $pkgs"
 }
 
@@ -131,8 +136,8 @@ function ff { find . -print | grep "$1"; }
 # < < < < < < end '$sep'
     ' >>"$b"
 }
-function ensure_nvim {
-    test -n "$inst_nvim" && dev pds install --tool lazyvim --kv "$inst_nvim"
+function ensure_pds {
+    test -n "$inst_pds" && dev pds install --nvim_config_repo "$inst_pds"
 }
 function ensure_copied_dirs_linked {
     for d in $copied_dirs; do
@@ -157,8 +162,8 @@ function main {
     sh ensure_proj_files
     sh ensure_environ_file_written_and_sourced
     sh ensure_bash_helpers
-    sh ensure_nvim
     sh ensure_copied_dirs_linked
+    sh ensure_pds
     sh ensure_ops_svcs_installed
 }
 
