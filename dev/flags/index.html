@@ -1,0 +1,1521 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Application Building Tools">
+      
+      
+      
+        <link rel="canonical" href="https://axgkl.github.io/devapps/dev/flags/">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.8">
+    
+    
+      
+        <title>Flags - devapps</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.644de097.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.e6a45f82.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#546d78">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../lcd/lp/css/xterm.min.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="preference" data-md-color-primary="blue-grey" data-md-color-accent="deep-purple">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-cli-flag-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="devapps" class="md-header__button md-logo" aria-label="devapps" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 2-5 4.5v11l5-4.5V2M6.5 5C4.55 5 2.45 5.4 1 6.5v14.66c0 .25.25.5.5.5.1 0 .15-.07.25-.07 1.35-.65 3.3-1.09 4.75-1.09 1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.31 4.75 1.06.1.05.15.03.25.03.25 0 .5-.25.5-.5V6.5c-.6-.45-1.25-.75-2-1V19c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6.5C10.55 5.4 8.45 5 6.5 5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            devapps
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Flags
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AXGKl/devapps" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    devapps
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Overview
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../install/python/" class="md-tabs__link">
+        Installation
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../projects/" class="md-tabs__link md-tabs__link--active">
+        Features
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/contributing/" class="md-tabs__link">
+        About
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="devapps" class="md-nav__button md-logo" aria-label="devapps" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 2-5 4.5v11l5-4.5V2M6.5 5C4.55 5 2.45 5.4 1 6.5v14.66c0 .25.25.5.5.5.1 0 .15-.07.25-.07 1.35-.65 3.3-1.09 4.75-1.09 1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.31 4.75 1.06.1.05.15.03.25.03.25 0 .5-.25.5-.5V6.5c-.6-.45-1.25-.75-2-1V19c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6.5C10.55 5.4 8.45 5 6.5 5z"/></svg>
+
+    </a>
+    devapps
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AXGKl/devapps" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    devapps
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Installation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Installation" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Installation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install/python/" class="md-nav__link">
+        Python
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install/prod_inst/" class="md-nav__link">
+        DevApps Packages
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install/dev_inst/" class="md-nav__link">
+        Installing A Development Version
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install/cicd/" class="md-nav__link">
+        Setting up CI/CD
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Features
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Features" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Features
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_1">
+          Projects
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Projects" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Projects
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/" class="md-nav__link">
+        About
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/resources/" class="md-nav__link">
+        Resources
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/resource_definitions/" class="md-nav__link">
+        Resource Definitions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/usage/" class="md-nav__link">
+        Usage
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Flags
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Flags
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#flag-definitions-via-nested-class-trees" class="md-nav__link">
+    Flag Definitions via Nested Class Trees
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flag-types" class="md-nav__link">
+    Flag Types
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environ-flags" class="md-nav__link">
+    Environ Flags
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flagsets" class="md-nav__link">
+    Flagsets
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3">
+          Standard Flags
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Standard Flags" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          Standard Flags
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reload_on_change/" class="md-nav__link">
+        Reload on Change
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        Logging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../autodocs/src/devapp/devapp.app.md" class="md-nav__link">
+        App
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugins/" class="md-nav__link">
+        Plugins
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tips/" class="md-nav__link">
+        Tips
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          About
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="About" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          About
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/changelog/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/credits/" class="md-nav__link">
+        Credits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/todo/" class="md-nav__link">
+        TODO
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/AXGKl/devapps/edit/master/docs/dev/flags.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+
+<h1 id="the-cli-flag-system">The CLI Flag System<a class="headerlink" href="#the-cli-flag-system" title="Permanent link">¤</a></h1>
+<p><code>devapps</code> uses <a href="https://abseil.io/docs/python/guides/flags">absl flags</a> to get configured via the CLI or
+environ.</p>
+<p>Application modules and packages define the flags they require or support within their source code themselves.</p>
+<p>Dependent on which of these modules are <strong>imported</strong> at a certain time after startup (before the call to <code>app.run</code>),
+then these are the flags presented to the user when he calls <code>-h|--help|--helpful|-hf</code>. </p>
+<p>Set flag values are then globals throughout the application.</p>
+<p>This makes a lot of sense when a package has a lot of varying use cases, with certain modules sometimes needed or not.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is allowed to do <code>FLG.foo=bar</code> after startup - but considered bad practice.</p>
+</div>
+<h2 id="flag-definitions-via-nested-class-trees">Flag Definitions via Nested Class Trees<a class="headerlink" href="#flag-definitions-via-nested-class-trees" title="Permanent link">¤</a></h2>
+<p>In devapps, while fully supporting the standard absl mechanics (<code>flags.DEFINE_string</code>) we also allow to defined them in
+class name spaces:</p>
+<p>These are e.g. the flags of the <code>project</code> module:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">devapp.app</span> <span class="kn">import</span> <span class="n">FLG</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">run_app</span><span class="p">,</span> <span class="n">do</span><span class="p">,</span> <span class="n">system</span>
+
+<span class="k">class</span> <span class="nc">Flags</span><span class="p">:</span>
+    <span class="c1"># short codes built dynamically (conflict resolved) for all flags:</span>
+    <span class="n">autoshort</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="c1"># You could give a short code prefix here</span>
+
+    <span class="c1"># flag name:</span>
+    <span class="k">class</span> <span class="nc">force</span><span class="p">:</span>
+        <span class="c1"># CLI help string:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="s1">&#39;Assume y on all questions. Required when started w/o a tty&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># default</span>
+
+    <span class="k">class</span> <span class="nc">init_at</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="s1">&#39;Set up project in given directory. env vars / relative dirs supported.&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">class</span> <span class="nc">init_create_unit_files</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="s1">&#39;List service unit files you want to have created for systemctl --user&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">class</span> <span class="nc">init_resource_match</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="s1">&#39;Install only matching resources. Example: -irm &quot;redis, hub&quot;&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">class</span> <span class="nc">list_resources_files</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="s1">&#39;Show available definition files.&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">class</span> <span class="nc">edit_matching_resource_file</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="s1">&#39;Open resource files in $EDITOR, matching given string in their content&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">FLG</span><span class="o">.</span><span class="n">init_at</span><span class="p">:</span>
+        <span class="c1"># structlog call:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Re-initializing project&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">FLG</span><span class="o">.</span><span class="n">init_at</span><span class="p">)</span>
+        <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># if flags argument to run_app is given it will implicitly call devapp.tools.define_flags:</span>
+<span class="n">main</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">run_app</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Flags</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition hint">
+<p class="admonition-title">Full Control</p>
+<p>module import does <em>not</em> cause flags already to be defined, the parent class is just a namespace
+without any magic.</p>
+<p>Instead there is special call <code>devapp.tools.define_flags(my_flags_class)</code>, which calls
+<code>absl.define_&lt;type&gt;</code> for any of the inner classes.   </p>
+<p>Handing the flags via the flags argument into <code>run_app</code> will issue that call.</p>
+</div>
+<p>A call to help then lists the flags on the CLI:</p>
+<details class="note" open="open">
+<summary><code>-h</code>: Module Help</summary>
+<p>This lists the supported flags for the module whose main method is called:</p>
+<p><!-- id: 270eb46cc446afe908d7ad13cfa94d85 -->
+<xterm /></p>
+<pre><code>$ ops project -h
+
+[1;38;5;11mCreating A Project With Resources
+[1;38;5;11m────────────────────────────────────────────────────────────────────────────────
+[0m
+This plugin is helper for creating a project directory, incl. required local
+resources. Your system remains unchanged, except &lt;project_dir&gt; and
+&lt;conda_prefix&gt;.
+[0m
+It provides an [0;38;5;5minstall[0m action (implicitely by providing the
+--init_resource_match or --init_at switch)
+[0m
+Default action is: [0;38;5;5mlist[0m (show installable resources, -m &lt;match&gt; filters).
+[0m
+At install we will (re-)initialize a "project_dir", at location given with
+--init_at (default: '.'), incl:
+[0m
+[0;38;5;5m❖ [0mInstalling available resources, like databases and tools within a given
+  directory (conda_prefix)
+[0m
+[0;38;5;5m❖ [0mCreating resource start wrappers in &lt;project_dir&gt;/bin
+[0m
+[0;38;5;5m❖ [0mGenerating default config when required
+[0m
+[0;38;5;5m❖ [0mOptionally generating systemd unit files (e.g. via: --init_create_all_units)
+[0m
+[0;38;5;5m❖ [0mInstances support: export &lt;name&gt;_instances=x before running and you'll get x
+  systemd units created, for startable commands.
+[0;38;5;5m
+[0;38;5;5m  [0;38;5;5mExample: export client_instances=10; ops p -irm client -icau
+[0;38;5;5m  [0;38;5;5m(Name of a resource: ops p [-m &lt;match&gt;])[0m
+[0m
+[0;38;5;5m❖ [0mAny other parametrization: Via environ variables Check key environ vars in
+  list output and also doc text.
+[0m
+Privilege escalation is not required for any of these steps.
+[0m
+
+Main command line flags [matching [1;32mops_devapp.project[0m]:
+[0;32mappc    [1;33madd_post_process_cmd     [0;31m''[0;38;5;245m
+Add this to all commands which have systemd service units. Intended for output redirection. Not applied when stdout is a tty.
+Example: -appc='2&gt;&amp;1 | rotatelogs -e -n1 "$logfile" 1M' ($logfile defined in wrapper -&gt; use single quotes).
+Tip: Use rotatelogs only on powers of 10 - spotted problems with 200M. Use 100M or 1G in that case. 
+[0;32mcp      [1;33mconda_prefix             [0;31m/home/runner/miniconda3[0;38;5;245m
+
+    Resources install location, except filesystem based ones. Env vars resolved.
+
+    Aliases:
+    - local|l: &lt;project_dir&gt;/conda
+    - default|d: $HOME/miniconda3 (default path of conda)
+    - current|c: Any current conda_prefix set when running.
+
+    Note: Installing resources outside the project keeps the project relocatable and resources reusable for other products.
+
+[0;32mdamsu   [1;33mdelete_all_matching_service_unit_files [0;31m''[0;38;5;245m
+This removes all matching unit files calling devapp service wrappers. Say "service" to match all 
+[0;32mdi      [1;33mdev_install              [0;31mFalse[0;38;5;245m
+Set the project up in developer mode - incl. make and poetry file machinery 
+[0;32memrf    [1;33medit_matching_resource_file [0;31m''[0;38;5;245m
+Open resource files in $EDITOR, matching given string in their content 
+[0;32mf       [1;33mforce                    [0;31mFalse[0;38;5;245m
+Assume y on all questions. Required when started w/o a tty 
+[0;32mfr      [1;33mforce_reinstall          [0;31mFalse[0;38;5;245m
+Do not only install resources detected uninstalled but reinstall all 
+[0;32mfd      [1;33mfs_dir                   [0;31mdefault[0;38;5;245m
+
+    Filesystem based resource location. Env vars resolved.
+    Aliases:
+    - local|l: &lt;project_dir&gt;/fs
+    - default|d: $HOME/miniconda3/fs (default path of conda)
+    - conda|c: Within conda_prefix/fs
+
+[0;32mia      [1;33minit_at                  [0;31m''[0;38;5;245m
+Set up project in given directory. env vars / relative dirs supported. Sets install action implicitly 
+[0;32micau    [1;33minit_create_all_units    [0;31mFalse[0;38;5;245m
+If set we create unit files for ALL service type resources 
+[0;32micuf    [1;33minit_create_unit_files   [0;31m''[0;38;5;245m
+List service unit files you want to have created for systemctl --user.  [0;38;5;241m
+Valid: Entries in rsc.provides, rsc.cmd or rsc.exe (i.e. the filename of the wrapper in bin dir). Not: rsc.name.
+[0;32mirm     [1;33minit_resource_match      [0;31m''[0;38;5;245m
+Like resource match but implies install action 
+[0;32mi       [1;33minstall                  [0;33mACTION[0;38;5;245m
+Install 
+[0;32mis      [1;33minstall_state            [0;31mFalse[0;38;5;245m
+show install state infos 
+[0;32ml       [1;33mlist                     [1;33mACTION*[0;38;5;245m
+Show available definition files. 
+[0;32mlrf     [1;33mlist_resources_files     [0;33mACTION[0;38;5;245m
+Alias for list action 
+[0;32m        [1;33mlog_resources_fully      [0;31mFalse[0;38;5;245m
+Always output all settings of resources when logging 
+[0;32mm       [1;33mresource_match           [0;31m''[0;38;5;245m
+Provide a match string for actions. Examples: -irm "redis, hub" or -irm '!mysql, !redis' (! negates). 
+[0;32ms       [1;33msystem                   [0;31m''[0;38;5;245m
+Set to a server for system mode API (e.g. lc hub(s))
+
+[36m-hf [match string][0m: List [36;1mALL[0m (matching) flags. E.g. -hf or -hf log.
+[0m
+</code></pre>
+<!-- id: 270eb46cc446afe908d7ad13cfa94d85 -->
+</details>
+<details class="note" open="open">
+<summary><code>-hf</code>: All Flags</summary>
+<p><code>-hf &lt;match&gt;</code> gives help for ALL flags imported, here with a match:</p>
+<p><!-- id: e82349d9e9fbb3693746605d6b811308 -->
+<xterm /></p>
+<pre><code>$ ops project -hf log | grep -A 100 'All supported'
+All supported command line flags [matching [1;32mlog[0m]:
+[1;34mabsl.logging
+[0;32m        [1;33malsologtostderr          [0;31mFalse[0;38;5;245m
+also log to stderr? 
+[0;32m        [1;33mlog_dir                  [0;31m''[0;38;5;245m
+directory to write logfiles into 
+[0;32m        [1;33mlogger_levels            [0;31m''[0;38;5;245m
+Specify log level of loggers. The format is a CSV list of `name:level`. Where `name` is the logger name used with `logging.getLogger()`, and `level` is a level name  (INFO, DEBUG, etc). e.g. `myapp.foo:INFO,other.logger:DEBUG` 
+[0;32m        [1;33mlogtostderr              [0;31mFalse[0;38;5;245m
+Should only log to stderr? 
+[0;32m        [1;33mshowprefixforinfo        [0;31mTrue[0;38;5;245m
+If False, do not prepend prefix to info messages when it's logged to stderr, --verbosity is set to INFO level, and python logging is used. 
+[0;32m        [1;33mstderrthreshold          [0;31mfatal[0;38;5;245m
+log messages at this level, or more severe, to stderr in addition to the logfile.  Possible values are 'debug', 'info', 'warning', 'error', and 'fatal'.  Obsoletes --alsologtostderr. Using --alsologtostderr cancels the effect of this flag. Please also note that this flag is subject to --verbosity and requires logfile not be stderr. 
+[0;32mv       [1;33mverbosity                [0;31m-1[0;38;5;245m
+Logging verbosity level. Messages logged at this level or lower will be included. Set to 1 for debug logging. If the flag was not set or supplied, the value will be changed from the default of -1 (warning) to 0 (info) after flags are parsed. 
+[1;34mdevapp.tools
+[0;32mdasdi   [1;33msensitive_data_identifiers [0;31mpass.*|.*secret.*[0;38;5;245m
+Regexp which helps identify keys carrying sensitive information (for filtering out of logs). Case insensitive matching. 
+[1;34mstructlogging.sl
+[0;32mlatn    [1;33mlog_add_thread_name      [0;31mFalse[0;38;5;245m
+Add name of thread 
+[0;32mldcs    [1;33mlog_dev_coljson_style    [0;31mdark[0;38;5;245m
+ Pygments style for colorized json. To use the 16 base colors and leave it to the terminal palette how to render choose light or dark &lt;abap|algol|algol_nu|arduino|autumn|borland|bw|colorful|dark|default|dracula|emacs|friendly|friendly_grayscale|fruity|gruvbox-dark|gruvbox-light|igor|inkpot|light|lilypond|lovelace|manni|material|monokai|murphy|native|one-dark|paraiso-dark|paraiso-light|pastie|perldoc|rainbow_dash|rrt|sas|solarized-dark|solarized-light|stata|stata-dark|stata-light|tango|trac|vim|vs|xcode|zenburn&gt;
+[0;32mldfc    [1;33mlog_dev_fmt_coljson      [0;31mjson,payload[0;38;5;245m
+List of keys to log as json. 
+[0;32mlf      [1;33mlog_fmt                  [0;31mauto[0;38;5;245m
+Force a log format. 0: off, 1: auto, 2: plain, 3: plain_no_colors, 4: json. Note: This value can be set away from auto via export log_fmt as well. 
+[0;32mll      [1;33mlog_level                [0;31m20[0;38;5;245m
+Log level (10: debug, 20: info, ...). You may also say log_level=error 
+[0;32mlsf     [1;33mlog_stack_filter         [0;31mfn not contains frozen and fn not contains /rx/[0;38;5;245m
+When logging error tracebacks this is an optional filter. Keywords:fn: filename, frame: frame nr, line: line nr, name: name of callable  [0;38;5;241m
+Example: fn contains project and frame lt 1 (axiros/pycond expression)
+[0;32mlsmf    [1;33mlog_stack_max_frames     [0;31m3[0;38;5;245m
+Maximum Frames Shown in Terminal Stack Traces 
+[0;32mltln    [1;33mlog_thread_local_names   [0;31mFalse[0;38;5;245m
+Prefer thread local logger_name, when set 
+[0;32mltf     [1;33mlog_time_fmt             [0;31m%m-%d %H:%M:%S[0;38;5;245m
+Log time format. Shortcuts: "ISO", "dt" 
+[1;34mops_devapp.project
+[0;32mappc    [1;33madd_post_process_cmd     [0;31m''[0;38;5;245m
+Add this to all commands which have systemd service units. Intended for output redirection. Not applied when stdout is a tty.
+Example: -appc='2&gt;&amp;1 | rotatelogs -e -n1 "$logfile" 1M' ($logfile defined in wrapper -&gt; use single quotes).
+Tip: Use rotatelogs only on powers of 10 - spotted problems with 200M. Use 100M or 1G in that case. 
+[0;32m        [1;33mlog_resources_fully      [0;31mFalse[0;38;5;245m
+Always output all settings of resources when logging 
+[0m
+</code></pre>
+<!-- id: e82349d9e9fbb3693746605d6b811308 -->
+</details>
+<h2 id="flag-types">Flag Types<a class="headerlink" href="#flag-types" title="Permanent link">¤</a></h2>
+<!-- id: ab7010f6765d05383e3207c9ee5c0b58 -->
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">flagtest</span><span class="o">.</span><span class="n">py</span>
+<span class="c1">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">devapp.app</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">run_app</span><span class="p">,</span> <span class="n">FLG</span>
+
+<span class="k">class</span> <span class="nc">Flags</span><span class="p">:</span>
+    <span class="n">autoshort</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="c1"># enabling short forms, prefixed with &#39;&#39;, i.e. not prefixed</span>
+
+    <span class="k">class</span> <span class="nc">my_bool</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">class</span> <span class="nc">my_float</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="mf">1.1</span>
+
+    <span class="k">class</span> <span class="nc">my_int</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">class</span> <span class="nc">my_multi_str</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;multi_string&#39;</span>  <span class="c1"># can supply more than once, any value</span>
+
+    <span class="k">class</span> <span class="nc">my_list</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span>   <span class="c1"># non auto short form</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="nb">list</span>  <span class="c1"># comma sepped values into a list </span>
+        <span class="n">d</span> <span class="o">=</span>  <span class="s1">&#39;foo, bar&#39;</span>
+
+    <span class="k">class</span> <span class="nc">my_opt</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span>  <span class="c1"># can pick exactly one within the list (enum)</span>
+        <span class="n">d</span> <span class="o">=</span>  <span class="s1">&#39;foo&#39;</span>
+
+    <span class="k">class</span> <span class="nc">my_opt_multi</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">)</span> <span class="c1"># now we can select more than one within the tuple (multi_enum)</span>
+        <span class="n">d</span> <span class="o">=</span>  <span class="s1">&#39;a&#39;</span>
+
+    <span class="k">class</span> <span class="nc">my_str</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;foo&#39;</span> <span class="c1"># most easy way</span>
+
+    <span class="k">class</span> <span class="nc">my_str_detailed</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39;Detailed help&#39;&#39;&#39;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;Options (multiline help)</span>
+<span class="s1">        - opt1: foo</span>
+<span class="s1">        - opt2: bar</span>
+<span class="s1">        &#39;&#39;&#39;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># disable short</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;opt1&#39;</span>
+
+    <span class="k">class</span> <span class="nc">my_condition</span><span class="p">:</span>
+        <span class="c1"># will be parsed into an axiros/pycond filter, incl. the condition (list).</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;pycond&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;fn not contains frozen and fn not contains /rx/&#39;</span>
+
+
+<span class="c1"># Print out all FLG vals.</span>
+<span class="c1"># Normal (global) app access e.g. like : if FLG.my_int &gt; 42:</span>
+<span class="n">flg</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">FLG</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">FLG</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;my_&#39;</span><span class="p">)]</span>
+<span class="n">run</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">app</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Flag values (CLI over defaults):&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">flg</span><span class="p">())</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># supplying the flags keyword implicitly calls devapp.tools.define_flags on them:</span>
+    <span class="n">run_app</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Flags</span><span class="p">)</span>
+</code></pre></div>
+<!-- id: ab7010f6765d05383e3207c9ee5c0b58 -->
+
+<p>With this</p>
+<!-- id: 08b960b701b5153b803a7b12d7cb57ad -->
+<p><xterm /></p>
+<pre><code>$ /tmp/flagtest.py -h
+[1;34m__main__
+[0;32mmb    [1;33mmy_bool         [0;31mFalse       [0;38;5;245mMy_bool                                       
+[0;32mmc    [1;33mmy_condition    [0;31mfn not..    [0;38;5;245mMy_condition (axiros/pycond expression)       
+[0;32mmf    [1;33mmy_float        [0;31m1.1         [0;38;5;245mMy_float                                      
+[0;32mmi    [1;33mmy_int          [0;31m1           [0;38;5;245mMy_int                                        
+[0;32mx     [1;33mmy_list         [0;31mfoo,bar     [0;38;5;245mMy_list                                       
+[0;32mmms   [1;33mmy_multi_str    [0;31m['']        [0;38;5;245mMy_multi_str; repeat this option to specify.. 
+[0;32mmo    [1;33mmy_opt          [0;31mfoo         [0;38;5;245m My_opt&lt;foo|bar&gt;                              
+[0;32mmom   [1;33mmy_opt_multi    [0;31m['a']       [0;38;5;245mMy_opt_multi; repeat this option to specify.. 
+[0;32mms    [1;33mmy_str          [0;31mfoo         [0;38;5;245mMy_str                                        
+[0;32m      [1;33mmy_str_detailed [0;31mopt1        [0;38;5;245mOptions (multiline help) - opt1: foo - opt2:..
+
+[36m-hf [match string][0m: List [36;1mALL[0m (matching) flags. E.g. -hf or -hf log.
+[0m
+$ /tmp/flagtest.py -mo baz || true
+FATAL Flags parsing error: flag --my_opt=baz: value should be one of &lt;foo|bar&gt;
+Pass --helpshort or --helpfull to see help on flags.
+$ /tmp/flagtest.py -ms a -mb -mf 42.1 -mi 42 -mms a -mms b -mo bar -mom b -mom c -x a,b -ms b -lf plain
+[2;38;5;5m07-25 16:06:03[0m [[38;5;2minfo     [0m] Flag values (CLI over defaults):[0m [[38;5;5mflagtest[0m] [1;32mjson[0m=[1;38;5;11m[0m[[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_list"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[[90m[39;49;00m
+[90m      [39;49;00m[33m"a"[39;49;00m,[90m[39;49;00m
+[90m      [39;49;00m[33m"b"[39;49;00m[90m[39;49;00m
+[90m    [39;49;00m][90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_bool"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[94mtrue[39;49;00m[90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_condition"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[[90m[39;49;00m
+[90m      [39;49;00m[33m"&lt;function build_pycond_flag_expr.&lt;locals&gt;.&lt;lambda&gt; at 0x7fcc09a830e0&gt;"[39;49;00m,[90m[39;49;00m
+[90m      [39;49;00m[33m"fn not contains frozen and fn not contains /rx/"[39;49;00m[90m[39;49;00m
+[90m    [39;49;00m][90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_float"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[94m42.1[39;49;00m[90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_int"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[94m42[39;49;00m[90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_multi_str"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[[90m[39;49;00m
+[90m      [39;49;00m[33m"a"[39;49;00m,[90m[39;49;00m
+[90m      [39;49;00m[33m"b"[39;49;00m[90m[39;49;00m
+[90m    [39;49;00m][90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_opt"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[33m"bar"[39;49;00m[90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_opt_multi"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[[90m[39;49;00m
+[90m      [39;49;00m[33m"b"[39;49;00m,[90m[39;49;00m
+[90m      [39;49;00m[33m"c"[39;49;00m[90m[39;49;00m
+[90m    [39;49;00m][90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_str"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[33m"b"[39;49;00m[90m[39;49;00m
+[90m  [39;49;00m],[90m[39;49;00m
+[90m  [39;49;00m[[90m[39;49;00m
+[90m    [39;49;00m[33m"my_str_detailed"[39;49;00m,[90m[39;49;00m
+[90m    [39;49;00m[33m"opt1"[39;49;00m[90m[39;49;00m
+[90m  [39;49;00m][90m[39;49;00m
+][90m[39;49;00m
+[0m
+</code></pre>
+<!-- id: 08b960b701b5153b803a7b12d7cb57ad -->
+
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Note <code>my_str</code> defined twice in the example - last wins (except when defined <code>multi_string</code>) -&gt; you can preparametrize apps in wrappers
+and still overwrite flags when calling the wrapper.</p>
+<p>E.g. in the wrapper you have -ll 20 while in the call you say -ll 10 to have debug logging for a certain run.  </p>
+</div>
+<h2 id="environ-flags">Environ Flags<a class="headerlink" href="#environ-flags" title="Permanent link">¤</a></h2>
+<p>Adding <code>--environ_flags</code> causes the app to check the process environ first(!), for any flag value.</p>
+<details class="example" open="open">
+<summary>Setting project directory and log level via environ</summary>
+<p><!-- id: 1f8bd792643e46ad0dd3248c251fc2e6 -->
+<xterm /></p>
+<pre><code>$ export init_at="$HOME/foo"; export log_level=30
+$
+$ ops project -ia /tmp --environ_flags
+
+[31m╭───────────────────── [1mTraceback [2m(most recent call last)[0m[31m[49m ──────────────────────╮
+│[39m                                                                              [31m│
+│[39m [2m[33m/home/runner/work/devapps/devapps/src/devapp/[0;1m[33m[49mapp.py[0m[39m[49m:[94m509[39m in [92mrun_phase_2[39m       [31m│
+│[39m                                                                              [31m│
+│[39m   [2m506 │   │   │   # main = lambda: run_app(Action, flags=Flags, wrapper=clea[0m[39m[49m [31m│
+│[39m   [2m507 │   │   │   [0m[94m[49mif[39m FLG.dirwatch:                                           [31m│
+│[39m   [2m508 │   │   │   │   [0m[39m[49msignal.signal(reload_signal, reload_handler)           [31m│
+│[39m [31m❱ [39m509 [2m│   │   │   [0m[39m[49mres = wrapper(main) [94mif[39m wrapper [94melse[39m main()                 [31m│
+│[39m   [2m510 │   │   │   [0m[94m[49mif[39m FLG.dirwatch:                                           [31m│
+│[39m   [2m511 │   │   │   │   [0m[39m[49mapp.info([33m'Keep running, dirwatch is set'[39m)              [31m│
+│[39m   [2m512 │   │   │   │   [0m[94m[49mwhile[39m [94m1[39m:                                               [31m│
+│[39m                                                                              [31m│
+│[39m [33m╭───────────────────────────────── locals ─────────────────────────────────╮[39m [31m│
+│[39m [33m│[39m            args = [1m[[0m[39m[49m                                                      [33m│[39m [31m│
+│[39m [33m│[39m                   [2m│   [0m[39m[49m                                                   [33m│[39m [31m│
+│[39m [33m│[39m                   [33m'/home/runner/miniconda3/envs/devapps_py3.7/bin/ops'[39m,  [33m│[39m [31m│
+│[39m [33m│[39m                   [2m│   [0m[33m[49m'project'[39m                                          [33m│[39m [31m│
+│[39m [33m│[39m                   [1m][0m[39m[49m                                                      [33m│[39m [31m│
+│[39m [33m│[39m              ex = [1m[35mDieNow[39m([0m[33m[49m'Not exists'[39m, [1m{[0m[33m[49m'dir'[39m: [33m'/home/runner/foo'[1m[39m})[0m[39m[49m      [33m│[39m [31m│
+│[39m [33m│[39m flags_validator = [94mNone[39m                                                   [33m│[39m [31m│
+│[39m [33m│[39m          kw_log = [1m{}[0m[39m[49m                                                     [33m│[39m [31m│
+│[39m [33m│[39m             log = [1m&lt;[35mAXLogger[39m([0m[33m[49mcontext[39m=[1m{}[0m[39m[49m, [33mprocessors[39m=[1m[[0m[39m[49m&lt;function            [33m│[39m [31m│
+│[39m [33m│[39m                   filter_by_level at [94m0x7fa9487c0290[1m[39m&gt;[0m[39m[49m,                    [33m│[39m [31m│
+│[39m [33m│[39m                   [1m&lt;[95mstructlog.processors.TimeStamper[0m[39m[49m object at            [33m│[39m [31m│
+│[39m [33m│[39m                   [94m0x7fa948329cd0[1m[39m&gt;[0m[39m[49m, [1m&lt;[95mfunction[0m[39m[49m add_log_level at            [33m│[39m [31m│
+│[39m [33m│[39m                   [94m0x7fa9489599e0[1m[39m&gt;[0m[39m[49m, [1m&lt;[95mfunction[0m[39m[49m censor_passwords at         [33m│[39m [31m│
+│[39m [33m│[39m                   [94m0x7fa9487c0320[1m[39m&gt;[0m[39m[49m, [1m&lt;[95mfunction[0m[39m[49m add_logger_name at          [33m│[39m [31m│
+│[39m [33m│[39m                   [94m0x7fa9487c03b0[1m[39m&gt;[0m[39m[49m, [1m&lt;[95mfunction[0m[39m[49m                             [33m│[39m [31m│
+│[39m [33m│[39m                   stack_info.&lt;locals[1m&gt;[0m[39m[49m._stack_info at [94m0x7fa949f2a440[39m&gt;,    [33m│[39m [31m│
+│[39m [33m│[39m                   [1m&lt;[95mstructlogging.renderers.ThemeableConsoleRenderer[0m[39m[49m      [33m│[39m [31m│
+│[39m [33m│[39m                   object at [94m0x7fa94869b9d0[1m[39m&gt;])[0m[39m[49m&gt;                           [33m│[39m [31m│
+│[39m [33m│[39m            main = [1m&lt;[95mfunction[0m[39m[49m run at [94m0x7fa9486888c0[1m[39m&gt;[0m[39m[49m                       [33m│[39m [31m│
+│[39m [33m│[39m            name = [33m'project'[39m                                              [33m│[39m [31m│
+│[39m [33m│[39m            post = [94mNone[39m                                                   [33m│[39m [31m│
+│[39m [33m│[39m             res = [94mNone[39m                                                   [33m│[39m [31m│
+│[39m [33m│[39m     watcher_pid = [94mNone[39m                                                   [33m│[39m [31m│
+│[39m [33m│[39m         wrapper = [94mNone[39m                                                   [33m│[39m [31m│
+│[39m [33m╰──────────────────────────────────────────────────────────────────────────╯[39m [31m│
+│[39m [2m[33m/home/runner/work/devapps/devapps/src/devapp/plugins/ops_devapp/project/[0;1m[33m[49m__in[0m[39m[49m [31m│
+│[39m [1m[33mit__.py[0m[39m[49m:[94m301[39m in [92mrun[39m                                                           [31m│
+│[39m                                                                              [31m│
+│[39m   [2m298 │   [0m[39m[49md = os.path.abspath(d)                                             [31m│
+│[39m   [2m299 │   [0m[39m[49md = d[:-[94m1[39m] [94mif[39m d.endswith([33m'/'[39m) [94melse[39m d                               [31m│
+│[39m   [2m300 │   [0m[94m[49mif[39m [95mnot[39m exists(d):                                                  [31m│
+│[39m [31m❱ [39m301 [2m│   │   [0m[39m[49mapp.die([33m'Not exists'[39m, [96mdir[39m=d)                                   [31m│
+│[39m   [2m302 │   [0m[39m[49mdo(os.chdir, d)                                                    [31m│
+│[39m   [2m303 │   [0m[39m[49md = FLG.init_at = os.path.abspath([33m'.'[39m)                             [31m│
+│[39m   [2m304 │   [0m[39m[49mproject.set_project_dir([96mdir[39m=d)                                     [31m│
+│[39m                                                                              [31m│
+│[39m [33m╭──────── locals ────────╮[39m                                                   [31m│
+│[39m [33m│[39m d = [33m'/home/runner/foo'[39m [33m│[39m                                                   [31m│
+│[39m [33m│[39m m = [33m''[39m                 [33m│[39m                                                   [31m│
+│[39m [33m╰────────────────────────╯[39m                                                   [31m│
+│[39m                                                                              [31m│
+│[39m [2m[33m/home/runner/work/devapps/devapps/src/devapp/[0;1m[33m[49mapp.py[0m[39m[49m:[94m166[39m in [92mdie[39m               [31m│
+│[39m                                                                              [31m│
+│[39m   [2m163 │   [0m[39m[49m                                                                   [31m│
+│[39m   [2m164 │   [0m[94m[49mdef[39m [92mdie[39m(msg, **kw):                                                [31m│
+│[39m   [2m165 │   │   [0m[33m[49m"""Application decided to bail out"""[39m                          [31m│
+│[39m [31m❱ [39m166 [2m│   │   [0m[94m[49mraise[39m DieNow(msg, kw)                                          [31m│
+│[39m   [2m167 │   [0m[39m[49m                                                                   [31m│
+│[39m   [2m168 │   [0m[39m[49mapp.die = die                                                      [31m│
+│[39m   [2m169 │   [0m[39m[49mapp.name = name                                                    [31m│
+│[39m                                                                              [31m│
+│[39m [33m╭───────────── locals ──────────────╮[39m                                        [31m│
+│[39m [33m│[39m  kw = [1m{[0m[33m[49m'dir'[39m: [33m'/home/runner/foo'[1m[39m}[0m[39m[49m [33m│[39m                                        [31m│
+│[39m [33m│[39m msg = [33m'Not exists'[39m                [33m│[39m                                        [31m│
+│[39m [33m╰───────────────────────────────────╯[39m                                        [31m│
+╰──────────────────────────────────────────────────────────────────────────────╯
+[1m[91mDieNow: [39m([0m[32m[49m'Not exists'[39m, [1m{[0m[32m[49m'dir'[39m: [32m'/home/runner/foo'[1m[39m})
+
+[0;2m[38;5;5m[49m07-25 16:06:09[0m[39m[49m [[1m[38;5;124merror    [0m[39m[49m] Not exists                     [[38;5;5mproject[39m] [1m[32mdir[0m[39m[49m=[1m[38;5;11m/home/runner/foo
+[0m[39m[49m$
+</code></pre>
+<!-- id: 1f8bd792643e46ad0dd3248c251fc2e6 -->
+</details>
+<div class="admonition danger">
+<p class="admonition-title">Environ over CLI</p>
+<p>Please note again that the environ value does overwrite the CLI value, when <code>environ_flags</code> is
+explicitly set. On the cli, you'd have to use the <code>unset</code> command first.</p>
+</div>
+<h2 id="flagsets">Flagsets<a class="headerlink" href="#flagsets" title="Permanent link">¤</a></h2>
+<p>You can store full sets of flags in files and refer to them via the absl standard <code>--flagfile=....</code> flag.</p>
+<h1 id="using-flags-in-pytest">Using Flags in <code>pytest</code><a class="headerlink" href="#using-flags-in-pytest" title="Permanent link">¤</a></h1>
+<p>When the started process is pytest, then the <code>environ_flags</code> flag is set to true. Means you can export non default flag
+values before starting pytest like so:</p>
+<div class="highlight"><pre><span></span><code><span class="go">export my_flag=myval &amp;&amp; pytest -xs test/test_my_test.py</span>
+</code></pre></div>
+<h2 id="action-flags">Action Flags<a class="headerlink" href="#action-flags" title="Permanent link">¤</a></h2>
+<p>Example:</p>
+<!-- id: 482e01df22ea9e717b780dd8ebb19294 -->
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">action_flagtest</span><span class="o">.</span><span class="n">py</span>
+<span class="c1">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">devapp.app</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">run_app</span><span class="p">,</span> <span class="n">FLG</span>
+
+
+<span class="k">class</span> <span class="nc">Flags</span><span class="p">:</span>
+    <span class="n">autoshort</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+
+    <span class="k">class</span> <span class="nc">force</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">class</span> <span class="nc">Actions</span><span class="p">:</span>
+        <span class="k">class</span> <span class="nc">install</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">class</span> <span class="nc">verbose</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;iv&#39;</span> <span class="c1"># no auto for nested flags</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">class</span> <span class="nc">run</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># default</span>
+
+
+<span class="k">class</span> <span class="nc">ActionNS</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_pre</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_post</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;running&#39;</span><span class="p">,</span> <span class="n">FLG</span><span class="o">.</span><span class="n">force</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">install</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;installing&#39;</span><span class="p">,</span> <span class="n">FLG</span><span class="o">.</span><span class="n">force</span><span class="p">,</span> <span class="n">FLG</span><span class="o">.</span><span class="n">install_verbose</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">run_app</span><span class="p">(</span><span class="n">ActionNS</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Flags</span><span class="p">)</span>
+</code></pre></div>
+<!-- id: 482e01df22ea9e717b780dd8ebb19294 -->
+
+<p>Test it:</p>
+<!-- id: f1abe807f1c93ee4796adf29f7252336 -->
+<p><xterm /></p>
+<pre><code>$ /tmp/action_flagtest.py -h
+[1;34m__main__
+[0;32mf     [1;33mforce           [0;31mFalse       [0;38;5;245mForce                                         
+[0;32mi     [1;33minstall         [0;33mACTION      [0;38;5;245mInstall                                       
+[0;32mr     [1;33mrun             [1;33mACTION*     [0;38;5;245mRun
+
+[36m-hf [match string][0m: List [36;1mALL[0m (matching) flags. E.g. -hf or -hf log.
+[0m
+$ /tmp/action_flagtest.py
+pre
+running False
+post
+$ /tmp/action_flagtest.py install -iv
+pre
+installing False True
+post
+$ /tmp/action_flagtest.py -f install --install_verbose
+pre
+installing True True
+post
+$ /tmp/action_flagtest.py run --install_verbose=True || true
+FATAL Flags parsing error: Unknown command line flag 'install_verbose'
+Pass --helpshort or --helpfull to see help on flags.
+</code></pre>
+<!-- id: f1abe807f1c93ee4796adf29f7252336 -->
+
+<p>Mind the concatenation of action and flag name for the nested property verbose within <code>def install()</code>
+action.</p>
+
+<script>typeof start_lc === "undefined" ? 0 : start_lc() </script>
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        
+<style>
+  .md-footer__link--next {
+    width: 75%;
+  }
+  .overlay_block {
+    position: relative;
+    width: 100%;
+  }
+  .overlay_block .overlay_link {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+  }
+  .overlay_block .overlay_inner {
+    position: relative;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .overlay_block .overlay_inner a {
+    pointer-events: all;
+  }
+</style>
+
+<footer class="md-footer">
+  
+
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../../projects/usage/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Usage" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Usage
+            </div>
+          </div>
+        </a>
+
+
+
+       
+      <div class="md-footer__link md-footer__link--next">
+        
+        <div class="overlay_block">
+          <a
+            class="overlay_link"
+            href="../reload_on_change/"
+            rel="next"
+          ></a>
+          <div class="overlay_inner">
+            <div class="md-footer__title">
+              <div class="md-ellipsis">
+                <span class="md-footer__direction">
+                  Next
+                </span>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-left: -2rem" class="md-footer__button md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+        </div>
+      </div>
+
+
+
+
+      
+    </nav>
+  </div>
+  
+
+
+
+
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2012 - 2023 Gunther Klessinger
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/axiros" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.top", "navigation.instant", "navigation.tabs", "toc.integrate"], "search": "../../assets/javascripts/workers/search.5e67fbfe.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c44cc438.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/tablesort.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/xterm.4.9.0.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/tables.js"></script>
+      
+        <script src="../../lcd/lp/javascript/xterm-addon-fit.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/xterm-addon-search.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/lc.js"></script>
+      
+        <script src="../../lcd/lp/javascript/Rx.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/fa_all.js"></script>
+      
+    
+  </body>
+</html>

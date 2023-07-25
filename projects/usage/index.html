@@ -1,0 +1,1459 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Application Building Tools">
+      
+      
+      
+        <link rel="canonical" href="https://axgkl.github.io/devapps/projects/usage/">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.8">
+    
+    
+      
+        <title>Usage - devapps</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.644de097.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.e6a45f82.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#546d78">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../lcd/lp/css/xterm.min.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="preference" data-md-color-primary="blue-grey" data-md-color-accent="deep-purple">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-ops-project-tool" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="devapps" class="md-header__button md-logo" aria-label="devapps" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 2-5 4.5v11l5-4.5V2M6.5 5C4.55 5 2.45 5.4 1 6.5v14.66c0 .25.25.5.5.5.1 0 .15-.07.25-.07 1.35-.65 3.3-1.09 4.75-1.09 1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.31 4.75 1.06.1.05.15.03.25.03.25 0 .5-.25.5-.5V6.5c-.6-.45-1.25-.75-2-1V19c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6.5C10.55 5.4 8.45 5 6.5 5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            devapps
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Usage
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AXGKl/devapps" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    devapps
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Overview
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../install/python/" class="md-tabs__link">
+        Installation
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link md-tabs__link--active">
+        Features
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/contributing/" class="md-tabs__link">
+        About
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="devapps" class="md-nav__button md-logo" aria-label="devapps" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 2-5 4.5v11l5-4.5V2M6.5 5C4.55 5 2.45 5.4 1 6.5v14.66c0 .25.25.5.5.5.1 0 .15-.07.25-.07 1.35-.65 3.3-1.09 4.75-1.09 1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.31 4.75 1.06.1.05.15.03.25.03.25 0 .5-.25.5-.5V6.5c-.6-.45-1.25-.75-2-1V19c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6.5C10.55 5.4 8.45 5 6.5 5z"/></svg>
+
+    </a>
+    devapps
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AXGKl/devapps" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    devapps
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Installation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Installation" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Installation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install/python/" class="md-nav__link">
+        Python
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install/prod_inst/" class="md-nav__link">
+        DevApps Packages
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install/dev_inst/" class="md-nav__link">
+        Installing A Development Version
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install/cicd/" class="md-nav__link">
+        Setting up CI/CD
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Features
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Features" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Features
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_1">
+          Projects
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Projects" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Projects
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        About
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/" class="md-nav__link">
+        Resources
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource_definitions/" class="md-nav__link">
+        Resource Definitions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Usage
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Usage
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#project" class="md-nav__link">
+    Project
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    Resources
+  </a>
+  
+    <nav class="md-nav" aria-label="Resources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resources-of-devapps" class="md-nav__link">
+    Resources of devapps
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-init" class="md-nav__link">
+    Project Init
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unit-files" class="md-nav__link">
+    Unit Files
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/flags/" class="md-nav__link">
+        Flags
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3">
+          Standard Flags
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Standard Flags" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          Standard Flags
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/reload_on_change/" class="md-nav__link">
+        Reload on Change
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/logging/" class="md-nav__link">
+        Logging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../autodocs/src/devapp/devapp.app.md" class="md-nav__link">
+        App
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/plugins/" class="md-nav__link">
+        Plugins
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/tips/" class="md-nav__link">
+        Tips
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          About
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="About" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          About
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/changelog/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/credits/" class="md-nav__link">
+        Credits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/todo/" class="md-nav__link">
+        TODO
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/AXGKl/devapps/edit/master/docs/projects/usage.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+
+<h1 id="the-ops-project-tool">The <code>ops project</code> Tool<a class="headerlink" href="#the-ops-project-tool" title="Permanent link">¤</a></h1>
+<p>After installation of <code>devapps</code> you have the <code>ops project</code> command available<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>. The tool allows to install and
+maintain projects and resources.</p>
+<h2 id="project">Project<a class="headerlink" href="#project" title="Permanent link">¤</a></h2>
+<p>To use the tool, first activate your environment via <code>poetry shell</code> in case of a development installation (virtual
+environ activation in case of a pip(x) based install).</p>
+<p>Verification:</p>
+<!-- id: 51fe79556a58ef0dd0ae469a7639f534 -->
+<p><xterm /></p>
+<pre><code>$ poetry debug info
+
+[1mPoetry
+[0m[34m[49mVersion[39m: [32m1.1.15
+[34mPython[39m:  [32m3.7.12
+
+[1m[39mVirtualenv
+[0m[34m[49mPython[39m:         [32m3.7.12
+[34mImplementation[39m: [32mCPython
+[34mPath[39m:           [32m/home/runner/miniconda3/envs/devapps_py3.7
+[34mValid[39m:          [32mTrue
+
+[1m[39mSystem
+[0m[34m[49mPlatform[39m: [32mlinux
+[34mOS[39m:       [32mposix
+[34mPython[39m:   [32m/home/runner/miniconda3/envs/devapps_py3.7
+[39m
+</code></pre>
+<!-- id: 51fe79556a58ef0dd0ae469a7639f534 -->
+
+<p>Let's now create a (new) directory for the project:</p>
+<!-- id: 4c652d1e83f1fac38bf25e54f869857b -->
+<p><xterm /></p>
+<pre><code>$ mkdir $HOME/myproject &amp;&amp; cd $HOME/myproject &amp;&amp; ls -lta
+total 8
+drwxr-xr-x  2 runner docker 4096 Jul 25 16:06 .
+drwxr-x--- 17 runner docker 4096 Jul 25 16:06 ..
+</code></pre>
+<!-- id: 4c652d1e83f1fac38bf25e54f869857b -->
+
+<h2 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">¤</a></h2>
+<p><code>devapps</code> (and derived packages) contain resource defining python modules named <code>resources.py</code>.</p>
+<h3 id="resources-of-devapps">Resources of <code>devapps</code><a class="headerlink" href="#resources-of-devapps" title="Permanent link">¤</a></h3>
+<p>Here are the resources defined in <code>devapps</code>. They are required for running the tests but also provide some tools:</p>
+<!-- id: 9790c7560fc3981794ea0380095bac86 -->
+
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Cmd</label><label for="__tabbed_1_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>ops project --list_resources_files
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p><xterm /></p>
+<pre><code>$ ops project --list_resources_files
+[2m[38;5;5m07-25 16:06:21[0m[39m[49m [[38;5;2minfo     [39m] Directories                    [[38;5;5mproject[39m] [1m[32mconda_prefix[0m[39m[49m=[1m[38;5;11m/home/runner/miniconda3[0m[39m[49m [1m[32mfs_dir[0m[39m[49m=[1m[38;5;11m/home/runner/miniconda3/fs(default)
+[0;2m[38;5;5m[49m07-25 16:06:21[0m[39m[49m [[38;5;2minfo     [39m] Listing Defined Resources      [[38;5;5mproject[39m] 
+[2m[38;5;5m07-25 16:06:21[0m[39m[49m [[38;5;2minfo     [39m] details                        [[38;5;5mproject[39m] [1m[32mjson[0m[39m[49m=[
+[90m  [39m{
+[90m    [94m"bin_name"[39m:[90m [33m"lc_tools"[39m,
+[90m    [94m"conda_chan"[39m:[90m [33m"conda-forge"[39m,
+[90m    [94m"conda_pkg"[39m:[90m [33m"git fzf jq ripgrep fd-find httpie htop tmux"[39m,
+[90m    [94m"disabled"[39m:[90m [94mfalse[39m,
+[90m    [94m"doc"[39m:[90m [33m""[39m,
+[90m    [94m"host_conf_dir"[39m:[90m [33m"$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools"[39m,
+[90m    [94m"installed"[39m:[90m [94mtrue[39m,
+[90m    [94m"module"[39m:[90m [33m"devapp"[39m,
+[90m    [94m"module_dir"[39m:[90m [33m"/home/runner/work/devapps/devapps/src/devapp"[39m,
+[90m    [94m"name"[39m:[90m [33m"lc_tools"[39m,
+[90m    [94m"path"[39m:[90m [33m"/home/runner/miniconda3/envs/lc_tools/bin"[39m,
+[90m    [94m"provides"[39m:[90m [39m[
+[90m      [33m"git"[39m,
+[90m      [33m"fzf"[39m,
+[90m      [33m"jq"[39m,
+[90m      [33m"rg"[39m,
+[90m      [33m"fd"[39m,
+[90m      [33m"http"[39m,
+[90m      [33m"htop"[39m,
+[90m      [33m"tmux"
+[90m    [39m],
+[90m    [94m"run"[39m:[90m [33m"lc_tools"[39m,
+[90m    [94m"verify_present"[39m:[90m [33m"verify_tools"
+[90m  [39m},
+[90m  [39m{
+[90m    [94m"bin_name"[39m:[90m [33m"lc_tools_kf"[39m,
+[90m    [94m"conda_chan"[39m:[90m [33m"kalefranz"[39m,
+[90m    [94m"conda_pkg"[39m:[90m [33m"httpd"[39m,
+[90m    [94m"disabled"[39m:[90m [94mfalse[39m,
+[90m    [94m"doc"[39m:[90m [33m""[39m,
+[90m    [94m"host_conf_dir"[39m:[90m [33m"$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools_kf"[39m,
+[90m    [94m"installed"[39m:[90m [94mtrue[39m,
+[90m    [94m"module"[39m:[90m [33m"devapp"[39m,
+[90m    [94m"module_dir"[39m:[90m [33m"/home/runner/work/devapps/devapps/src/devapp"[39m,
+[90m    [94m"name"[39m:[90m [33m"lc_tools_kf"[39m,
+[90m    [94m"path"[39m:[90m [33m"/home/runner/miniconda3/envs/lc_tools_kf/bin"[39m,
+[90m    [94m"provides"[39m:[90m [39m[
+[90m      [33m"rotatelogs"
+[90m    [39m],
+[90m    [94m"verify_present"[39m:[90m [33m"verify_tools"
+[90m  [39m},
+[90m  [39m{
+[90m    [94m"bin_name"[39m:[90m [33m"redis_server"[39m,
+[90m    [94m"cmd"[39m:[90m [33m"redis-server"[39m,
+[90m    [94m"disabled"[39m:[90m [94mfalse[39m,
+[90m    [94m"doc"[39m:[90m [33m""[39m,
+[90m    [94m"host_conf_dir"[39m:[90m [33m"$PROJECT_ROOT/conf/${host:-$HOSTNAME}/redis_server"[39m,
+[90m    [94m"installed"[39m:[90m [94mtrue[39m,
+[90m    [94m"module"[39m:[90m [33m"devapp"[39m,
+[90m    [94m"module_dir"[39m:[90m [33m"/home/runner/work/devapps/devapps/src/devapp"[39m,
+[90m    [94m"name"[39m:[90m [33m"redis_server"[39m,
+[90m    [94m"path"[39m:[90m [33m"/home/runner/miniconda3/envs/redis_server/bin"[39m,
+[90m    [94m"pkg"[39m:[90m [33m"redis-server"[39m,
+[90m    [94m"port"[39m:[90m [94m6379[39m,
+[90m    [94m"provides"[39m:[90m [39m[
+[90m      [33m"redis-server"[39m,
+[90m      [33m"redis-cli"
+[90m    [39m],
+[90m    [94m"run"[39m:[90m [33m"redis_server"[39m,
+[90m    [94m"systemd"[39m:[90m [33m"redis-server"
+[90m  [39m}
+]
+
+[
+[90m    [33m"  i   lc_tools ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux']"[39m,
+[90m    [33m"  i   lc_tools_kf ['rotatelogs']"[39m,
+[90m    [33m"s i   redis-server ['redis-server', 'redis-cli']"
+[39m]
+</code></pre>
+</div>
+</div>
+</div>
+<!-- id: 9790c7560fc3981794ea0380095bac86 -->
+
+<div class="admonition note">
+<p class="admonition-title">More Tools</p>
+<p><code>devapps</code> based applications usually define more, e.g. databases, more tools or log targets.</p>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Batteries Included - but Replaceable</p>
+<p>DevApps' resource management is only meant as a convenience machinery to quickly get up projects or dev setups up
+and running. In production you'll have more distributed setups anyway, installed e.g. via Ansible and/or Container
+Orchestrators.</p>
+<p>Means:
+You do not need to have those resources managed as shown below - we install "normal" versions, packaged as Conda
+packages and use standard config options (see previous chapter why).</p>
+</div>
+<h2 id="project-init">Project Init<a class="headerlink" href="#project-init" title="Permanent link">¤</a></h2>
+<p>Via the <code>--init_at</code> flag you set up a new project, within the given directory, plus its resources:</p>
+<!-- id: 8b90d9698b1efefa01d881d347e3494f -->
+
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Cmd</label><label for="__tabbed_2_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>ops project --init_at . --port_offset <span class="m">2000</span> --force
+<span class="gp">$ </span>tree -L <span class="m">2</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p><xterm /></p>
+<pre><code>$ ops project --init_at . --port_offset 2000 --force
+[2m[38;5;5m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] chdir                          [[38;5;5mproject[39m] [1m[32margs[0m[39m[49m=[1m[38;5;11m/home/runner/myproject[0m[39m[49m [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] Directories                    [[38;5;5mproject[39m] [1m[32mconda_prefix[0m[39m[49m=[1m[38;5;11m/home/runner/miniconda3[0m[39m[49m [1m[32mfs_dir[0m[39m[49m=[1m[38;5;11m/home/runner/miniconda3/fs(default)
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[1m[38;5;124mwarning  [0m[39m[49m] Installing resources           [[38;5;5mproject[39m] [1m[32mresources[0m[39m[49m=[1m[38;5;11m[{'bin_name': 'lc_tools', 'conda_chan': 'conda-forge', 'conda_pkg': 'git fzf jq ripgrep fd-find httpie htop tmux', 'disabled': False, 'doc': '', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools', 'installed': True, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools', 'path': '/home/runner/miniconda3/envs/lc_tools/bin', 'provides': ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'], 'run': 'lc_tools', 'verify_present': 'verify_tools'}, {'bin_name': 'lc_tools_kf', 'conda_chan': 'kalefranz', 'conda_pkg': 'httpd', 'disabled': False, 'doc': '', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools_kf', 'installed': True, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools_kf', 'path': '/home/runner/miniconda3/envs/lc_tools_kf/bin', 'provides': ['rotatelogs'], 'verify_present': 'verify_tools'}, {'bin_name': 'redis_server', 'cmd': 'redis-server', 'disabled': False, 'doc': '', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/redis_server', 'installed': True, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'redis_server', 'path': '/home/runner/miniconda3/envs/redis_server/bin', 'pkg': 'redis-server', 'port': 6379, 'provides': ['redis-server', 'redis-cli'], 'run': 'redis_server', 'systemd': 'redis-server'}]
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] create_project_dirs            [[38;5;5mproject[39m] [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] creating                       [[38;5;5mproject[39m] [1m[32mdir[0m[39m[49m=[1m[38;5;11m/home/runner/myproject/bin
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] creating                       [[38;5;5mproject[39m] [1m[32mdir[0m[39m[49m=[1m[38;5;11m/home/runner/myproject/data
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] creating                       [[38;5;5mproject[39m] [1m[32mdir[0m[39m[49m=[1m[38;5;11m/home/runner/myproject/log
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] creating                       [[38;5;5mproject[39m] [1m[32mdir[0m[39m[49m=[1m[38;5;11m/home/runner/myproject/work
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] creating                       [[38;5;5mproject[39m] [1m[32mdir[0m[39m[49m=[1m[38;5;11m/home/runner/myproject/conf
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] creating                       [[38;5;5mproject[39m] [1m[32mdir[0m[39m[49m=[1m[38;5;11m/home/runner/myproject/tmp
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] creating                       [[38;5;5mproject[39m] [1m[32mdir[0m[39m[49m=[1m[38;5;11m/home/runner/myproject/build
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] chdir                          [[38;5;5mproject[39m] [1m[32margs[0m[39m[49m=[1m[38;5;11m/home/runner/myproject[0m[39m[49m [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0;2m[38;5;5m[49m07-25 16:06:22[0m[39m[49m [[38;5;2minfo     [39m] git_init                       [[38;5;5mproject[39m] [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0m[39m[49m-ne 
+[38;5;240mbin/git: line 34: MC: command not found
+[33mhint: Using 'master' as the name for the initial branch. This default branch name
+hint: is subject to change. To configure the initial branch name to use in all
+hint: of your new repositories, which will suppress this warning, call:
+hint: 
+hint: [39m  [33mgit config --global init.defaultBranch &lt;name&gt;
+hint: 
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint: 
+hint: [39m  [33mgit branch -m &lt;name&gt;
+[39mInitialized empty Git repository in /home/runner/myproject/.git/
+-ne
+$ tree -L 2
+.
+├── bin
+│   ├── fd
+│   ├── fzf
+│   ├── git
+│   ├── htop
+│   ├── http
+│   ├── jq
+│   ├── redis-cli
+│   ├── redis-server
+│   ├── rg
+│   ├── rotatelogs
+│   └── tmux
+├── build
+├── conf
+├── data
+├── log
+├── tmp
+│   └── tmux
+└── work
+
+9 directories, 11 files
+</code></pre>
+</div>
+</div>
+</div>
+<!-- id: 8b90d9698b1efefa01d881d347e3494f -->
+
+<p>As you can see, we created start files in the <code>bin</code> subdirectory of the project directory, pointing to where the actual binaries
+had been installed. We did set a global <code>port_offset</code>, which affects any port of listening resources started.</p>
+<div class="admonition hint">
+<p class="admonition-title">Controlling Resources Installation</p>
+<p>There are few options regarding which resources are to be installed, where.
+See the output of the <code>-h</code> regarding this:</p>
+<!-- id: 429e0985ffa960461234d10dd097ae2c -->
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Cmd</label><label for="__tabbed_3_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>ops p -h
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p><xterm /></p>
+<pre><code>$ ops p -h
+
+[1m[38;5;11mCreating A Project With Resources
+────────────────────────────────────────────────────────────────────────────────
+
+[0m[39m[49mThis plugin is helper for creating a project directory, incl. required local
+resources. Your system remains unchanged, except &lt;project_dir&gt; and
+&lt;conda_prefix&gt;.
+
+It provides an [38;5;5minstall[39m action (implicitely by providing the
+--init_resource_match or --init_at switch)
+
+Default action is: [38;5;5mlist[39m (show installable resources, -m &lt;match&gt; filters).
+
+At install we will (re-)initialize a "project_dir", at location given with
+--init_at (default: '.'), incl:
+
+[38;5;5m❖ [39mInstalling available resources, like databases and tools within a given
+  directory (conda_prefix)
+
+[38;5;5m❖ [39mCreating resource start wrappers in &lt;project_dir&gt;/bin
+
+[38;5;5m❖ [39mGenerating default config when required
+
+[38;5;5m❖ [39mOptionally generating systemd unit files (e.g. via: --init_create_all_units)
+
+[38;5;5m❖ [39mInstances support: export &lt;name&gt;_instances=x before running and you'll get x
+  systemd units created, for startable commands.
+
+[38;5;5m  Example: export client_instances=10; ops p -irm client -icau
+  (Name of a resource: ops p [-m &lt;match&gt;])
+
+❖ [39mAny other parametrization: Via environ variables Check key environ vars in
+  list output and also doc text.
+
+Privilege escalation is not required for any of these steps.
+
+Main command line flags [matching [1m[32mops_devapp.project[0m[39m[49m]:
+[32mappc    [1m[33madd_post_process_cmd     [0m[31m[49m''
+[38;5;245mAdd this to all commands which have systemd service units. Intended for output redirection. Not applied when stdout is a tty.
+Example: -appc='2&gt;&amp;1 | rotatelogs -e -n1 "$logfile" 1M' ($logfile defined in wrapper -&gt; use single quotes).
+Tip: Use rotatelogs only on powers of 10 - spotted problems with 200M. Use 100M or 1G in that case. 
+[32mcp      [1m[33mconda_prefix             [0m[31m[49m/home/runner/miniconda3
+
+[38;5;245m    Resources install location, except filesystem based ones. Env vars resolved.
+
+    Aliases:
+    - local|l: &lt;project_dir&gt;/conda
+    - default|d: $HOME/miniconda3 (default path of conda)
+    - current|c: Any current conda_prefix set when running.
+
+    Note: Installing resources outside the project keeps the project relocatable and resources reusable for other products.
+
+[32mdamsu   [1m[33mdelete_all_matching_service_unit_files [0m[31m[49m''
+[38;5;245mThis removes all matching unit files calling devapp service wrappers. Say "service" to match all 
+[32mdi      [1m[33mdev_install              [0m[31m[49mFalse
+[38;5;245mSet the project up in developer mode - incl. make and poetry file machinery 
+[32memrf    [1m[33medit_matching_resource_file [0m[31m[49m''
+[38;5;245mOpen resource files in $EDITOR, matching given string in their content 
+[32mf       [1m[33mforce                    [0m[31m[49mFalse
+[38;5;245mAssume y on all questions. Required when started w/o a tty 
+[32mfr      [1m[33mforce_reinstall          [0m[31m[49mFalse
+[38;5;245mDo not only install resources detected uninstalled but reinstall all 
+[32mfd      [1m[33mfs_dir                   [0m[31m[49mdefault
+
+[38;5;245m    Filesystem based resource location. Env vars resolved.
+    Aliases:
+    - local|l: &lt;project_dir&gt;/fs
+    - default|d: $HOME/miniconda3/fs (default path of conda)
+    - conda|c: Within conda_prefix/fs
+
+[32mia      [1m[33minit_at                  [0m[31m[49m''
+[38;5;245mSet up project in given directory. env vars / relative dirs supported. Sets install action implicitly 
+[32micau    [1m[33minit_create_all_units    [0m[31m[49mFalse
+[38;5;245mIf set we create unit files for ALL service type resources 
+[32micuf    [1m[33minit_create_unit_files   [0m[31m[49m''
+[38;5;245mList service unit files you want to have created for systemctl --user.  
+[38;5;241mValid: Entries in rsc.provides, rsc.cmd or rsc.exe (i.e. the filename of the wrapper in bin dir). Not: rsc.name.
+[32mirm     [1m[33minit_resource_match      [0m[31m[49m''
+[38;5;245mLike resource match but implies install action 
+[32mi       [1m[33minstall                  [0m[33m[49mACTION
+[38;5;245mInstall 
+[32mis      [1m[33minstall_state            [0m[31m[49mFalse
+[38;5;245mshow install state infos 
+[32ml       [1m[33mlist                     ACTION*
+[0m[38;5;245m[49mShow available definition files. 
+[32mlrf     [1m[33mlist_resources_files     [0m[33m[49mACTION
+[38;5;245mAlias for list action 
+[32m        [1m[33mlog_resources_fully      [0m[31m[49mFalse
+[38;5;245mAlways output all settings of resources when logging 
+[32mm       [1m[33mresource_match           [0m[31m[49m''
+[38;5;245mProvide a match string for actions. Examples: -irm "redis, hub" or -irm '!mysql, !redis' (! negates). 
+[32ms       [1m[33msystem                   [0m[31m[49m''
+[38;5;245mSet to a server for system mode API (e.g. lc hub(s))
+
+[36m-hf [match string][39m: List [1m[36mALL[0m[39m[49m (matching) flags. E.g. -hf or -hf log.
+</code></pre>
+</div>
+</div>
+</div>
+<!-- id: 429e0985ffa960461234d10dd097ae2c -->
+</div>
+<div class="admonition note">
+<p class="admonition-title">More CLI flags</p>
+<p>More control flags are only accessible via <code>--helpfull &lt;match&gt;</code> (<code>-hf</code>):
+Try <code>ops p -hf log_level</code>, <code>ops p -hf port</code> (...)</p>
+</div>
+<details class="example">
+<summary>Project initialization flags</summary>
+<p>In the example above, a <code>--port_offset=2000</code> flag was given, determining the start parameters written into the redis wrapper:</p>
+<p><!-- id: dfb9ed5f3d9468406462d07976eab52c -->
+<div class="highlight"><pre><span></span><code>$ bin/redis-server
+bin/redis-server: line <span class="m">35</span>: MC: <span class="nb">command</span> not found
+<span class="m">4103</span>:C <span class="m">25</span> Jul <span class="m">2023</span> <span class="m">16</span>:06:25.162 <span class="c1"># oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo</span>
+<span class="m">4103</span>:C <span class="m">25</span> Jul <span class="m">2023</span> <span class="m">16</span>:06:25.162 <span class="c1"># Redis version=7.0.12, bits=64, commit=22906652, modified=1, pid=4103, just started</span>
+<span class="m">4103</span>:C <span class="m">25</span> Jul <span class="m">2023</span> <span class="m">16</span>:06:25.162 <span class="c1"># Configuration loaded</span>
+<span class="m">4103</span>:M <span class="m">25</span> Jul <span class="m">2023</span> <span class="m">16</span>:06:25.163 * monotonic clock: POSIX clock_gettime
+                _._                                                  
+           _.-<span class="sb">``</span>__ <span class="s1">&#39;&#39;</span>-._                                             
+      _.-<span class="sb">``</span>    <span class="sb">`</span>.  <span class="sb">`</span>_.  <span class="s1">&#39;&#39;</span>-._           Redis <span class="m">7</span>.0.12 <span class="o">(</span><span class="m">22906652</span>/1<span class="o">)</span> <span class="m">64</span> bit
+  .-<span class="sb">``</span> .-<span class="sb">```</span>.  <span class="sb">```</span><span class="se">\/</span>    _.,_ <span class="s1">&#39;&#39;</span>-._                                  
+ <span class="o">(</span>    <span class="s1">&#39;      ,       .-`  | `,    )     Running in standalone mode</span>
+<span class="s1"> |`-._`-...-` __...-.``-._|&#39;</span><span class="sb">`</span> _.-<span class="s1">&#39;|     Port: 8379</span>
+<span class="s1"> |    `-._   `._    /     _.-&#39;</span>    <span class="p">|</span>     PID: <span class="m">4103</span>
+  <span class="sb">`</span>-._    <span class="sb">`</span>-._  <span class="sb">`</span>-./  _.-<span class="s1">&#39;    _.-&#39;</span>                                   
+ <span class="p">|</span><span class="sb">`</span>-._<span class="sb">`</span>-._    <span class="sb">`</span>-.__.-<span class="s1">&#39;    _.-&#39;</span>_.-<span class="s1">&#39;|                                  </span>
+<span class="s1"> |    `-._`-._        _.-&#39;</span>_.-<span class="s1">&#39;    |           https://redis.io       </span>
+<span class="s1">  `-._    `-._`-.__.-&#39;</span>_.-<span class="s1">&#39;    _.-&#39;</span>                                   
+ <span class="p">|</span><span class="sb">`</span>-._<span class="sb">`</span>-._    <span class="sb">`</span>-.__.-<span class="s1">&#39;    _.-&#39;</span>_.-<span class="s1">&#39;|                                  </span>
+<span class="s1"> |    `-._`-._        _.-&#39;</span>_.-<span class="s1">&#39;    |                                  </span>
+<span class="s1">  `-._    `-._`-.__.-&#39;</span>_.-<span class="s1">&#39;    _.-&#39;</span>                                   
+      <span class="sb">`</span>-._    <span class="sb">`</span>-.__.-<span class="s1">&#39;    _.-&#39;</span>                                       
+          <span class="sb">`</span>-._        _.-<span class="s1">&#39;                                           </span>
+<span class="s1">              `-.__.-&#39;</span>                                               
+
+<span class="m">4103</span>:M <span class="m">25</span> Jul <span class="m">2023</span> <span class="m">16</span>:06:25.163 <span class="c1"># Server initialized</span>
+<span class="m">4103</span>:M <span class="m">25</span> Jul <span class="m">2023</span> <span class="m">16</span>:06:25.163 <span class="c1"># WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add &#39;vm.overcommit_memory = 1&#39; to /etc/sysctl.conf and then reboot or run the command &#39;sysctl vm.overcommit_memory=1&#39; for this to take effect.</span>
+<span class="m">4103</span>:M <span class="m">25</span> Jul <span class="m">2023</span> <span class="m">16</span>:06:25.164 <span class="c1"># WARNING You have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command &#39;echo madvise &gt; /sys/kernel/mm/transparent_hugepage/enabled&#39; as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled (set to &#39;madvise&#39; or &#39;never&#39;).</span>
+<span class="m">4103</span>:M <span class="m">25</span> Jul <span class="m">2023</span> <span class="m">16</span>:06:25.164 * Ready to accept connections
+</code></pre></div>
+<!-- id: dfb9ed5f3d9468406462d07976eab52c --></p>
+</details>
+<div class="admonition success">
+<p class="admonition-title">Idempotency</p>
+<p>If you need to re-parametrize the project (e.g. set different port offsets) then run <code>ops project --init_at</code> again
+and have new start wrappers created.</p>
+</div>
+<h2 id="unit-files">Unit Files<a class="headerlink" href="#unit-files" title="Permanent link">¤</a></h2>
+<p>We do not try to manage the live cycle of services but leave that to systemd (available on all Linux major distributions).</p>
+<p>The <code>--init_create_unit_files=&lt;name of daemon resource&gt;</code> will create a unit file after installing the resource itself:</p>
+<div class="admonition example">
+<p class="admonition-title">Creating a resource incl. unit file</p>
+<!-- id: bbb0295e0931845c001a33c958ecc728 -->
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Cmd</label><label for="__tabbed_4_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>ops project --init_at<span class="o">=</span>. --init_create_unit_files<span class="o">=</span>redis-server --force
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p><xterm /></p>
+<pre><code>$ ops project --init_at=. --init_create_unit_files=redis-server --force
+[2m[38;5;5m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] chdir                          [[38;5;5mproject[39m] [1m[32margs[0m[39m[49m=[1m[38;5;11m/home/runner/myproject[0m[39m[49m [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0;2m[38;5;5m[49m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] Directories                    [[38;5;5mproject[39m] [1m[32mconda_prefix[0m[39m[49m=[1m[38;5;11m/home/runner/miniconda3[0m[39m[49m [1m[32mfs_dir[0m[39m[49m=[1m[38;5;11m/home/runner/miniconda3/fs(default)
+[0;2m[38;5;5m[49m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] verify_systemctl_availability  [[38;5;5mproject[39m] [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0m[39m[49msystemctl is /usr/bin/systemctl
+[2m[38;5;5m07-25 16:06:26[0m[39m[49m [[1m[38;5;124mwarning  [0m[39m[49m] Installing resources           [[38;5;5mproject[39m] [1m[32mresources[0m[39m[49m=[1m[38;5;11m[{'bin_name': 'lc_tools', 'conda_chan': 'conda-forge', 'conda_pkg': 'git fzf jq ripgrep fd-find httpie htop tmux', 'disabled': False, 'doc': '', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools', 'installed': True, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools', 'path': '/home/runner/miniconda3/envs/lc_tools/bin', 'provides': ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'], 'run': 'lc_tools', 'verify_present': 'verify_tools'}, {'bin_name': 'lc_tools_kf', 'conda_chan': 'kalefranz', 'conda_pkg': 'httpd', 'disabled': False, 'doc': '', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools_kf', 'installed': True, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools_kf', 'path': '/home/runner/miniconda3/envs/lc_tools_kf/bin', 'provides': ['rotatelogs'], 'verify_present': 'verify_tools'}, {'bin_name': 'redis_server', 'cmd': 'redis-server', 'disabled': False, 'doc': '', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/redis_server', 'installed': True, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'redis_server', 'path': '/home/runner/miniconda3/envs/redis_server/bin', 'pkg': 'redis-server', 'port': 6379, 'provides': ['redis-server', 'redis-cli'], 'run': 'redis_server', 'systemd': 'redis-server'}]
+[0;2m[38;5;5m[49m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] create_project_dirs            [[38;5;5mproject[39m] [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0;2m[38;5;5m[49m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] chdir                          [[38;5;5mproject[39m] [1m[32margs[0m[39m[49m=[1m[38;5;11m/home/runner/myproject[0m[39m[49m [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0;2m[38;5;5m[49m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] have written unit file         [[38;5;5mproject[39m] [1m[32mfn[0m[39m[49m=[1m[38;5;11m/home/runner/.config/systemd/user/redis-server-myproject.service
+[0;2m[38;5;5m[49m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] have written unit file         [[38;5;5mproject[39m] [1m[32mfn[0m[39m[49m=[1m[38;5;11m/home/runner/.config/systemd/user/redis-server-myproject.service
+[0;2m[38;5;5m[49m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] git_init                       [[38;5;5mproject[39m] [1m[32mstore_log[0m[39m[49m=[1m[38;5;11mNone
+[0;2m[38;5;5m[49m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] All project file created.      [[38;5;5mproject[39m] 
+[2m[38;5;5m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] Enabling systemd user service units. [[38;5;5mproject[39m] 
+[2m[38;5;5m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] systemd --user available, calling daemon-reload [[38;5;5mproject[39m] 
+[2m[38;5;5m07-25 16:06:26[0m[39m[49m [[38;5;2minfo     [39m] Done init.                     [[38;5;5mproject[39m]
+</code></pre>
+</div>
+</div>
+</div>
+<!-- id: bbb0295e0931845c001a33c958ecc728 -->
+<p>You control the service using <code>systemctl --user</code>:</p>
+<!-- id: e617126e33050c4f4834b21684c66562 -->
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Cmd</label><label for="__tabbed_5_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>systemctl --user --no-pager start  redis-server-myproject
+<span class="gp">$ </span>systemctl --user --no-pager status redis-server-myproject
+<span class="gp">$ </span>systemctl --user --no-pager stop   redis-server-myproject
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p><xterm /></p>
+<pre><code>$ systemctl --user --no-pager start  redis-server-myproject
+$ systemctl --user --no-pager status redis-server-myproject
+[1m[32m●[0m[39m[49m redis-server-myproject.service - redis-server myproject  redis-server
+     Loaded: loaded (/home/runner/.config/systemd/user/redis-server-myproject.service; disabled; vendor preset: enabled)
+     Active: [1m[32mactive (running)[0m[39m[49m since Tue 2023-07-25 16:06:26 UTC; 36ms ago
+   Main PID: 4150 (bash)
+      Tasks: 6 (limit: 8307)
+     Memory: 7.9M
+        CPU: 9ms
+     CGroup: /user.slice/user-1001.slice/user@1001.service/app.slice/redis-server-myproject.service
+             ├─4150 bash /home/runner/myproject/bin/redis-server
+             └─4152 "redis-server *:6379" "" "" "" "" ""
+
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:2…79.
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:2…zed
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:26.4…
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:26.4…
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:2….12
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:2…nds
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:2… Mb
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:2… 0.
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:2…nds
+Jul 25 16:06:26 fv-az1030-910 redis-server[4152]: 4152:M 25 Jul 2023 16:06:2…ons
+Hint: Some lines were ellipsized, use -l to show in full.
+$ systemctl --user --no-pager stop   redis-server-myproject
+</code></pre>
+</div>
+</div>
+</div>
+<!-- id: e617126e33050c4f4834b21684c66562 -->
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>In order to install unit files for <em>ALL</em> service type resources, you can  supply <code>--init_create_all_units</code>, alternatively.</p>
+</div>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Technically <code>project</code> is implemented as a <a href="../../dev/plugins">plugin</a> of the <code>ops</code> tool.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+<script>typeof start_lc === "undefined" ? 0 : start_lc() </script>
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        
+<style>
+  .md-footer__link--next {
+    width: 75%;
+  }
+  .overlay_block {
+    position: relative;
+    width: 100%;
+  }
+  .overlay_block .overlay_link {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+  }
+  .overlay_block .overlay_inner {
+    position: relative;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .overlay_block .overlay_inner a {
+    pointer-events: all;
+  }
+</style>
+
+<footer class="md-footer">
+  
+
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../resource_definitions/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Resource Definitions" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Resource Definitions
+            </div>
+          </div>
+        </a>
+
+
+
+       
+      <div class="md-footer__link md-footer__link--next">
+        
+        <div class="overlay_block">
+          <a
+            class="overlay_link"
+            href="../../dev/flags/"
+            rel="next"
+          ></a>
+          <div class="overlay_inner">
+            <div class="md-footer__title">
+              <div class="md-ellipsis">
+                <span class="md-footer__direction">
+                  Next
+                </span>
+                
+                <a href="/devapps/projects/">
+                    
+                  <small>Features</small> - 
+                </a>
+                
+                <a href="/devapps/dev/flags/">
+                     <span>Flags</span> 
+                </a>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-left: -2rem" class="md-footer__button md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+        </div>
+      </div>
+
+
+
+
+      
+    </nav>
+  </div>
+  
+
+
+
+
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2012 - 2023 Gunther Klessinger
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/axiros" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.top", "navigation.instant", "navigation.tabs", "toc.integrate"], "search": "../../assets/javascripts/workers/search.5e67fbfe.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c44cc438.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/tablesort.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/xterm.4.9.0.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/tables.js"></script>
+      
+        <script src="../../lcd/lp/javascript/xterm-addon-fit.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/xterm-addon-search.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/lc.js"></script>
+      
+        <script src="../../lcd/lp/javascript/Rx.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/fa_all.js"></script>
+      
+    
+  </body>
+</html>
