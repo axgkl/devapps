@@ -98,7 +98,7 @@ from threading import Thread
 
 def spawn(f, *a, **kw):
     app.info(f.__qualname__, args=a)
-    if FLG.dbg_non_parallel:
+    if FLG.dbg_non_parallel or len(FLG.node) == 1:
         f(*a, **kw)
         return
 
@@ -112,7 +112,28 @@ def spawn(f, *a, **kw):
     t.start()
 
 
+no_node = 'XX'
+
+
+def single_node_cmds(as_str=False):
+    def r(a):
+        for n in FLG.node:
+            a = a.replace(n, no_node)
+        return a
+
+    l = [r(i) for i in list(sys.argv)]
+    cmds = []
+    for n in FLG.node:
+        f = list(l)
+        f.extend(['--node', n])
+        if as_str:
+            f = ' '.join([f'"{i}"' for i in f])
+        cmds.append(f)
+    return cmds
+
+
 def prep_make_workdir_and_abspath_flags():
+    FLG.node = [i for i in FLG.node if not i == no_node]
     os.makedirs(workdir, exist_ok=True)
     l = [abspath(i) for i in FLG.transfer_install_local_dirs]
     FLG.transfer_install_local_dirs = l
@@ -121,8 +142,9 @@ def prep_make_workdir_and_abspath_flags():
 
 def tar_any_project_files():
     f = [i.strip() for i in FLG.transfer_project_files.split(',')]
-    if not f:
+    if not f or not f[0]:
         FLG.transfer_project_files = None
+        return
     if any([i for i in f if not exists(i)]):
         app.die('Not found', files=f)
     cmd = f'tar cfvz proj_files.tgz {" ".join(f)}'

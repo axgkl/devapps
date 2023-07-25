@@ -6,8 +6,9 @@
 import devapp.gevent_patched
 from .tools import run_app, do, FLG, load_spec, app, g, waitfor, spawn, time, workdir, os
 from .tools import write_file, read_file, out_table, api, have_all, partial, system
-from .tools import exists, dir_of, now, json, organize_bzip2
+from .tools import exists, dir_of, now, json, organize_bzip2, no_node
 from .tools import prep_make_workdir_and_abspath_flags, tar_any_project_files
+from .tools import single_node_cmds
 from hashlib import md5
 from shutil import copyfile
 from devapp.tools import abspath
@@ -53,13 +54,20 @@ class Flags:
     class transfer_project_files:
         n = 'Comma sepped local files or dirs to be tar piped into project folder. E.g. tpf="conf/hub/flows.json,conf/functions.py"'
 
-    class install_nvim:
-        n = 'Point to a lazyvim config repo (gh default). Example: AXGKl/pds_lazy.git (or full repo url)'
+    class with_pds:
+        n = 'Point to a lazyvim config repo (gh default). Example: AXGKl/pds_lazy.git (or full repo url). lazy is alias for LazyVim/starter'
         d = ''
 
     class Actions:
         class deploy:
             d = True
+
+        class login:
+            d = False
+
+            class count:
+                n = 'If > 1 we will login into different tmux windows, not panes'
+                d = 1
 
 
 class Node:
@@ -154,6 +162,10 @@ class deploy_modes:
         def run_installer_script(ssh, host):
             cmds = ['chmod +x installer.sh', './installer.sh']
             res = ssh.run_cmd(cmds, host)
+
+        @classmethod
+        def login(ssh, host):
+            os.system(SSH + f' {FLG.user}@{host}')
 
         @classmethod
         def run_cmd(ssh, cmds, host, as_root=False, sep='!!cmd output!!'):
@@ -251,13 +263,15 @@ def render_installer_script_and_scp_files(host):
     svcs = [s.__name__ for s in host.svcs]
     T = read_file(dir_of(__file__) + '/templates/inst_base.sh')
     environ_file = make_environ_file(host)
+    if FLG.with_pds == 'lazy':
+        FLG.with_pds = 'LazyVim/starter'
     ctx = dict(
         app_libs=g('app_libs'),
         copied_dirs=' '.join(copied_dirs),
         d_project=g('d_project'),
         lc_hubs=lc_hubs(),
         node=f'{host.type}.{host.nr}',
-        inst_nvim=str(FLG.install_nvim),
+        inst_pds=FLG.with_pds,
         inst_ops=' '.join(svcs),
         pip_to_install=g('pip_to_install', first_pip),
         environ_file=environ_file,
@@ -282,11 +296,39 @@ def ssh_user(as_root=False):
     return 'root' if as_root else FLG.user
 
 
+def login():
+    if not FLG.node:
+        return 'no node'
+    if len(FLG.node) == 1:
+        return deploy_modes.ssh.login(FLG.node[0].split(':', 1)[0])
+    c = FLG.login_count
+    cmds = single_node_cmds(as_str=True)
+    if c > 1:
+        cmds = [[cmd.replace('"--login"', 'login')] * c for cmd in cmds]
+    from devapp.tools import tmux
+
+    return tmux.run_cmds(cmds, attach=True, win_titles=FLG.node)
+
+
+def deploy():
+    if not FLG.node:
+        return 'no node'
+    if len(FLG.node) == 1:
+        breakpoint()   # FIXME BREAKPOINT
+        return do(getattr(deploy_modes, FLG.deploy_mode).deploy)
+    cmds = single_node_cmds()
+    from devapp.tools import tmux
+
+    return tmux.run_cmds(cmds, attach=True)
+
+
 def run():
     prep_make_workdir_and_abspath_flags()
+    if FLG.login:
+        return login()
 
     if FLG.deploy:
-        return do(getattr(deploy_modes, FLG.deploy_mode).deploy)
+        return deploy()
 
 
 main = lambda: run_app(run, flags=Flags)
@@ -294,29 +336,3 @@ main = lambda: run_app(run, flags=Flags)
 
 if __name__ == '__main__':
     main()
-
-
-# begin_archive
-# # # Could be done far smaller.
-# from re import match
-# from devapp import gevent_patched
-# import hashlib
-# import json
-# import os
-# import shutil
-# from copy import deepcopy
-# from functools import partial
-#
-# import requests
-
-# from devapp import tools
-# from devapp.tools import (
-#     exists,
-#     to_list,
-#     repl_dollar_var_with_env_val,
-#     project,
-#     read_file,
-#     write_file,
-# )
-# import devapp.tools.resource as api
-#
