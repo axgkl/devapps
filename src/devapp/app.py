@@ -203,7 +203,6 @@ def init_app_parse_flags(*args):
     tools.set_flag_vals_from_env()
     kw_log = {}
     sl.setup_logging(**kw_log)
-    breakpoint()   # FIXME BREAKPOINT
     log = sl.get_logger(name)
     set_app(name, log)
 
