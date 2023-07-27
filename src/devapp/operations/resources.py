@@ -45,9 +45,9 @@ def lc_tools(*a, **kw):
 class rsc:
     """For services we change dir to project."""
 
-    class lc_system:
-        cmd = 'ops system_lifecycle'
-        environ = ['lc_hubs']
+    # class lc_system:
+    #     cmd = 'ops system_lifecycle'
+    #     environ = ['lc_hubs']
 
     class redis_server:
         provides = ['redis-server', 'redis-cli']
