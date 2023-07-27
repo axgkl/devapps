@@ -12,6 +12,7 @@ copied_dirs="%(copied_dirs)s"
 inst_ops="%(inst_ops)s"
 inst_pds="%(inst_pds)s"
 set +a
+have_hub=false
 
 # anything we copied here before is exe:
 chmod +x "$HOME/.local/bin/"*
@@ -148,8 +149,15 @@ function ensure_copied_dirs_linked {
 function ensure_ops_svcs_installed {
     cd "$d_project" || true
     for d in $inst_ops; do
-        ops project install --system="$lc_hubs" --resource_match="$d" --init_create_all_units --force -lf 3
+        test "$d" = "hub" && have_hub=true
+        ops project install --resource_match="$d" --init_create_all_units --force -lf 3
     done
+    export lc_system_lc_hubs="$lc_hubs"
+}
+
+function ensure_system_lifecycle_mgmt {
+    have_hub && ops project install --resource_match="maint" --init_create_all_units --force -lf 3
+    have_hub || ops project install --resource_match="lc_system" --init_create_all_units --force -lf 3
 }
 
 function main {
