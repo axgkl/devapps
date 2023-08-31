@@ -279,6 +279,7 @@ is_no_pkg_rsc = lambda rsc: g(rsc, 'pkg') == False
 
 class Run:
     def get_full_cmd(rsc, sel):
+        spec = {}
         cmd_pre = ''
         if is_no_pkg_rsc(rsc):
             f = gf(rsc, sel, sel)
@@ -552,7 +553,7 @@ class Install:
             D = S.conda_prefix
 
             # return False if not dp else all([exists(dp + '/' + p) for p in rsc.provides])
-            if not exists(D + '/bin/'):
+            if not exists(D):
                 app.warn('Conda base not fully installed')
                 do(Install.Conda.base, location=D)
 
