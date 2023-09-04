@@ -671,7 +671,7 @@ def download_file(url, local_filename, auto_extract=True):
     d = dirname(local_filename)
     os.makedirs(d, exist_ok=True)
     verify = os.environ.get('SSL_VERIFY', 'true').lower() != 'false' 
-    app.info('Downloading', url=url, to=local_filename)
+    app.info('Downloading', url=url, to=local_filename, ssl_verify=verify)
     r = requests.get(url, stream=True, verify=verify)
     arch, fn = None, local_filename
     if auto_extract:
