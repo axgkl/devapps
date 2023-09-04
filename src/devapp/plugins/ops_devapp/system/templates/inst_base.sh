@@ -17,6 +17,11 @@ have_hub=false
 # anything we copied here before is exe:
 chmod +x "$HOME/.local/bin/"*
 
+function ops_inst {
+    local svc="$1"
+    shift
+    ops project install --resource_match="$svc" --init_create_all_units --force -lf 3 "$@"
+}
 #inst_url="$inst_protocol://$inst_host"
 function d_artifacts { echo "$MAMBA_ROOT_PREFIX/artifacts/hubpkgs"; }
 
@@ -148,16 +153,14 @@ function ensure_copied_dirs_linked {
 
 function ensure_ops_svcs_installed {
     cd "$d_project" || true
+    inst_ops="$inst_ops slc"
+    export slc_lc_hubs="$lc_hubs"
     for d in $inst_ops; do
-        test "$d" = "hub" && have_hub=true
-        ops project install --resource_match="$d" --init_create_all_units --force -lf 3
+        ops_inst "$d"
+        test "$d" = "hub" && {
+            worker_name=slcm worker_functions=system worker_lc_tabs=System ops_inst worker
+        }
     done
-    export lc_system_lc_hubs="$lc_hubs"
-}
-
-function ensure_system_lifecycle_mgmt {
-    have_hub && ops project install --resource_match="maint" --init_create_all_units --force -lf 3
-    have_hub || ops project install --resource_match="lc_system" --init_create_all_units --force -lf 3
 }
 
 function main {

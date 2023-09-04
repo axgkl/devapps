@@ -296,33 +296,29 @@ def ssh_user(as_root=False):
     return 'root' if as_root else FLG.user
 
 
+from devapp.tools import tmux
+
+
 def login():
-    if not FLG.node:
-        return 'no node'
     if len(FLG.node) == 1:
         return deploy_modes.ssh.login(FLG.node[0].split(':', 1)[0])
     c = FLG.login_count
     cmds = single_node_cmds(as_str=True)
     if c > 1:
         cmds = [[cmd.replace('"--login"', 'login')] * c for cmd in cmds]
-    from devapp.tools import tmux
-
     return tmux.run_cmds(cmds, attach=True, win_titles=FLG.node)
 
 
 def deploy():
-    if not FLG.node:
-        return 'no node'
     if len(FLG.node) == 1:
-        breakpoint()   # FIXME BREAKPOINT
         return do(getattr(deploy_modes, FLG.deploy_mode).deploy)
-    cmds = single_node_cmds()
-    from devapp.tools import tmux
-
+    cmds = single_node_cmds(as_str=True)
     return tmux.run_cmds(cmds, attach=True)
 
 
 def run():
+    if not FLG.node:
+        return 'no node'
     prep_make_workdir_and_abspath_flags()
     if FLG.login:
         return login()

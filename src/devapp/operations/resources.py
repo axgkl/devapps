@@ -42,12 +42,18 @@ def lc_tools(*a, **kw):
     return cmd
 
 
+def slc(**kw):
+    h = os.environ.get('slc_lc_hubs')
+    return {'cmd': ':ops slc connect'}
+
+
 class rsc:
     """For services we change dir to project."""
 
-    # class lc_system:
-    #     cmd = 'ops system_lifecycle'
-    #     environ = ['lc_hubs']
+    class slc:
+        cmd = slc
+        pkg = False
+        environ = ['lc_hubs']
 
     class redis_server:
         provides = ['redis-server', 'redis-cli']
