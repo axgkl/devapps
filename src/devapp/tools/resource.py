@@ -319,7 +319,7 @@ class Run:
         cmd = cmd_pre + cmd
         # if not cmd.split(' ')[0] == orig_cmd.split(' ')[0]:
         #     app.info('completing command', given=orig_cmd, completed=cmd)
-        return cmd, spec
+        return cmd, spec or {}
 
 
 def get_instances(rsc):

@@ -1,6 +1,7 @@
 from devapp.tools import offset_port, exists, project
 import os
 from devapp.app import app
+from devapp.operations import binenv
 
 
 class tool:
@@ -82,3 +83,6 @@ class rsc:
         conda_chan = 'kalefranz'
         conda_pkg = 'httpd'
         verify_present = verify_tools
+
+
+rsc.binenv = binenv.binenv
