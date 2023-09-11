@@ -1034,6 +1034,14 @@ def get_app(c=[0]):
     c[0] = app
     return app
 
+def process_instance_nr():
+    try:
+        return int(os.environ['INSTANCE']) # often empty, then 0
+    except Exception as _:
+        return 0
+    
+def process_instance_offset(base):
+    return base + process_instance_nr()
 
 def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
     'API: Write a file. chmod e.g. 0o755 (as octal integer)'
