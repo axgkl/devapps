@@ -20,7 +20,8 @@ email='g.k@ax.lc.net'
 no_selinux=true
 aws_key="$(pass show AWS/id)"
 set +a
-
 git config user.email "$email"
 source ./make -a # giving us make docs, make tests, .. -a activates venv
 echo "sourced ./make"
+test -e bin/asdf && { . $HOME/.asdf/asdf.sh && asdf list; }
+test -e bin/binenv && { echo "$PATH" | grep -q binenv || PATH="$HOME/.binenv:$PATH"; binenv versions -f | grep -v '^#'; }

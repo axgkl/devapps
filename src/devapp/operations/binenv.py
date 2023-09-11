@@ -14,6 +14,7 @@ import platform
 from devapp.app import app, system
 from devapp.tools import download_file, write_file, abspath, read_file
 import json
+from . import tools_help
 
 
 def verify_present(path, rsc, **kw):
@@ -30,8 +31,7 @@ inst = """
 """
 
 ENVIRON_FILE = """
-echo "$PATH" | grep -q binenv || PATH="$HOME/.binenv:$PATH"
-binenv versions -f | grep -v '^#'
+test -e bin/binenv && { echo "$PATH" | grep -q binenv || PATH="$HOME/.binenv:$PATH"; binenv versions -f | grep -v '^#'; }
 """
 
 PATCHES = """
@@ -83,20 +83,13 @@ def write_patches():
         s.append('')
     s = f'{s[0].rstrip()}\n{sep}\n{PATCHES}\n{sep}\n{s[-1].rstrip()}'
     write_file(fn, s)
+    write_file(fn, s)
     if CACHEADDS:
         fn = os.environ['HOME'] + '/.cache/binenv/cache.json'
         j = json.loads(read_file(fn))
         j.update(CACHEADDS)
         app.info(f'updating {fn}', patches=CACHEADDS)
         write_file(fn, json.dumps(j))
-
-
-def write_environ():
-    fn = project.root() + '/environ'
-    s = read_file(fn, dflt='')
-    s = '\n'.join([l for l in s.splitlines() if not 'binenv' in l.lower()])
-    s += ENVIRON_FILE
-    write_file(fn, s)
 
 
 def binenv(rsc, **kw):
@@ -119,8 +112,9 @@ def binenv(rsc, **kw):
     fni = R + '/tmp/bininst'
     write_file(fni, pre + inst, chmod=0o755)
     system(fni)
-    write_environ()
+    tools_help.write_environ(ENVIRON_FILE, match='binenv')
     write_patches()
+    tools_help.write_tools_cmd()
     return {'cmd': ':' + os.environ['HOME'] + '/.binenv/binenv', 'cmd_pre': pre}
 
 

@@ -1,7 +1,7 @@
 from devapp.tools import offset_port, exists, project
 import os
 from devapp.app import app
-from devapp.operations import binenv
+from devapp.operations import binenv, asdf
 
 
 class tool:
@@ -86,3 +86,4 @@ class rsc:
 
 
 rsc.binenv = binenv.binenv
+rsc.asdf = asdf.asdf
