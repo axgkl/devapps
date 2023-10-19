@@ -1,7 +1,7 @@
 from devapp.tools import offset_port, exists, project
 import os
 from devapp.app import app
-from devapp.operations import binenv, asdf
+# from devapp.operations import binenv, asdf
 
 
 class tool:
@@ -44,7 +44,7 @@ def lc_tools(*a, **kw):
 
 
 def slc(**kw):
-    h = os.environ.get('slc_lc_hubs')
+    os.environ.get('slc_lc_hubs')
     return {'cmd': ':ops slc connect'}
 
 
@@ -85,5 +85,5 @@ class rsc:
         verify_present = verify_tools
 
 
-rsc.binenv = binenv.binenv
-rsc.asdf = asdf.asdf
+# rsc.binenv = binenv.binenv
+# rsc.asdf = asdf.asdf
