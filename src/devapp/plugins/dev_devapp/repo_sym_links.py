@@ -38,11 +38,9 @@ import os
 
 
 # Could be done far smaller.
-from datetime import datetime
 from importlib import import_module
 
-from devapp import gevent_patched, tools
-from devapp.app import FLG, app, do, run_app, system
+from devapp.app import FLG, app, do, run_app
 from devapp.tools import exists
 
 # ran these & return the output of the last one (links function):
@@ -50,7 +48,8 @@ from json import dumps, loads
 import devapp
 
 d_sitep = None
-d_backup = lambda: d_sitep + '/backup_repo_symlinks'
+def d_backup():
+    return d_sitep + '/backup_repo_symlinks'
 
 
 path = os.path
@@ -59,7 +58,8 @@ here = os.getcwd()
 
 H = os.environ['HOME']
 
-repl_home = lambda r: loads(dumps(r).replace(H, '~'))
+def repl_home(r):
+    return loads(dumps(r).replace(H, '~'))
 
 
 class Flags:
@@ -94,7 +94,7 @@ msg_deb = 'delete existing backup'
 
 
 def inspect(d_repo):
-    if not '.git' in dirs(here):
+    if '.git' not in dirs(here):
         app.die('Need to be in repo root')
     if d_repo == here:
         app.info('Ignoring our own repo', dir=d_repo)
@@ -141,11 +141,12 @@ def report(repo, c=[0]):
     msg = 'Will create the following symlinks'
     app.warn(msg)
     app.info('spec', json=todos)
-    if not 'y' in input('Confirm todos [y|Q] ').lower():
+    if 'y' not in input('Confirm todos [y|Q] ').lower():
         app.die('Unconfirmed...')
 
 
-links = lambda repo: [do(link, spec=v) for v in todos[repo]]
+def links(repo):
+    return [do(link, spec=v) for v in todos[repo]]
 
 
 def link(spec):
@@ -183,7 +184,7 @@ class ActionNS:
     def _pre():
         def p(p):
             a = os.path.abspath
-            if not '/' in p:
+            if '/' not in p:
                 return a('../' + p)
             return a(p)
 
@@ -198,7 +199,7 @@ class ActionNS:
         st = status()
         jobs = []
         if not st['repos']:
-            app.die('No repos give to link')
+            app.die('No repos given to link')
         for _, R in st['repos'].items():
             for mod in R:
                 if mod.get('link_present'):
@@ -210,7 +211,7 @@ class ActionNS:
         app.info('Confirm links', json=jobs)
 
         if not FLG.force:
-            if not 'y' in input('Confirm todos [y|Q] ').lower():
+            if 'y' not in input('Confirm todos [y|Q] ').lower():
                 app.die('Unconfirmed...')
         [link(j) for j in jobs]
         return ActionNS.list()
@@ -226,7 +227,7 @@ class ActionNS:
             app.die('Nothing to do')
         if not FLG.force:
             app.info('Confirm restore', json=jobs)
-            if not 'y' in input('Confirm todos [y|Q] ').lower():
+            if 'y' not in input('Confirm todos [y|Q] ').lower():
                 app.die('Unconfirmed...')
         for d in jobs:
             os.unlink(d_sitep + '/' + d)
@@ -234,7 +235,8 @@ class ActionNS:
         return ActionNS.list()
 
 
-main = lambda: run_app(ActionNS, flags=Flags)
+def main():
+    return run_app(ActionNS, flags=Flags)
 
 
 if __name__ == '__main__':
