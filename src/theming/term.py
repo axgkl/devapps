@@ -59,7 +59,7 @@ class Theme:
 
     # fmt:off
     I = [11, 'Important', 'Titles, H1, New contexts']
-    G = [2, 'Green', 'OK, H2, Success']
+    G = [4, 'Green', 'OK, H2, Success']
     M = [1, 'Marked UP', 'Sub Titles, H3, Important values in dicts']
     R = [124, 'Red', 'Alarm, Error, Warning, Failed']
     L = [5, 'Low Intensity', 'Debug Output, Code, Shell output']
@@ -373,7 +373,7 @@ def structlog_style(use_pygm=None):
         ss['Token.Error'] = ss['Token.Generic.Error']
         for k, v in ss.items():
             print(f'{v[0]}{k}\x1b[0m')
-        l = 'R:Generic.Error;I:Name.Class;M:Keyword.Constant;L:Name.Other;D:Text;G:Literal.String'
+        l = 'R:Generic.Error;I:Name.Class;M:Keyword.Constant;L:Name.Other;D:Comment;G:Literal.String'
         C = {}
         for _ in l.split(';'):
             k, v = _.split(':')
@@ -389,7 +389,7 @@ def structlog_style(use_pygm=None):
             timestamp   = C['D']
             logger_name = C['L']
             kv_key      = C['M']
-            kv_value    = C['I']
+            kv_value    = C['G']
             reset       = RESET
 
         return S
