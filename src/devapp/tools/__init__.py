@@ -31,7 +31,9 @@ from absl import flags
 from pycond import parse_cond
 from theming.formatting.markdown import deindent, indent  # noqa
 
-reverse_dict = lambda m: {v: k for k, v in m.items()}
+
+def reverse_dict(m):
+    return {v: k for k, v in m.items()}
 
 
 def parse_kw_str(kws, header_kws=None, try_json=True):
@@ -94,7 +96,6 @@ def flatten(d, sep='_'):
     obj = collections.OrderedDict()
 
     def recurse(t, parent_key=''):
-
         if isinstance(t, list):
             for i in range(len(t)):
                 recurse(t[i], parent_key + sep + str(i) if parent_key else str(i))
@@ -122,7 +123,9 @@ def cast(v, bools={'true': True, 'True': True, 'false': False, 'False': False}):
 
 
 # --------------------------------------------------------------------------------- tty
-have_tty = lambda: sys.stdin.isatty() and sys.stdout.isatty()
+def have_tty():
+    return sys.stdin.isatty() and sys.stdout.isatty()
+
 
 try:
     # Setting the default for the cli - flag, i.e. this rules w/o the flag:
@@ -140,7 +143,7 @@ def walk_dir(directory, crit=None):
     crit = (lambda *a: True) if crit is None else crit
     files = []
     j = os.path.join
-    for (dirpath, dirnames, filenames) in os.walk(directory):
+    for dirpath, dirnames, filenames in os.walk(directory):
         files += [j(dirpath, file) for file in filenames if crit(dirpath, file)]
     return files
 
@@ -148,7 +151,9 @@ def walk_dir(directory, crit=None):
 class Pytest:
     """Helpers specifically for pytest"""
 
-    this_test = lambda: os.environ['PYTEST_CURRENT_TEST']
+    def this_test():
+        return os.environ['PYTEST_CURRENT_TEST']
+
     cur_flags = {}
     had_flags = {}
 
@@ -176,7 +181,8 @@ class Pytest:
         m['path'] = mod.__file__
         return m
 
-    this_test_func_name = lambda: Pytest.parse_test_infos()['test']
+    def this_test_func_name():
+        return Pytest.parse_test_infos()['test']
 
     def set_sys_argv(done=[0]):
         """
@@ -424,13 +430,12 @@ def get_deep(key, data, sep='.', create=False, dflt=None):
     # key maybe already path tuple - or string with sep as seperator:
     if not key:
         return data
-    d = data
     parts = key.split(sep) if isinstance(key, str) else list(key)
     while parts:
         part = parts.pop(0)
         try:
             data = data[part]
-        except TypeError as ex:
+        except TypeError:
             # a list was in the original data:
             try:
                 data = data[int(part)]
@@ -441,7 +446,7 @@ def get_deep(key, data, sep='.', create=False, dflt=None):
                 if dflt is None:
                     raise KeyError(key)
                 return dflt
-        except KeyError as ex:
+        except KeyError:
             if not create:
                 if dflt is None:
                     raise
@@ -472,7 +477,8 @@ def in_gevent():
         return False
 
 
-has_tty = lambda: sys.stdin.isatty() and sys.stdout.isatty()
+def has_tty():
+    return sys.stdin.isatty() and sys.stdout.isatty()
 
 
 def confirm(msg, dflt='n'):
@@ -490,7 +496,10 @@ def confirm(msg, dflt='n'):
         app.die('Unconfirmed')
 
 
-now = lambda: int(time.time() * 1000)
+def now():
+    return int(time.time() * 1000)
+
+
 is_ = isinstance
 
 
@@ -498,7 +507,7 @@ def jdiff(d1, d2):
     try:
         # Got exception when we have L(list) in test_share.py
         return jsondiff(d1, d2, marshal=True)
-    except Exception as ex:
+    except Exception:
         # TODO: convert tuples recursively into strings
         try:
             d1 = json.loads(json.dumps(d1, default=str))
@@ -522,13 +531,21 @@ def dict_merge(source, destination):
     return destination
 
 
-tn = lambda: current_thread().name
-pass_ = lambda *a, **kw: None
+def tn():
+    return current_thread().name
+
+
+def pass_(*a, **kw):
+    return None
+
+
 exists = os.path.exists
 dirname = os.path.dirname
 abspath = os.path.abspath
 env = os.environ
 envget = os.environ.get
+
+
 # kw: rscs may later provide e.g. their name, allowing port offset specific for them:
 def offset_port(port, **kw):
     return int(port) + FLG.port_offset
@@ -544,17 +561,21 @@ def wait_for_port(port, host='127.0.0.1', timeout=5.0, log_err=True):
         try:
             with socket.create_connection((host, port), timeout=timeout):
                 return True
-        except OSError as ex:
+        except OSError:
             time.sleep(0.01)
             if time.perf_counter() - start_time >= timeout:
                 if not log_err:
                     return
+
+                msg = 'Timeout'
+                if isinstance(log_err, str):
+                    msg += ' - %s' % log_err
                 try:
                     from devapp.app import app
 
-                    return app.error('Timeout', host=host, port=port, timeout=timeout)
+                    return app.error(msg, host=host, port=port, timeout=timeout)
                 except Exception:
-                    print('timeout awaiting port %s' % port)
+                    print(msg + ' awaiting port %s' % port)
 
 
 def repl_dollar_var_with_env_val(s, die_on_fail=True, ask_on_fail=False, get_vals=False):
@@ -562,7 +583,7 @@ def repl_dollar_var_with_env_val(s, die_on_fail=True, ask_on_fail=False, get_val
     s = foo_$bar.or${baz}  - the first form searched until first non Letter char
     Will be replaced by value of environ for $bar and $baz
     """
-    if not '$' in s:
+    if '$' not in s:
         if not get_vals:
             return s
         return s, {}
@@ -573,25 +594,25 @@ def repl_dollar_var_with_env_val(s, die_on_fail=True, ask_on_fail=False, get_val
         s += ' '
         missing, have, Letters, nil = {}, [], string.ascii_letters + '_', '\x1b'
         parts = s.split('$')
-        n = parts[0]
+        parts[0]
         for p in parts[1:]:
             if not p:
                 raise
             if p[0] == '{':
-                if not '}' in p:
+                if '}' not in p:
                     raise
                 have.append(p.split('}', 1)[0][1:])
             else:
                 S = ''
                 for c in p:
                     S += c
-                    if not c in Letters:
+                    if c not in Letters:
                         break
                 have.append(S[:-1])
                 s = s.replace('$%s' % S, '${%s}%s' % (have[-1], c))
         for k in have:
             app = import_app()
-            if not k in env and ask_on_fail and tty:
+            if k not in env and ask_on_fail and tty:
                 app.warn('Missing value in environ', required=k, within=s)
                 v = input('Enter value for "$%s": ' % k)
             else:
@@ -605,7 +626,7 @@ def repl_dollar_var_with_env_val(s, die_on_fail=True, ask_on_fail=False, get_val
         r = go(s, ask_on_fail)
         if '$' in r:
             raise
-    except Exception as ex:
+    except Exception:
         if die_on_fail or ask_on_fail:
             app = import_app()
             app.die('Not defined in environ', var=s)
@@ -631,7 +652,7 @@ def to_url(shorthand):
     if not s.startswith('http'):
         s = 'http://' + s
     schema, rest = s.split('://', 1)
-    if not '/' in rest:
+    if '/' not in rest:
         rest = rest + '/'
     hp, path = rest.split('/', 1)
     if hp.startswith(':'):
@@ -667,10 +688,11 @@ def download_file(url, local_filename, auto_extract=True):
     """
     import requests
     from devapp.app import app
+
     local_filename = abspath(local_filename)
     d = dirname(local_filename)
     os.makedirs(d, exist_ok=True)
-    verify = os.environ.get('SSL_VERIFY', 'true').lower() != 'false' 
+    verify = os.environ.get('SSL_VERIFY', 'true').lower() != 'false'
     app.info('Downloading', url=url, to=local_filename, ssl_verify=verify)
     r = requests.get(url, stream=True, verify=verify)
     arch, fn = None, local_filename
@@ -707,13 +729,13 @@ def sp_call(*args, as_root='false', get_all=False):
     sp = subprocess
     sudo = str(as_root).lower() == 'true'
     if sudo:
-        if _is_root[0] == None:
+        if _is_root[0] is None:
             _is_root[0] = os.system('touch /etc/hosts 2>/dev/null') == 0
         if _is_root[0]:
             sudo = False
     if sudo:
         args = ('sudo', '-S') + tuple(args)
-        if _sudo_pw[0] == None:
+        if _sudo_pw[0] is None:
             _sudo_pw[0] = sudo_pw()
         pw = sp.Popen(('echo', _sudo_pw[0]), stdout=sp.PIPE)
         stdin = pw.stdout
@@ -747,9 +769,9 @@ def funcname(f):
 
 env = os.environ
 
-clean_env_key = lambda s: ''.join(
-    [c for c in s if c in string.digits + string.ascii_letters]
-)
+
+def clean_env_key(s):
+    return ''.join([c for c in s if c in string.digits + string.ascii_letters])
 
 
 def restart_unshared(name):
@@ -794,14 +816,19 @@ env, envget, exists = os.environ, os.environ.get, os.path.exists
 ctx = {}
 
 str8 = partial(str, encoding='utf-8')
-is_str = lambda s: isinstance(s, str)
+
+
+def is_str(s):
+    return isinstance(s, str)
+
 
 # not matches classes which are callable:
-is_func = lambda f: isinstance(
-    f, (types.FunctionType, types.BuiltinFunctionType, partial)
-)
+def is_func(f):
+    return isinstance(f, (types.FunctionType, types.BuiltinFunctionType, partial))
 
-json_diff = lambda old, new: json.loads(js_diff(old, new, syntax='explicit', dump=True))
+
+def json_diff(old, new):
+    return json.loads(js_diff(old, new, syntax='explicit', dump=True))
 
 
 def into(d, k, v):
@@ -840,14 +867,13 @@ def deep(m, dflt, *pth):
 
 
 def start_of(s, chars=100):
-    """ to not spam output we often do "foo {a': 'b'...."""
+    """to not spam output we often do "foo {a': 'b'...."""
     s = str8(s)
     return s[:100] + '...' if len(s) > 100 else ''
 
 
-cast_list = lambda v, sep=',': (
-    [] if v == '[]' else [s.strip() for s in v.split(sep)] if is_str(v) else v
-)
+def cast_list(v, sep=','):
+    return [] if v == '[]' else [s.strip() for s in v.split(sep)] if is_str(v) else v
 
 
 dt_precision = '%.2fs'
@@ -861,7 +887,8 @@ def dt_human(ts_start, ts_end=None):
 
 
 class AllStatic(type):
-    'turn all methods of this class into static methods'
+    "turn all methods of this class into static methods"
+
     new = None
 
     def __new__(cls, name, bases, local):
@@ -973,7 +1000,7 @@ def GR(s):
 
 
 def check_start_env(req_env):
-    """ can we run ? """
+    """can we run ?"""
 
     def die(msg):
         print(msg)
@@ -1034,17 +1061,20 @@ def get_app(c=[0]):
     c[0] = app
     return app
 
+
 def process_instance_nr():
     try:
-        return int(os.environ['INSTANCE']) # often empty, then 0
+        return int(os.environ['INSTANCE'])  # often empty, then 0
     except Exception as _:
         return 0
-    
+
+
 def process_instance_offset(base):
     return base + process_instance_nr()
 
+
 def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
-    'API: Write a file. chmod e.g. 0o755 (as octal integer)'
+    "API: Write a file. chmod e.g. 0o755 (as octal integer)"
 
     fn = os.path.abspath(fn)
 
@@ -1061,7 +1091,7 @@ def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
         sep = '\n----------------------\n'
         ps = (
             s
-            if not 'key' in fn and not 'assw' in fn and not 'ecret' in fn
+            if 'key' not in fn and 'assw' not in fn and 'ecret' not in fn
             else '<hidden>'
         )
         app.debug('Content', content=sep + ps + sep[:-1])
@@ -1135,7 +1165,7 @@ def set_flag_vals_from_env():
     # hmm. pytest -> nrtesting -> run_app in greenlet. How to pass flags, e.g. to drawflow
     ef = FLG.environ_flags
     if not ef:
-        if envget( 'environ_flags', '').lower() in {'true', '1'}:
+        if envget('environ_flags', '').lower() in {'true', '1'}:
             ef = True
     for f in dir(FLG):
         if ef:
@@ -1153,7 +1183,7 @@ def shorten(key, prefix, maxlen, all_shorts=None, take=1):
     take, sold = 1, None
     for i in range(10):
         s = autoshort(key, prefix, maxlen + i, take)
-        if not s in all_shorts:
+        if s not in all_shorts:
             return s
     if s == sold:
         raise Exception('Unresolvable collision in autoshort names: %s' % key)
@@ -1162,7 +1192,7 @@ def shorten(key, prefix, maxlen, all_shorts=None, take=1):
 def autoshort(key, prefix, maxlen, take=1):
     ml = maxlen - len(prefix)
     parts = key.split('_')
-    if prefix and not any([c for c in prefix if not c in parts[0]]):
+    if prefix and not any([c for c in prefix if c not in parts[0]]):
         parts.pop(0)
     r = prefix + ''.join([parts.pop(0)[0:take].lower() for i in range(ml) if parts])
     return r[:maxlen]
@@ -1250,12 +1280,13 @@ def make_flag(c, module, autoshort, default, sub=False, **kw):
     else:
         try:
             define_flag(key, d, txt, **mkw)
-        except Exception as ex:
+        except Exception:
             print('conflicting:', c, module, kw)
             raise
 
 
-human = lambda key: ' '.join([k.capitalize() for k in key.split(' ')])
+def human(key):
+    return ' '.join([k.capitalize() for k in key.split(' ')])
 
 
 # this allows a module to "steal" the flags class of another module. e.g. lc client:
@@ -1274,7 +1305,9 @@ def have_subs(c):
 
 def rm_absl_flags():
     FLG.remove_flag_values(
-        ['v',]
+        [
+            'v',
+        ]
     )
 
 
@@ -1306,7 +1339,7 @@ def define_flags(Class, sub=False, parent_autoshort=False):
         if not isinstance(c, type):
             continue
         if sub == 'Actions':
-            setattr(c, 'd', False if not g(c, 'd', None) == True else True)
+            setattr(c, 'd', False if g(c, 'd', None) is not True else True)
             action_flags[k] = {
                 'flg_cls': c,
                 'class': Class,
@@ -1366,7 +1399,7 @@ class project:
 
     config, dir_home, fn_cfg = {}, None, None
 
-    def root(no_fail=False)->str:
+    def root(no_fail=False) -> str:
         # r = FLG.project_directory or os.environ.get('project_directory')
         # if r:
         #     if not exists(r):
@@ -1381,7 +1414,7 @@ class project:
             p = project.set_project_dir(no_fail=no_fail)
             if p:
                 b = p + '/bin:'
-                if not b in envget('PATH', ''):
+                if b not in envget('PATH', ''):
                     env['PATH'] = b + envget('PATH', '')
             project.dir_home = p
         return project.dir_home
@@ -1409,9 +1442,11 @@ class project:
 
         app.die('could not determine project root dir')
 
-    fn_resources = lambda: project.root() + '/.resources.json'
+    def fn_resources():
+        return project.root() + '/.resources.json'
 
-    fn_config = lambda: project.root() + '/pyproject.toml'
+    def fn_config():
+        return project.root() + '/pyproject.toml'
 
     def read_resources(filename=None):
         from devapp.app import app
@@ -1463,14 +1498,14 @@ class project:
         app.info('loaded config', filename=fn)
         c = project.config
         c.update(cfg)
-        if not 'project' in c:
+        if 'project' not in c:
             c['project'] = {'urls': {}}
         if 'tool' in c and 'poetry' in c['tool']:
             c['project'].update(c['tool']['poetry'])
             c['project']['urls']['homepage'] = c['project']['homepage']
             c['project']['urls']['repository'] = c['project']['repository']
 
-        t = cfg['tool']
+        cfg['tool']
         project.fn_cfg = fn
         # app.die('Did not find a pyproject.toml file with badges declared')
         return project.config
@@ -1555,13 +1590,18 @@ def parse_deps(deplist, seps='~<>!= '):
     return m
 
 
-is_sensitive = lambda key: re.match(FLG.sensitive_data_identifiers, key, re.IGNORECASE)
-filter_passwords = lambda dct: {k: v for k, v in dct.items() if not is_sensitive(k)}
+def is_sensitive(key):
+    return re.match(FLG.sensitive_data_identifiers, key, re.IGNORECASE)
+
+
+def filter_passwords(dct):
+    return {k: v for k, v in dct.items() if not is_sensitive(k)}
 
 
 # --------------------------------------------------------------------- Not importable
 def unavail(missing, req=None, warn=True):
     """We don't need everything always"""
+
     # TODO:Add a few pip install options
     def f(*a, _miss=missing, _req=req, _warn=warn, **kw):
         print('Function from package "%s" not available in your installation!' % _miss)
@@ -1576,7 +1616,7 @@ def unavail(missing, req=None, warn=True):
 
 try:
     from jsondiff import diff as jsondiff
-except Exception as ex:
+except Exception:
     jsondiff = unavail('jsondiff', req='pip install jsondiff', warn=False)
 
 
@@ -1588,12 +1628,12 @@ except Exception as ex:
 
 try:
     from decorator import decorate, decorator
-except ImportError as ex:
+except ImportError:
     decorate = decorator = unavail('decorator', req='pip install decorator', warn=False)
 
 try:
     from tabulate import tabulate
-except ImportError as ex:
+except ImportError:
     tabulate = unavail('tabulate', req='pip install tabulate', warn=False)
 
 
@@ -1663,7 +1703,7 @@ class appflags:
     ]
 
     class dirwatch:
-        '''Spawning helper process, sending reload, monitoring changes in given directory.
+        """Spawning helper process, sending reload, monitoring changes in given directory.
         The app itself keeps full access at stdin, out, err, unlike using tools e.g. `entr`.
 
         You may deliver a match spec, colon seperated.
@@ -1677,7 +1717,8 @@ class appflags:
         Examples:
         myapp -dw .:.py # reloads app on every python file change
         while true; do myapp -dw .:.py:1:15:2; done # kills app every 2 secs, scans recursively
-        '''
+        """
+
         n = 'Restart or reload application on file changes'
         d = ''
         s = 'dw'
