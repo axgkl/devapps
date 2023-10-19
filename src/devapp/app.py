@@ -46,7 +46,7 @@ def notify(app, msg, **kw):
         return
     try:
         subprocess.Popen([notifier[0], msg, '\n' + kvmsg(kw)])
-    except:
+    except Exception:
         pass
 
 

@@ -67,7 +67,7 @@ def get_meta(s):
         else:
             m = yaml.safe_load(l[1])
         return sep, m, l[2]
-    except:
+    except Exception:
         return None, None, None
 
 

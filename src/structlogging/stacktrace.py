@@ -125,7 +125,7 @@ def rich_stack(colors):
         Traceback = rt.Traceback
 
         from rich.console import Console
-    except:
+    except Exception:
         return lambda exc: str(exc)
 
     class StackFilter(Exception):

@@ -468,7 +468,7 @@ def get_cols():
         return int(
             (env('term_width') or os.popen('tput cols 2>/dev/null').read().strip() or 80)
         )
-    except:
+    except Exception:
         return 80
 
 

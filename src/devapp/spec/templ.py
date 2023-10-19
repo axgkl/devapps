@@ -51,7 +51,7 @@ class SmartAdapt:
         for part in parts:
             try:
                 m = m[part]
-            except:
+            except Exception:
                 raise Exception(self.name, 'part not present', part, 'in', ko)
         # check env, alternatively:
         v = m.get(k, r['env'].get(ko, dflt))

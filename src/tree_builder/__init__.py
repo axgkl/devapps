@@ -39,7 +39,7 @@ def sys_path_insert(fn):
 
 try:
     is_str = lambda s, t=str: isinstance(s, t)
-except:
+except Exception:
     is_str = lambda s: isinstance(s, (str, bytes))  # v3
 
 
@@ -52,7 +52,7 @@ try:
             return dict_to_txt(self)
 
 
-except:
+except Exception:
     import json
 
     ODict = OrderedDict
@@ -269,7 +269,7 @@ def cast_str(v):
     for t in float, int:
         try:
             return t(v)
-        except:
+        except Exception:
             pass
     if v.lower() == 'true':
         return True
@@ -327,7 +327,7 @@ class TypeMetaClass(ItemGetterMetaType):
     def __new__(cls, name, bases, attrs):
         try:
             attrs = dict(attrs)  # 0
-        except:
+        except Exception:
             pass
         attrs['name'] = name
         if not bases:
@@ -462,7 +462,7 @@ def descr(c):
 def has_typ(c):
     try:
         return hasattr(c, 'type')
-    except:
+    except Exception:
         pass
 
 

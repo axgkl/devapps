@@ -192,7 +192,7 @@ class Theme:
             cf = FLG.log_fmt
             if cf in {'2', 2, 'plain'}:
                 cls.force_colors = True
-        except:
+        except Exception:
             pass
 
         def col_def(k, v, dt='Unnamed %s Color', tt='<Untagged>'):
@@ -338,7 +338,7 @@ class Cell:
         """
         try:
             symb = char(_chars[nr % _lchars])
-        except:
+        except Exception:
             symb, nr = nr, hash(nr)
         return Cell.colorize(symb, nr)
 

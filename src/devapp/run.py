@@ -192,7 +192,7 @@ def psutil_str_to_dict(v):
         kvs = s.split('(', 1)[1][:-1].split(', ')
         kvs = [kv.split('=', 1) for kv in kvs]
         return dict([(k, auto_type(v)) for k, v in kvs])
-    except:
+    except Exception:
         return {}
 
 
@@ -894,7 +894,7 @@ def auto_type(v):
     for typ in int, float:
         try:
             return typ(v)
-        except:
+        except Exception:
             pass
     if not v:
         return ''

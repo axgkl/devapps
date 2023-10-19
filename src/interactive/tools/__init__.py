@@ -95,7 +95,7 @@ def colyhighlight(s, style='colorful'):
     if not isinstance(s, str):
         try:
             s = safe_dump(s, allow_unicode=True)
-        except:
+        except Exception:
             s = dump(s, default_flow_style=False, allow_unicode=True)
     highlight(s, ysl, ytermf, io)
     res = io.getvalue()
@@ -210,7 +210,7 @@ def require_pip(package):
     try:
         p = importlib.import_module(package)
         return p
-    except:
+    except Exception:
         cmd = f'pip install {package}'
         print(f'\x1b[32mInstalling required package: {package}\x1b[0m')
         if not input(f'{cmd}\nProceed [y/N]? ').lower() == 'y':

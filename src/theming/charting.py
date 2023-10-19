@@ -163,7 +163,7 @@ def bar_chart(
                 for vt in v.values():
                     try:
                         val_list.append(vt[v_index])
-                    except:
+                    except Exception:
                         raise ValueError(
                             'value count is not matching for row %s \
                                     of series %s, index is %s'

@@ -12,7 +12,7 @@ try:
     pass
 
     have_gevent = True
-except:
+except Exception:
     have_gevent = False
 
 

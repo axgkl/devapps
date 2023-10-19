@@ -21,7 +21,7 @@ def positional_args_into_msg(logger, level, ev_dict):
                 pa = pa[0]
             ev_dict['event'] = ev % pa
             del ev_dict['positional_args']
-        except:
+        except Exception:
             pass
     return ev_dict
 
@@ -93,7 +93,7 @@ def add_thread_name(L, l, ev_dict):
     t = current_thread()
     try:
         tn = int(t.getName().rsplit('-', 1)[1])
-    except:
+    except Exception:
         if t.getName() == 'MainThread':
             tn = 0
         else:

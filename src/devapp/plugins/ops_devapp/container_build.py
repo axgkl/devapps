@@ -212,7 +212,7 @@ def read(fn):
         s = fd.read()
         try:
             return json.loads(s)
-        except:
+        except Exception:
             return s
 
 

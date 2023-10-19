@@ -257,7 +257,7 @@ def censor_passwords(_, __, ev, _censored=censored):
 
 try:
     import gevent
-except:
+except Exception:
     gevent = None
 
 
@@ -306,7 +306,7 @@ def log_dropper(*a):
 def to_str(obj):
     try:
         return obj.decode('utf-8')
-    except:
+    except Exception:
         return str(obj)
 
 
@@ -315,7 +315,7 @@ def safe_dumps(obj, to_str=to_str, default=None):
         # fails when objects are in, e.g. connection sockets:
         # can dump tuple keys
         return ujson.dumps(obj, ensure_ascii=False, reject_bytes=False)
-    except:
+    except Exception:
         try:
             return json.dumps(obj, default=default)
         except Exception as ex:
@@ -346,7 +346,7 @@ def setup_logging(
     """
     # try:
     #     log_fmt = FLG.log_fmt
-    # except:
+    # except Exception:
     #     breakpoint()  # FIXME BREAKPOINT
     #     FLG = F
 

@@ -125,12 +125,12 @@ def fmt_ips(key, d, into):
     r = into
     try:
         r['ip_priv'] = d['private_net'][0]['ip']
-    except:
+    except Exception:
         pass
     for k, t in (['ip', 'public_net'],):
         try:
             r[k] = d[t]['ipv4']['ip']
-        except:
+        except Exception:
             pass
 
 
@@ -194,7 +194,7 @@ class HProv(Provider):
     def rm_junk(api_response):
         try:
             [i['datacenter'].pop('server_types') for i in api_response]
-        except:
+        except Exception:
             pass
 
     class droplet:

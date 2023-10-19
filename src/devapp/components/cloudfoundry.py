@@ -26,7 +26,7 @@ def get_endpoint(example='//api.aida.appcloud.my_company.com'):
         try:
             if requests.get(url).status_code in (200, 404):
                 return 'write'
-        except:
+        except Exception:
             print('Not reachable')
             return
 
@@ -41,7 +41,7 @@ def cfg(c=[], all=None):
     """
     try:
         return c[0][FLG.endpoint_name]
-    except:
+    except Exception:
         pass
     c.append(ConfigParser())
     fn = fn_cfg()

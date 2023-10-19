@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
     try:
         testString = open(sys.argv[1]).read()
-    except:
+    except Exception:
         print('filename as first argument needed')
         sys.exit(0)
     s = Ansi2HtmlWriter()

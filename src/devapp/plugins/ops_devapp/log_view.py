@@ -44,7 +44,7 @@ def colorize(s, rend, p=PrintLogger(file=sys.stdout), levels=levels):
         if levels[l] < app.log_level:
             return
         sys.stdout.write(rend(p, s['level'], s) + '\n')
-    except:
+    except Exception:
         print(s, file=sys.stderr)
 
 

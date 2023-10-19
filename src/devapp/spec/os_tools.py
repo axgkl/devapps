@@ -14,7 +14,7 @@ try:
     from devapp.app import app
 
     app.die
-except:
+except Exception:
     app = None
 
 env = os.environ

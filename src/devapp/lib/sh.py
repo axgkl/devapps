@@ -309,7 +309,7 @@ def encode_to_py3bytes_or_py2str(s):
         # but attempt to fall back to something
         try:
             s = s.encode(DEFAULT_ENCODING)
-        except:
+        except Exception:
             s = s.encode(fallback_encoding, 'replace')
     return s
 
@@ -1999,7 +1999,7 @@ class OProc(object):
             # if your parent process experiences an exit code 255, it is most
             # likely that an exception occurred between the fork of the child
             # and the exec.  this should be reported.
-            except:
+            except Exception:
                 # some helpful debugging
                 try:
                     tb = traceback.format_exc().encode('utf8', 'ignore')
@@ -2776,7 +2776,7 @@ class StreamWriter(object):
                 # EOF time
                 try:
                     char = termios.tcgetattr(self.stream)[6][termios.VEOF]
-                except:
+                except Exception:
                     char = chr(4).encode()
 
                 # normally, one EOF should be enough to signal to an program
@@ -3379,7 +3379,7 @@ def run_repl(env):  # pragma: no cover
             exec(compile(line, '<dummy>', 'single'), env, env)
         except SystemExit:
             break
-        except:
+        except Exception:
             print(traceback.format_exc())
 
     # cleans up our last line

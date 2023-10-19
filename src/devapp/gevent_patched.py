@@ -8,7 +8,7 @@ try:
 
     if not os.environ.get('gevent_no_patch'):
         monkey.patch_all()
-except:
+except Exception:
     # no gevent. That's ok for many apps.
     pass
 fn_backd = lambda: os.environ['var_dir'] + '/proc_enter.sock'

@@ -44,7 +44,7 @@ def colyhighlight(s):
     if not isinstance(s, str):
         try:
             s = safe_dump(s, allow_unicode=True)
-        except:
+        except Exception:
             s = dump(s, default_flow_style=False, allow_unicode=True)
     highlight(s, ysl, ytermf, io)
     res = io.getvalue()

@@ -126,7 +126,7 @@ class wait:
                 ips = ds[0]['ip']
                 assert ips
                 return ips.split(',', 1)[0]
-            except:
+            except Exception:
                 pass
 
         return wait.for_(f'droplet {name} ip', waiter, tmout=300, dt=4)
@@ -236,7 +236,7 @@ class fmt:
                             },
                         ]
                     return [col, {'justify': 'right'}]
-                except:
+                except Exception:
                     pass
             if col == 'name':
                 return [col, {'style': 'green'}]

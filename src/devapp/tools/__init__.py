@@ -41,7 +41,7 @@ def parse_kw_str(kws, header_kws=None, try_json=True):
         if kws and kws[0] in ('{', '['):
             try:
                 return json.loads(kws)
-            except:
+            except Exception:
                 pass
     if ', ' in kws:
         raise Exception('No comma allowed')
@@ -114,10 +114,10 @@ def cast(v, bools={'true': True, 'True': True, 'false': False, 'False': False}):
         return json.loads(v)
     try:
         return int(v)
-    except:
+    except Exception:
         try:
             return float(v)
-        except:
+        except Exception:
             return bools.get(v, v)
 
 
@@ -127,12 +127,12 @@ have_tty = lambda: sys.stdin.isatty() and sys.stdout.isatty()
 try:
     # Setting the default for the cli - flag, i.e. this rules w/o the flag:
     term_fixed_width_env = int(os.environ.get('term_width'))
-except:
+except Exception:
     term_fixed_width_env = 0
 try:
     # Setting the default for the cli - flag, i.e. this rules w/o the flag:
     term_fixed_height_env = int(os.environ.get('term_height'))
-except:
+except Exception:
     term_fixed_height_env = 0
 
 
@@ -242,7 +242,7 @@ def terminal_size():
                 fcntl.ioctl(fd, termios.TIOCGWINSZ, struct.pack('HHHH', 0, 0, 0, 0)),
             )
             return (w or 80), h  # go really sure its no 0
-        except:
+        except Exception:
             pass
     return 80, 25
 
@@ -254,7 +254,7 @@ def termwidth():
 def termsize():
     try:
         w, h = FLG.term_fixed_width, FLG.term_fixed_height
-    except:
+    except Exception:
         # not yet parsed?
         w, h = 0, 0
     if w and h:
@@ -434,7 +434,7 @@ def get_deep(key, data, sep='.', create=False, dflt=None):
             # a list was in the original data:
             try:
                 data = data[int(part)]
-            except:
+            except Exception:
                 # this happens when we are already at a value, like an int
                 # client wants to go deeper, not possible, but we can't delete the int
                 # -> leave the client to decide:
@@ -468,7 +468,7 @@ def in_gevent():
         import gevent
 
         return gevent.sleep == time.sleep
-    except:
+    except Exception:
         return False
 
 
@@ -553,7 +553,7 @@ def wait_for_port(port, host='127.0.0.1', timeout=5.0, log_err=True):
                     from devapp.app import app
 
                     return app.error('Timeout', host=host, port=port, timeout=timeout)
-                except:
+                except Exception:
                     print('timeout awaiting port %s' % port)
 
 
@@ -1199,7 +1199,7 @@ def build_pycond_flag_expr(val, key, done):
         done[0] = 1
         setattr(FLG, key, [c, val])
         return True
-    except:
+    except Exception:
         return False
 
 

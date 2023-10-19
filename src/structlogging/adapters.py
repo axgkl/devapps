@@ -42,7 +42,7 @@ def absl_run(mod_name, main, write_pid=True):
     def do_write_pid():
         try:
             fn = FLAGS.pidfile
-        except:
+        except Exception:
             # only when he gave the flag
             return
         os.makedirs(os.path.dirname(fn), exist_ok=True)

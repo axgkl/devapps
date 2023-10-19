@@ -29,7 +29,7 @@ have_tty = lambda: sys.stdin.isatty() and sys.stdout.isatty()
 try:
     # Setting the default for the cli - flag, i.e. this rules w/o the flag:
     term_fixed_width_env = int(os.environ.get('term_width'))
-except:
+except Exception:
     term_fixed_width_env = 0
 
 
@@ -170,7 +170,7 @@ def termwidth(c=[-1, 0]):
             if not i:
                 raise Exception('x')
             return i
-        except:
+        except Exception:
             return 80
 
     c[0], c[1] = _tw(), now()
@@ -349,7 +349,7 @@ def get_deep(key, data, sep='.', create=False, dflt=None):
             # a list was in the original data:
             try:
                 data = data[int(part)]
-            except:
+            except Exception:
                 # this happens when we are already at a value, like an int
                 # client wants to go deeper, not possible, but we can't delete the int
                 # -> leave the client to decide:
@@ -383,7 +383,7 @@ def in_gevent():
         import gevent
 
         return gevent.sleep == time.sleep
-    except:
+    except Exception:
         return False
 
 

@@ -15,7 +15,7 @@ from io import StringIO
 #         Terminal256Formatter,
 #         TerminalFormatter,
 #     )
-# except:
+# except Exception:
 #     from pygments.formatters.terminal import TerminalFormatter
 #
 #     Terminal256Formatter = TerminalFormatter
@@ -90,7 +90,7 @@ def coljhighlight(
                 from devapp.app import FLG
 
                 style = FLG.log_dev_coljson_style
-            except:
+            except Exception:
                 # use the 16 base colors and leave to the terminal palette how to render:
                 style = 'dark'
             Style['style'] = style
@@ -126,7 +126,7 @@ def colyhighlight(s, style='colorful'):
     if not isinstance(s, str):
         try:
             s = y.safe_dump(s, allow_unicode=True)
-        except:
+        except Exception:
             s = y.dump(s, default_flow_style=False, allow_unicode=True)
     highlight(s, ysl, ytermf, io)
     res = io.getvalue()

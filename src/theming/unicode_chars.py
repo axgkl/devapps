@@ -85,7 +85,7 @@ def split_off_incompl(chunk, pre=None):
     def is_compl(b):
         try:
             return b.decode('utf-8')
-        except:
+        except Exception:
             return False
 
     if pre is not None:

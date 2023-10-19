@@ -657,7 +657,7 @@ class Install:
                 os.chdir(here)
                 environ['PATH'] = pth
 
-            # Usually pf installs - except:
+            # Usually pf installs - except Exception:
             # special case for tools, it has not a single cmd but a list of provides.
             # no cmd -> not yet install_conda_env was run. we do it now via this conventin:
             if res == 'install_conda_env':

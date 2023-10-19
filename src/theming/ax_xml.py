@@ -104,7 +104,7 @@ def pretty_print(xmlstr, style_overlay={}):
 
     try:
         el = minidom.parseString(xmlstr)
-    except:
+    except Exception:
         # we should return sth - so...make it xml(text):
         xmlstr = str(xmlstr)
         if not col:
@@ -171,7 +171,7 @@ def col_format(s, el, mode='tag', style={}):
         res = check_special_clients(s, el, mode, style)
         if res:
             return res
-    except:
+    except Exception:
         pass
 
     if format == 'html':

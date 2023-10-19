@@ -56,7 +56,7 @@ def start_dir_watch(dir_pid_match_rec):
             out(WD + f'Matching event: {event.event_type}  path : {event.src_path} {_}')
             try:
                 os.kill(int(pid), sig)
-            except:
+            except Exception:
                 pass
             if sig != signal_handled:
                 out(WD + 'Exitting watchdog')

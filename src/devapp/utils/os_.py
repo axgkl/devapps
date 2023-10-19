@@ -60,7 +60,7 @@ def do_logo():
         lg = f.read() + '\n'
     try:
         cols = term_width()
-    except:
+    except Exception:
         print('welcome to axc2')
         return
     if not cols:

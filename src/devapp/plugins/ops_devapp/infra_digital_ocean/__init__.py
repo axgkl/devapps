@@ -113,7 +113,7 @@ def fmt_ips(_, d, into):
     for k, t in ['ip', 'public'], ['ip_priv', 'private']:
         try:
             into[k] = [i['ip_address'] for i in d['networks']['v4'] if i['type'] == t][0]
-        except:
+        except Exception:
             pass
 
 
@@ -172,7 +172,7 @@ class DProv(Provider):
     def rm_junk(api_response):
         try:
             [i['region'].pop('sizes') for i in api_response]
-        except:
+        except Exception:
             pass
 
     class droplet:

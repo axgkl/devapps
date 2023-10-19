@@ -10,7 +10,7 @@ from .common import proc_modules, selected_by_name_processors
 try:
     from ax.utils.dynamic_objects import make_staticmethods
     from ax.utils.dynamic_objects import get_mod
-except:
+except Exception:
     get_mod = None
     make_staticmethods = None
 

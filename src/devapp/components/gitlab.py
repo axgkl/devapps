@@ -27,7 +27,7 @@ def cfg(c=[], all=None):
     """
     try:
         return c[0][FLG.endpoint_name]
-    except:
+    except Exception:
         pass
     c.append(ConfigParser())
     fn = fn_cfg()
@@ -59,7 +59,7 @@ def req(meth, pth, **kw):
     if res.status_code < 300:
         try:
             return json.loads(res.text)
-        except:
+        except Exception:
             return {'status': res.status_code, 'response': res.text}
     app.die('Error', status_code=res.status_code)
 

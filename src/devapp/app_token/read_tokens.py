@@ -35,7 +35,7 @@ def read_token(realm, raw_token=None, get_app=None, secret=None, unauth=None):
             token = jwt.decode(raw_token, secret, algorithms=['HS256'])
             realms = token['realms']
             # token = {'token': t}
-        except:
+        except Exception:
             unauth('Require valid %s' % FLAGS.token_name)
 
     realms = token['realms']

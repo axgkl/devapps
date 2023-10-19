@@ -2,7 +2,7 @@ try:
     pass
 
     have_colorama = True
-except:
+except Exception:
     have_colorama = False
 import sys
 

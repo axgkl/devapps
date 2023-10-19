@@ -31,7 +31,7 @@ from collections import OrderedDict
 
 try:
     is_str = lambda s, t=basestring: isinstance(s, t)
-except:
+except Exception:
     is_str = lambda s: isinstance(s, (str, bytes)) # v3
 
 
@@ -42,7 +42,7 @@ try:
     class ODict(OrderedDict):
         def __repr__(self):
             return dict_to_txt(self)
-except:
+except Exception:
     ODict = OrderedDict
     dict_to_txt = lambda a: json.dumps(a, indent=2, default=str)
 
@@ -158,7 +158,7 @@ def check_allow_add(cls, sub):
 def cast_str(v):
     for t in float, int:
         try: return t(v)
-        except: pass
+        except Exception: pass
     if v.lower() == 'true':
         return True
     if v.lower() == 'false':
@@ -208,7 +208,7 @@ class TypeMetaClass(ItemGetterMetaType):
     def __new__(cls, name, bases, attrs):
         try:
             attrs = dict(attrs) # 0
-        except:
+        except Exception:
             pass
         attrs['name'] = name
         if not bases:
@@ -325,7 +325,7 @@ def descr(c):
 def has_typ(c):
     try:
         return hasattr(c, 'type')
-    except:
+    except Exception:
         pass
 
 

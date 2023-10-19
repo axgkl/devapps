@@ -113,7 +113,7 @@ def inspect(d_repo):
                 mods.append(D)
             else:
                 mods.insert(0, D)
-        except:
+        except Exception:
             app.warning('Ignoring (not importable)', dir=k, within=d_repo)
     for mod in mods:
         f = getattr(mod['mod'], '__file__', None)

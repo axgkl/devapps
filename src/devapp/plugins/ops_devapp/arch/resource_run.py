@@ -83,7 +83,7 @@ def check_running():
 def alive(p):
     try:
         return not os.kill(p['pid'], 0)
-    except:
+    except Exception:
         return False
 
 
