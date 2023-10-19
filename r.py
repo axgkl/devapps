@@ -1,6 +1,9 @@
-i = 'asdfa'
-from rich import print
-from rich.panel import Panel
+from devapp.app import app, run_app
 
-p1 = Panel('Hello, [red]World!', title='Welcome', subtitle='Thank you')
-print(Panel(p1 + p1, title='Welcome', subtitle='Thank you'))
+
+def main():
+    app.info('adsfasfa', bar=23, foo='adsfasfas', payload={'fooJ': 'asdf', 'i': 23})
+
+
+if __name__ == '__main__':
+    run_app(main)

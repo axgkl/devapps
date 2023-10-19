@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "devapps"
-version = "2023.09.11"
+version = "2023.10.20"
 description = "Apps - End to End."
 authors = ["Gunther Klessinger <g_kle_ss_ing_er@gmx.de>"]
 license = "BSD"
@@ -14,12 +14,12 @@ homepage = "https://axgkl.github.io/devapps"
 keywords = []
 
 packages = [
-    { include = "ax",            from = "src" },
-    { include = "devapp",        from = "src" },
-    { include = "mdvl",          from = "src" },
-    { include = "structlogging", from = "src" },
-    { include = "theming",       from = "src" },
-    { include = "tree_builder",  from = "src" } 
+  { include = "ax", from = "src" },
+  { include = "devapp", from = "src" },
+  { include = "mdvl", from = "src" },
+  { include = "structlogging", from = "src" },
+  { include = "theming", from = "src" },
+  { include = "tree_builder", from = "src" },
 ]
 
 
@@ -31,6 +31,25 @@ discusshome = "https://join.skype.com/"
 # thats where my dev version for dt is - should not interfere w/o that:
 extraPaths = ["../docutools/src", "./src/devapp/plugins/"]
 reportSelfClsParameterName = false
+
+[tool.ruff]
+line-length = 90
+extend-select = ["Q"]
+select = ["E", "F", "B"] # Enable flake8-bugbear (`B`) rules.
+ignore = ["E501"]        # Never enforce `E501` (line length violations).
+unfixable = ["B"]        # Avoid trying to fix flake8-bugbear (`B`) violations.
+# [per-file-ignores] # Ignore `E402` (import violations) in all `__init__.py` files, and in `path/to/file.py`.
+# "__init__.py" = ["E402"]
+# "path/to/file.py" = ["E402"]
+
+[tool.ruff.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "single"
+
+[tool.ruff.format]
+# Prefer single quotes over double quotes
+quote-style = "single"
+
 
 [tool.poetry.dependencies]
 # gevent after monkeypatch and structlog clash with 3.6:
@@ -58,15 +77,15 @@ python = "^3.7"
 # pycond = "^2*"
 # PyYAML = "^5.3.1"
 
-toml       = "*"
+toml = "*"
 #python    = "*"
-absl-py    = "*"
-jsondiff   = "*"
-rich       = "*"
-structlog  = "*"
+absl-py = "*"
+jsondiff = "*"
+rich = "*"
+structlog = "*"
 inflection = "*"
-requests   = "*"
-pycond     = "*"
+requests = "*"
+pycond = "*"
 
 
 [tool.poetry.dev-dependencies]
@@ -113,10 +132,6 @@ fui = "interactive.cli:main"
 line-length = 90
 exclude = "tests/fixtures"
 
-[tool.ruff]
-#cache-dir = "/tmp/ruff1"
-line-length = 90
-ignore-init-module-imports = true
 
 [tool.isort]
 line_length = 90
@@ -135,52 +150,53 @@ show_source = false
 exclude = ["tests/fixtures"]
 # create baseline first for legacy code:https://wemake-python-stylegui.de/en/latest/pages/usage/integrations/flakehell.html
 
+
 [tool.flakehell.plugins]
 "*" = [
-    "+*",
-    "-RST*",  # we write docstrings in markdown, not rst
-    "-A001",  # redundant with W0622 (builtin override), which is more precise about line number
-    "-D105",  # missing docstring in magic method
-    "-D212",  # multi-line docstring summary should start at the first line
-    "-E203",  # whitespace before ‘:’ (incompatible with Black)
-    "-F821",  # redundant with E0602 (undefined variable)
-    "-Q000",  # black already deals with quoting
-    "-S101",  # use of assert
-    "-W503",  # line break before binary operator (incompatible with Black)
-    "-C0103", # two-lowercase-letters variable DO conform to snake_case naming style
-    "-C0116",  # redunant with D102 (missing docstring)
-    "-C0301",  # line too long
-    "-R0902",  # too many instance attributes
-    "-R0903",  # too few public methods
-    "-R0904",  # too many public methods
-    "-R0912",  # too many branches
-    "-R0913",  # too many methods
-    "-R0914",  # too many local variables
-    "-R0915",  # too many statements
-    "-W0212",  # redundant with WPS437 (access to protected attribute)
-    "-W0611",  # redundant with F401 (unused import)
-    "-W1203",  # lazy formatting for logging calls
-    "-WPS305",  # f-strings
-    "-WPS110",  # common variable names (too annoying)
-    "-WPS125",  # redundant with W0622 (builtin override), which is more precise about line number
-    "-WPS201",  # too many imports
-    "-WPS202",  # too many module members
-    "-WPS210",  # too many local variables
-    "-WPS211",  # too many arguments
-    "-WPS213",  # too many expressions
-    "-WPS214",  # too many methods
-    "-WPS220",  # too deep nesting
-    "-WPS223",  # too many elif branches
-    "-WPS226",  # string over-use: can't disable it per file?
-    "-WPS230",  # too many public instance attributes
-    "-WPS306",  # too cumbersome, asks to write class A(object)
-    "-WPS317",  # multi-line paramaters (incompatible with Black)
-    "-WPS322",  # multi-line strings (incompatible with attributes docstrings)
-    "-WPS326",  # implicit string concatenation
-    "-WPS336",  # explicit string concatenation
-    "-WPS402",  # nosa overuse
-    "-WPS412",  # __init__ modules with logic
-    "-WPS428",  # statement with no effect (not compatible with attribute docstrings)
-    "-WPS433",  # redundant with C0415 (not top-level import)
-    "-WPS529",  # implicit dict.get usage (generally false-positive)
+  "+*",
+  "-RST*",   # we write docstrings in markdown, not rst
+  "-A001",   # redundant with W0622 (builtin override), which is more precise about line number
+  "-D105",   # missing docstring in magic method
+  "-D212",   # multi-line docstring summary should start at the first line
+  "-E203",   # whitespace before ‘:’ (incompatible with Black)
+  "-F821",   # redundant with E0602 (undefined variable)
+  "-Q000",   # black already deals with quoting
+  "-S101",   # use of assert
+  "-W503",   # line break before binary operator (incompatible with Black)
+  "-C0103",  # two-lowercase-letters variable DO conform to snake_case naming style
+  "-C0116",  # redunant with D102 (missing docstring)
+  "-C0301",  # line too long
+  "-R0902",  # too many instance attributes
+  "-R0903",  # too few public methods
+  "-R0904",  # too many public methods
+  "-R0912",  # too many branches
+  "-R0913",  # too many methods
+  "-R0914",  # too many local variables
+  "-R0915",  # too many statements
+  "-W0212",  # redundant with WPS437 (access to protected attribute)
+  "-W0611",  # redundant with F401 (unused import)
+  "-W1203",  # lazy formatting for logging calls
+  "-WPS305", # f-strings
+  "-WPS110", # common variable names (too annoying)
+  "-WPS125", # redundant with W0622 (builtin override), which is more precise about line number
+  "-WPS201", # too many imports
+  "-WPS202", # too many module members
+  "-WPS210", # too many local variables
+  "-WPS211", # too many arguments
+  "-WPS213", # too many expressions
+  "-WPS214", # too many methods
+  "-WPS220", # too deep nesting
+  "-WPS223", # too many elif branches
+  "-WPS226", # string over-use: can't disable it per file?
+  "-WPS230", # too many public instance attributes
+  "-WPS306", # too cumbersome, asks to write class A(object)
+  "-WPS317", # multi-line paramaters (incompatible with Black)
+  "-WPS322", # multi-line strings (incompatible with attributes docstrings)
+  "-WPS326", # implicit string concatenation
+  "-WPS336", # explicit string concatenation
+  "-WPS402", # nosa overuse
+  "-WPS412", # __init__ modules with logic
+  "-WPS428", # statement with no effect (not compatible with attribute docstrings)
+  "-WPS433", # redundant with C0415 (not top-level import)
+  "-WPS529", # implicit dict.get usage (generally false-positive)
 ]

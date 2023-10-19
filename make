@@ -297,5 +297,5 @@ if [[ "$arg" == "-e" ]] || [[ "$arg" == "-ea" ]] ; then
     unset sourcing_make
 fi
 if [[ "$arg" == "-a" ]] || [[ "$arg" == "-ea" ]]; then activate_venv; fi
-[[ -d "$here/bin" ]] && [[ "$PATH" != *"$here/bin:"* ]] && PATH="$here/bin:$PATH" || true # add bin folder if present to PATH
+[[ -d "$here/bin" ]] && [[ "$PATH" != *":$here/bin"* ]] && PATH="$PATH:$here/bin" || true # add bin folder if present to PATH
 

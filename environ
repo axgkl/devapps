@@ -7,9 +7,9 @@ browser="chromium-browser"                       # for browser screenshots
 conda_project_tools="tmux poetry graphviz imagemagick"
 google_analytics_key="$(pass show google/analytics_key_blog 2>/dev/null)"
 mkdocs_port=2222
-nodejs="source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate nodejs && node" # for browser screenshots
-pyver="3.7"                                                                              # min version
-versioning=calver                                                                        # for git changelog
+#nodejs="source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate nodejs && node" # for browser screenshots
+pyver="3.7"       # min version
+versioning=calver # for git changelog
 environ_flags=true
 domain='dev-xyz.axiros.com'
 region='hel1'
@@ -23,5 +23,5 @@ set +a
 git config user.email "$email"
 source ./make -a # giving us make docs, make tests, .. -a activates venv
 echo "sourced ./make"
-test -e bin/asdf && { . $HOME/.asdf/asdf.sh && asdf list; }
-test -e bin/binenv && { echo "$PATH" | grep -q binenv || PATH="$HOME/.binenv:$PATH"; binenv versions -f | grep -v '^#'; }
+# test -e bin/asdf && { . $HOME/.asdf/asdf.sh && asdf list; }
+# test -e bin/binenv && { echo "$PATH" | grep -q binenv || PATH="$HOME/.binenv:$PATH"; binenv versions -f | grep -v '^#'; }
