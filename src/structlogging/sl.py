@@ -28,7 +28,7 @@ import structlog
 #     log_dev_coljson_style = ('paraiso-dark',)
 try:
     import ujson
-except Exception as ex:
+except Exception:
     pass  # that's ok - app to the app to depend on it
 from pygments.styles import get_all_styles
 from structlog import BoundLoggerBase, PrintLogger, wrap_logger
@@ -182,8 +182,7 @@ class AppLogLevel:
         self.level = level
         try:
             self.was_level = app.log._logger.level
-        except Exception as ex:
-
+        except Exception:
             print('init_app_parse_flags not yet ran')
             raise
 
@@ -234,7 +233,7 @@ def censor_passwords(_, __, ev, _censored=censored):
             for part in pkw:
                 try:
                     pw = pw.get(part)
-                except Exception as ex:
+                except Exception:
                     pw = None
                 if not pw:
                     break
@@ -318,7 +317,7 @@ def safe_dumps(obj, to_str=to_str, default=None):
     except Exception:
         try:
             return json.dumps(obj, default=default)
-        except Exception as ex:
+        except Exception:
             return json.dumps(
                 {
                     'event': 'cannot log-serialize: %s' % str(obj),
@@ -362,7 +361,7 @@ def setup_logging(
 
     if censor:
         censor = [censor] if isinstance(censor, str) else censor
-        [censored.append(c) for c in censor if not c in censored]
+        [censored.append(c) for c in censor if c not in censored]
 
     fmt = fmt_to_int(log_fmt)
     tty = sys.stdout.isatty()
@@ -390,7 +389,10 @@ def setup_logging(
         from structlogging import renderers
 
         rend = renderers.ThemeableConsoleRenderer(
-            colors=colors, fmt_vals=fmt_vals, val_formatters=val_formatters
+            colors=colors,
+            fmt_vals=fmt_vals,
+            val_formatters=val_formatters,
+            structlog_style=s,
         )
 
     if get_renderer:

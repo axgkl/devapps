@@ -22,7 +22,9 @@ from theming.unicode_chars import blocks
 if sys.version_info[0] > 2:
     char = chr
 else:
-    char = lambda nr: unichr(nr).encode('utf-8')
+
+    def char(nr):
+        return unichr(nr).encode('utf-8')
 
 envget = os.environ.get
 
@@ -114,12 +116,12 @@ class Theme:
         defined in python can be sourced
         (i.e. reversing the definition order, we normally use the shell theme)
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     @classmethod
     def attrs(cls):
         """Other attributes of the Theme"""
-        c = cls.color_keys()
+        cls.color_keys()
         r = {'name': cls.__name__}
         for k in dir(cls):
             if k.startswith('_'):
@@ -165,7 +167,7 @@ class Theme:
         while s:
             c, s = s[0], s[1:]
             r.append(c) if hasattr(cls, c) else 0
-        [r.append(c) for c in dir(cls) if not c in r and cls.is_col_key(c)]
+        [r.append(c) for c in dir(cls) if c not in r and cls.is_col_key(c)]
         return r
 
     @classmethod
@@ -248,7 +250,10 @@ class Theme:
     @classmethod
     def color_prefixes(cls):
         """returns just the prefix w/o the reset at the end"""
-        d = lambda k: getattr(cls, k.lower())('XX').split('XX')[0]
+
+        def d(k):
+            return getattr(cls, k.lower())('XX').split('XX')[0]
+
         return dict([(k, d(k)) for k in cls.color_keys()])
 
     @classmethod
@@ -356,10 +361,23 @@ def unique_str(s):
     return Cell.colorize(s, nr=hash(s))
 
 
-def structlog_style():
+def structlog_style(use_pygm=None):
     """for structlog init w/o colorama (e.g. ax.rx)"""
     #  structlog/dev.py
-    C = Theme.color_prefixes()
+    if not use_pygm or use_pygm in {'dark', 'light'}:
+        C = Theme.color_prefixes()
+    else:
+        from pygments.formatters.terminal256 import Terminal256Formatter
+
+        ss = Terminal256Formatter(style=use_pygm).style_string  # noqa: F841
+        ss['Token.Error'] = ss['Token.Generic.Error']
+        for k, v in ss.items():
+            print(f'{v[0]}{k}\x1b[0m')
+        l = 'R:Generic.Error;I:Name.Class;M:Keyword.Constant;L:Name.Other;D:Text;G:Literal.String'
+        C = {}
+        for _ in l.split(';'):
+            k, v = _.split(':')
+            C[k] = ss['Token.%s' % v][0]
 
     # fmt:off
     def style(orig_style):
@@ -429,6 +447,7 @@ def structlog_style():
 #        'justed_levels': justed_levels,
 #    }
 #
+
 
 # -------------------------------------------------------- oldish 8 color stuff
 # TODO gk: check if we can ditch all below:

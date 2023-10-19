@@ -2,7 +2,6 @@
 # For loading, simplejson is faster.
 # tried with big request dumps, and even we have
 # bool(getattr(simplejson, '_speedups', False))
-import sys
 from json import dumps
 
 from pygments import highlight
@@ -21,10 +20,9 @@ from io import StringIO
 #
 #     Terminal256Formatter = TerminalFormatter
 #
-# forget 256 colrs:
 
-from pygments.formatters.terminal import TerminalFormatter
-
+from pygments.formatters.terminal import TerminalFormatter  # dark/light
+from pygments.formatters.terminal256 import Terminal256Formatter  # rest
 
 # from pygments.styles import get_style_by_name
 
@@ -36,10 +34,13 @@ Style = {}
 
 
 def _fmt(style):
-    return TerminalFormatter(bg={'light': 'light'}.get(style, 'dark'))
-    # if style in {'dark', 'light'} or Terminal256Formatter == TerminalFormatter:
-    #     return TerminalFormatter(bg={'light': 'light'}.get(style, 'dark'))
-    # return Terminal256Formatter(style=style)
+    if style in {'light', 'dark'}:
+        return TerminalFormatter(bg={'light': 'light'}.get(style, 'dark'))
+    else:
+        r = Terminal256Formatter(style=style)
+        # their bg coloring for unparsable json is super annoying (payload="asdf...)
+        r.style_string['Token.Error'] = r.style_string['Token.Generic.Error']
+        return r
 
 
 def get_fmt(style):
@@ -62,7 +63,6 @@ def coljhighlight(
     no_indent_len=0,
     _checked=[0],
 ):
-
     global jsl
     if not jsl:
         jsl = JsonLexer()
@@ -72,14 +72,13 @@ def coljhighlight(
                 indent = None
         try:
             s = dumps(s, indent=indent, sort_keys=sort_keys, default=str)
-        except Exception as ex:
+        except Exception:
             try:
                 # the sort may fail: TypeError: '<' not supported between instances of 'int' and 'str'
                 s = dumps(s, indent=indent, default=str)
-            except Exception as ex:
-                print('breakpoint set')
-                breakpoint()
-                keep_ctx = True
+            except Exception:
+                _ = '🟥🟥🟥🟥🟥🟥 could not dumps to json %s [%s]🟥🟥🟥🟥🟥🟥'
+                return _ % (s, __file__)
 
     if colorize:
         # we may be called by structlog, then with style (from

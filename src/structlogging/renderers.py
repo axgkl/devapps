@@ -58,7 +58,7 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
 
         colors = kw.get('colors')
         if colors:
-            ax_style, ls = structlog_style()
+            ax_style, ls = structlog_style(use_pygm=self.cfg['structlog_style'])
             _ = 'level_styles'
             kw[_] = kw.get(_) or ls
 
@@ -100,10 +100,9 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
             # every thread shows in unique color:
             try:
                 tn = ev.pop('thread', None)
-            except Exception as ex:
+            except Exception:
                 print('breakpoint set')
                 breakpoint()
-                keep_ctx = True
         by = ev.pop('by', None)
         stack = ''
 
