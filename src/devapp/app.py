@@ -1,4 +1,3 @@
-from io import StringIO
 import json
 import os
 import signal
@@ -36,7 +35,7 @@ notifier = [None]
 
 def notify(app, msg, **kw):
     app.info('NOTIF: %s' % msg, **kw)
-    if notifier[0] == None:
+    if notifier[0] is None:
         notifier[0] = False
         for n in 'dunstify', 'notify-send':
             if os.system('type %s 1>/dev/null 2>/dev/null' % n) == 0:
@@ -140,7 +139,7 @@ def set_dirs():
 
     if db and os.path.exists(db):
         p = os.environ['PATH']
-        if not db + ':' in p:
+        if db + ':' not in p:
             os.environ['PATH'] = db + ':' + p
 
 
@@ -161,8 +160,11 @@ def set_app(name, log):
     # [setattr(app, k, v) for k, v in dirs(name).items()]
     # allows raise app.die(msg, **kw):
 
-    def die(msg, **kw):
+    def die(msg, silent=False, **kw):
         """Application decided to bail out"""
+        if silent:
+            app.warn(msg, **kw)
+            sys.exit(1)
         raise DieNow(msg, kw)
 
     app.die = die
@@ -274,7 +276,7 @@ def run_app(
             argv=argv,
             flags_parser=flags_parser,
         )
-    except Exception as ex:
+    except Exception:
         sys.exit(1)
 
 
@@ -287,7 +289,7 @@ def define_action_flags_in_cli():
         p += 1
         if a == '--':
             return
-        if not a in afs:
+        if a not in afs:
             continue
         if p > 1:
             pa = args[p - 1]
@@ -451,7 +453,6 @@ def reload_handler(signum, frame):
 
 
 def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
-
     tools.set_flag_vals_from_env()  # 0.0001sec
 
     if FLG.help_call:
@@ -463,7 +464,7 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         call_doc(main, level=3, render=True)
         return
 
-    kw_log = {} if kw_log == None else kw_log
+    kw_log = {} if kw_log is None else kw_log
     if flags_validator:
         try:
             err = flags_validator()
@@ -515,7 +516,7 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         except DieNow as ex:
             app.error(ex.msg, exc=ex, **ex.kw)
             raise
-        except Reloaded as ex:
+        except Reloaded:
             continue
         except SystemExit as ex:
             return ex.args[0]
@@ -539,7 +540,7 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
                 [p() for p in post] if isinstance(post, list) else post()
         break
     if not isinstance(res, (list, dict, tuple)):
-        if not res is None:
+        if res is not None:
             print(res)
         return
     # exit phase. postprocessing, pretty to stdout, plain to | jq .:
