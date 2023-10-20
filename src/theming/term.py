@@ -371,8 +371,7 @@ def structlog_style(use_pygm=None):
 
         ss = Terminal256Formatter(style=use_pygm).style_string  # noqa: F841
         ss['Token.Error'] = ss['Token.Generic.Error']
-        for k, v in ss.items():
-            print(f'{v[0]}{k}\x1b[0m')
+        # for k, v in ss.items(): print(f'{v[0]}{k}\x1b[0m')
         l = 'R:Generic.Error;I:Name.Class;M:Keyword.Constant;L:Name.Other;D:Comment;G:Literal.String'
         C = {}
         for _ in l.split(';'):
