@@ -9,6 +9,7 @@ from pygments.lexers import JsonLexer, YamlLexer
 from yaml import dump, safe_dump
 from io import StringIO
 
+
 #
 # try:
 #     from pygments.formatters import (
@@ -20,33 +21,47 @@ from io import StringIO
 #
 #     Terminal256Formatter = TerminalFormatter
 #
+#  structlog/dev.py
 
-from pygments.formatters.terminal import TerminalFormatter  # dark/light
-from pygments.formatters.terminal256 import Terminal256Formatter  # rest
+
+def formatter_by_style(pygm_style, _cache=[0]):  # noqa: B006
+    """pygm_style like "true:solarized-dark"
+    true color is NOT slower than 256, neither synth nor even when printed, on my alacritty
+    """
+    if pygm_style == 'get':
+        return _cache[0]
+    if not pygm_style:
+        return None, None
+    true_col = False
+    if pygm_style and pygm_style.startswith('true:'):
+        true_col, pygm_style = True, pygm_style.split(':', 1)[1]
+    if pygm_style in {'dark', 'light'}:
+        from pygments.formatters.terminal import TerminalFormatter as F
+
+        _cache[0] = pygm_style, F
+        return pygm_style, F(bg=pygm_style)
+    elif true_col:
+        from pygments.formatters.terminal256 import TerminalTrueColorFormatter as F
+    else:
+        from pygments.formatters.terminal256 import Terminal256Formatter as F
+    # their bg coloring for unparsable json is super annoying (payload="asdf...)
+    F = F(style=pygm_style)
+    # F.style_string['Token.Error'] = F.style_string['Token.Generic.Error']
+    _cache[0] = pygm_style, F
+    return pygm_style, F
+
 
 # from pygments.styles import get_style_by_name
 
 ysl = ytermf = jsl = ''
-# formatters by style:
-_fmts = {}
 
 Style = {}
 
 
-def _fmt(style):
-    if style in {'light', 'dark'}:
-        return TerminalFormatter(bg={'light': 'light'}.get(style, 'dark'))
-    else:
-        r = Terminal256Formatter(style=style)
-        # their bg coloring for unparsable json is super annoying (payload="asdf...)
-        r.style_string['Token.Error'] = r.style_string['Token.Generic.Error']
-        return r
-
-
-def get_fmt(style):
+def get_fmt(style, _fmts={}):  # noqa: B006
     termf = _fmts.get(style)
     if not termf:
-        termf = _fmts[style] = _fmt(style)
+        termf = _fmts[style] = formatter_by_style(style)[1]
     return termf
 
 

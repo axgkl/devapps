@@ -162,8 +162,8 @@ def set_app(name, log):
 
     def die(msg, silent=False, **kw):
         """Application decided to bail out"""
+        app.fatal(msg, **kw)
         if silent:
-            app.warn(msg, **kw)
             sys.exit(1)
         raise DieNow(msg, kw)
 

@@ -2,8 +2,8 @@
 """
 Ansi Escape Tools for Terminal Output
 
-Note: This was written while I did not yet realize the base16 term indirection,
-I.e. global shell themes.
+Note: This was written while I did not yet realize the 16 color term indirection,
+I.e. global cross app shell themes.
 Meanwhile I don't think, hardcoded colorthemes per app should even exist.
 """
 from __future__ import absolute_import, division, print_function
@@ -13,7 +13,7 @@ import sys
 import time
 from collections import OrderedDict
 from functools import partial
-
+from theming.colorhilite import formatter_by_style
 from theming.unicode_chars import blocks
 
 # https://misc.flogisoft.com/bash/tip_colors_and_formatting
@@ -361,43 +361,60 @@ def unique_str(s):
     return Cell.colorize(s, nr=hash(s))
 
 
+def add_ax_pygm_style():
+    from pygments import styles
+
+    def fst(fn):
+        return fn.rsplit('/', 1)[0] + '/ax_pygm.py'
+
+    if not os.path.exists(fst(styles.__file__)):
+        os.symlink(fst(__file__), fst(styles.__file__))
+
+    styles.STYLE_MAP['ax'] = 'ax_pygm::AXDarkStyle'
+
+
 def structlog_style(use_pygm=None):
     """for structlog init w/o colorama (e.g. ax.rx)"""
-    #  structlog/dev.py
-    if not use_pygm or use_pygm in {'dark', 'light'}:
+    style, F = formatter_by_style(use_pygm)
+    if not F or style in {'dark', 'light'}:
         C = Theme.color_prefixes()
+        C['RB'] = C['R']
     else:
-        from pygments.formatters.terminal256 import Terminal256Formatter
-
-        ss = Terminal256Formatter(style=use_pygm).style_string  # noqa: F841
-        ss['Token.Error'] = ss['Token.Generic.Error']
-        # for k, v in ss.items(): print(f'{v[0]}{k}\x1b[0m')
-        l = 'R:Generic.Error;I:Name.Class;M:Keyword.Constant;L:Name.Other;D:Comment;G:Literal.String'
+        ss = F.style_string  # noqa: F841
+        # ss['Token.Error'] = ss['Token.Generic.Error']
+        # ss['Token.String.Double'] = tuple( ['"%s"' % i for i in ss['Token.Literal.String.Double']]
         C = {}
-        for _ in l.split(';'):
-            k, v = _.split(':')
-            C[k] = ss['Token.%s' % v][0]
+        l = [
+            'R Generic.Error',
+            'I Name.Class',
+            'M Keyword.Constant',
+            'L Name.Other',
+            'D Comment',
+            'G Literal.String',
+        ]
+        for _ in l:
+            k, v = _.split(' ')
+            C[k] = ss['Token.%s' % v][0] or '\x1b[0m'
+        C['RB'] = ss['Token.Error'][0] or ss['Token.Generic.Error'][0]
 
     # fmt:off
     def style(orig_style):
         class S(orig_style):
-            level_critical = level_exception = level_error = C['R']
-            level_warn  = C['I']
-            level_info  = C['M']
-            level_debug = C['L']
             timestamp   = C['D']
             logger_name = C['L']
             kv_key      = C['M']
-            kv_value    = C['G']
+            kv_value    = C['D']
             reset       = RESET
 
         return S
 
     ls = {
-        'critical'  : C['R'],
-        'exception' : C['R'],
-        'error'     : C['R'],
-        'warn'      : C['I'],
+        'fatal'     : C['RB'],
+        'critical'  : C['RB'],
+        'exception' : C['RB'],
+        'error'     : C['RB'],
+        'err'       : C['RB'],
+        'warn'      : C['R'],
         'warning'   : C['R'],
         'info'      : C['G'],
         'debug'     : C['L'],

@@ -42,7 +42,7 @@ from structlogging import processors as ax_log_processors
 from devapp.tools import FLG, define_flags
 
 pygm_styles = list(get_all_styles())
-pygm_styles.extend(['light', 'dark'])
+pygm_styles.extend(['light', 'dark', 'ax'])
 
 
 class flags(stacktrace.flags):
@@ -72,6 +72,10 @@ class flags(stacktrace.flags):
 
     class log_thread_local_names:
         n = 'Prefer thread local logger_name, when set'
+        d = False
+
+    class log_dev_coljson_no_truecolor:
+        n = 'NOT use true color for styles (e.g. when no terminal support)'
         d = False
 
     class log_dev_coljson_style:
@@ -195,7 +199,11 @@ class AppLogLevel:
 
 # setting all level methods, like log.warn into the logger:
 for l, nr in log_levels.items():
-    setattr(AXLogger, l, lambda self, ev, _meth_=l, **kw: self.log(ev, kw, _meth_))
+
+    def meth(self, ev, _meth_=l, **kw):
+        return self.log(ev, kw, _meth_)
+
+    setattr(AXLogger, l, meth)
 
 
 def get_logger(name, level=None, **ctx):
@@ -380,6 +388,12 @@ def setup_logging(
 
         # fmt_vals['stack'] = 'f_coljson'  # stack tracebacks always
         s = log_dev_coljson_style
+        if s == 'ax':
+            from theming.term import add_ax_pygm_style
+
+            add_ax_pygm_style()
+        if not FLG.log_dev_coljson_no_truecolor:
+            s = 'true:' + s
         val_formatters['f_coljson'] = {'formatter': 'coljson', 'style': s}
         val_formatters['print_stack'] = {'formatter': 'stack'}
 
