@@ -523,8 +523,7 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         except KeyboardInterrupt:
             if watcher_pid:
                 os.kill(watcher_pid, 9)
-            print('Keyboard Interrupt - Bye.')
-            sys.exit(1)
+            app.die('Keyboard Interrupt - Bye.', silent=True)
         except Exception as ex:
             try:
                 app.error(str(ex), exc=ex)

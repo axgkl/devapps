@@ -245,7 +245,7 @@ def parse_xml_help(xml_help, match, cli_actions=None):
             opts = '|'.join([e.text for e in el if e.tag == 'enum_value'])
             c['opts'] = f'<{opts}>'
             m = c['meaning']
-            if '>:' in m:   # split off the opts if given in meaning, we have them in opts
+            if '>:' in m:  # split off the opts if given in meaning, we have them in opts
                 m = m.split('>:', 1)[1]
             c['meaning'] = m
 
@@ -303,7 +303,7 @@ def parse_xml_help(xml_help, match, cli_actions=None):
             f = modflags[p]
             fn = f['name']
             # mind e.g. droplet_list action and droplet_list_no_cache action:
-            while fn.startswith(k + '_') and not fn in action_flags:
+            while fn.startswith(k + '_') and fn not in action_flags:
                 j['actions'].append(f)
                 f['action'] = f['action_flag'] = True
                 f['action_name'] = k
@@ -368,7 +368,10 @@ def color_usage(*a, main_module, full=None, **kw):
                 d, no_print=True, header_numbering=True, header_numb_level_min=2
             )
         ret.append('\n' + d.strip() + '\n\n')
-    add = lambda s, end='\n', ret=ret: ret.append(s + end)
+
+    def add(s, end='\n', ret=ret):
+        return ret.append(s + end)
+
     # catch the original output:
     hof = get_argv_val('--help_output_fmt')
     hof = hof if hof else 'terminal'
@@ -427,7 +430,7 @@ def color_usage(*a, main_module, full=None, **kw):
     # show non main module flags on helpfull:
     n = main_module.__name__
     if full:
-        [do(fn_mod) for fn_mod in sorted(all_flgs) if not fn_mod in (n, 'actions')]
+        [do(fn_mod) for fn_mod in sorted(all_flgs) if fn_mod not in (n, 'actions')]
 
     if n in all_flgs:
         do(n)

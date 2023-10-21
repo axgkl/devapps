@@ -4,10 +4,12 @@ from json import dumps
 import structlog
 from theming.colorhilite import coljhighlight as coljson
 from theming.term import RESET, Cell, Theme, structlog_style
-
+import re
 # from theming.colorhilite import colyhighlight as colyaml
 
 from structlogging.stacktrace import rich_stack
+
+match_hl = {False: '🟧%s🟧', True: '\x1b[1;38;5;124;48;5;255m%s\x1b[0m'}
 
 
 class formatters:
@@ -55,7 +57,8 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
         for k in 'pad_event', 'repr_native_str':
             if k in kw:
                 sl_kw[k] = kw.pop(k)
-
+        self.match = re.compile(kw['match']) if kw['match'] else None
+        self.dimm_no_match = kw['dimm_no_match']
         colors = kw.get('colors')
         if colors:
             ax_style, ls = structlog_style(use_pygm=self.cfg['structlog_style'])
@@ -141,6 +144,19 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
         if fvs:
             while phs:
                 s1 = s1.replace('_sl_%s__' % len(phs), phs.pop())
+
+        matches = None
+        if self.match:
+            matches = self.match.findall(s1)
+            if matches:
+                repl = match_hl[self.colorful]
+                for h in set(matches):
+                    s1 = s1.replace(h, repl % h)
+            else:
+                if self.dimm_no_match and self.colorful:
+                    s1 = s1.replace('\x1b[', '\x1b[2;')
+                    _ = s1.split(']', 1)
+                    s1 = _[0] + ']\x1b[2;38;5;235m' + _[1]
 
         if not self.colorful or tn is None:
             return stack + s1

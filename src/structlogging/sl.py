@@ -56,33 +56,50 @@ class flags(stacktrace.flags):
         n = 'Log time format. Shortcuts: "ISO", "dt"'
         d = '%m-%d %H:%M:%S'
 
+    class log_to_stdout:
+        n = 'Default: stderr'
+        d = False
+
     class log_fmt:
+        """🟢 Json logging has far better performance then the colored console dev log.
+        You can pipe e.g. journalctl output into "ops log_view -fn -" to get dev logging from json.
+
+        This value can be set away from auto via export log_fmt as well.
+        """
+
         n = 'Force a log format. 0: off, 1: auto, 2: plain, 3: plain_no_colors, 4: json. '
-        n += 'Note: This value can be set away from auto via export log_fmt as well.'
         d = 'auto'
 
     class log_add_thread_name:
         n = 'Add name of thread'
         d = False
 
-    class log_dev_fmt_coljson:
-        n = 'List of keys to log as json.'
-        d = 'json,payload'
-        t = list
-
     class log_thread_local_names:
         n = 'Prefer thread local logger_name, when set'
         d = False
+
+    class log_dev_match:
+        n = 'Regex to search in loglines - will be highlighted.'
+        d = ''
+
+    class log_dev_dimm_no_match:
+        n = 'Dimm not matching lines (in colored output only)'
+        d = False
+
+    class log_dev_coljson_style:
+        n = 'Pygments style for colorized json. To use the 16 base colors and leave it '
+        n += 'to the terminal palette how to render: Choose light or dark'
+        t = sorted(pygm_styles)
+        d = 'dark'
 
     class log_dev_coljson_no_truecolor:
         n = 'NOT use true color for styles (e.g. when no terminal support)'
         d = False
 
-    class log_dev_coljson_style:
-        n = 'Pygments style for colorized json. To use the 16 base colors and leave it '
-        n += 'to the terminal palette how to render choose light or dark'
-        t = sorted(pygm_styles)
-        d = 'dark'
+    class log_dev_fmt_coljson:
+        n = 'List of keys to log as json.'
+        d = 'json,payload'
+        t = list
 
 
 define_flags(flags)
@@ -213,7 +230,8 @@ def get_logger(name, level=None, **ctx):
 
     FLG.log_level = int(log_levels.get(FLG.log_level, FLG.log_level))
     level = level or FLG.log_level
-    log = wrap_logger(PrintLogger(file=sys.stderr), wrapper_class=AXLogger)
+    f = sys.stdout if FLG.log_to_stdout else sys.stderr
+    log = wrap_logger(PrintLogger(file=f), wrapper_class=AXLogger)
     log._logger.name = name
     log._logger.level = level
     return log.bind(**ctx)
@@ -364,6 +382,8 @@ def setup_logging(
     log_add_thread_name     = FLG.log_add_thread_name
     log_dev_coljson_style   = FLG.log_dev_coljson_style
     log_dev_fmt_coljson_flg = FLG.log_dev_fmt_coljson
+    log_dev_match           = FLG.log_dev_match
+    log_dev_dimm_no_match   = FLG.log_dev_dimm_no_match
     # fmt:on
     stacktrace.set_log_stack_cfg(FLG)
 
@@ -407,6 +427,8 @@ def setup_logging(
             fmt_vals=fmt_vals,
             val_formatters=val_formatters,
             structlog_style=s,
+            match=log_dev_match,
+            dimm_no_match=log_dev_dimm_no_match,
         )
 
     if get_renderer:

@@ -25,4 +25,13 @@ them - pick a non true color one then.
 
 If you want your terminal base16 styles, pick 'dark'
 
+## Watching Json Logs
+
+The `ops log_viewer` command allows to ingest json logs, including systemd's journal logs,
+containing them.
+
+
+
+
+
 [sl]: https://www.structlog.org/en/stable/
