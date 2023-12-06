@@ -162,8 +162,8 @@ def set_app(name, log):
 
     def die(msg, silent=False, **kw):
         """Application decided to bail out"""
-        app.fatal(msg, **kw)
         if silent:
+            app.warn(msg, **kw)
             sys.exit(1)
         raise DieNow(msg, kw)
 
@@ -523,7 +523,8 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         except KeyboardInterrupt:
             if watcher_pid:
                 os.kill(watcher_pid, 9)
-            app.die('Keyboard Interrupt - Bye.', silent=True)
+            print('Keyboard Interrupt - Bye.')
+            sys.exit(1)
         except Exception as ex:
             try:
                 app.error(str(ex), exc=ex)
