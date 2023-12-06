@@ -32,7 +32,7 @@ mkdir $HOME/myproject && cd $HOME/myproject && ls -lta
 Here are the resources defined in `devapps`. They are required for running the tests but also provide some tools:
 
 ```bash lp session=project
-['ops project --list_resources_files']
+['ops project list']
 ```
 
 !!! note "More Tools"
@@ -114,3 +114,6 @@ The `--init_create_unit_files=<name of daemon resource>` will create a unit file
 !!! hint
 
     In order to install unit files for *ALL* service type resources, you can  supply `--init_create_all_units`, alternatively.
+
+
+
