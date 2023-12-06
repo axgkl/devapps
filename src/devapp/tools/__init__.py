@@ -31,6 +31,7 @@ from absl import flags
 from pycond import parse_cond
 from theming.formatting.markdown import deindent, indent  # noqa
 
+
 def reverse_dict(m):
     return {v: k for k, v in m.items()}
 
@@ -125,6 +126,7 @@ def cast(v, bools={'true': True, 'True': True, 'false': False, 'False': False}):
 def have_tty():
     return sys.stdin.isatty() and sys.stdout.isatty()
 
+
 try:
     # Setting the default for the cli - flag, i.e. this rules w/o the flag:
     term_fixed_width_env = int(os.environ.get('term_width'))
@@ -151,6 +153,7 @@ class Pytest:
 
     def this_test():
         return os.environ['PYTEST_CURRENT_TEST']
+
     cur_flags = {}
     had_flags = {}
 
@@ -495,6 +498,8 @@ def confirm(msg, dflt='n'):
 
 def now():
     return int(time.time() * 1000)
+
+
 is_ = isinstance
 
 
@@ -528,8 +533,12 @@ def dict_merge(source, destination):
 
 def tn():
     return current_thread().name
+
+
 def pass_(*a, **kw):
     return None
+
+
 exists = os.path.exists
 dirname = os.path.dirname
 abspath = os.path.abspath
@@ -760,6 +769,7 @@ def funcname(f):
 
 env = os.environ
 
+
 def clean_env_key(s):
     return ''.join([c for c in s if c in string.digits + string.ascii_letters])
 
@@ -806,12 +816,16 @@ env, envget, exists = os.environ, os.environ.get, os.path.exists
 ctx = {}
 
 str8 = partial(str, encoding='utf-8')
+
+
 def is_str(s):
     return isinstance(s, str)
+
 
 # not matches classes which are callable:
 def is_func(f):
     return isinstance(f, (types.FunctionType, types.BuiltinFunctionType, partial))
+
 
 def json_diff(old, new):
     return json.loads(js_diff(old, new, syntax='explicit', dump=True))
@@ -1578,6 +1592,8 @@ def parse_deps(deplist, seps='~<>!= '):
 
 def is_sensitive(key):
     return re.match(FLG.sensitive_data_identifiers, key, re.IGNORECASE)
+
+
 def filter_passwords(dct):
     return {k: v for k, v in dct.items() if not is_sensitive(k)}
 
