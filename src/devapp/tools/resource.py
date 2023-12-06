@@ -728,7 +728,9 @@ def find_resources_files_in_sys_path():
     return files
 
 
-def complete_attrs(rsc, fn):
+def complete_attrs(rsc):
+    fn = rsc._filename
+
     def to_name(rsc, p):
         if callable(p):
             n = p.__name__
@@ -826,7 +828,9 @@ def find_resource_defs(_have_mod={}):
         mod.rsc._filename = fn
 
         rsc_clses = rsc_classes(mod.rsc)
-        [complete_attrs(r, fn) for r in rsc_clses]
+        for r in rsc_clses:
+            r._filename = fn
+            r.module = r.__module__.replace('.operations.resources', '')
 
         rscs.extend(rsc_clses)
 
@@ -850,6 +854,8 @@ def find_resource_defs(_have_mod={}):
             app.info('%s resources redefined' % (i - j))
 
     remove_redefined_rscs()
+
+    [complete_attrs(r) for r in rscs]
     # remove dubs (through class rsc(other_rsc))
     rscs = set(rscs)
     # sort by name:
