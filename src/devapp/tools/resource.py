@@ -150,7 +150,8 @@ def set_fs_dir():
     S.fs_dir = cli
 
 
-conda_prefix = lambda: S.conda_prefix or [set_conda_prefix(), S.conda_prefix][1]
+def conda_prefix():
+    return S.conda_prefix or [set_conda_prefix(), S.conda_prefix][1]
 
 
 class CommonFlags:
@@ -176,13 +177,22 @@ class CommonFlags:
 # --------------------------------------------------------------------- tools/  actions
 
 simple_types = (bool, int, float, str, list)
-to_struct = lambda s: (to_list if s.name == 'resources' else to_dict)(s)
-to_list = lambda rscs: [to_dict(rsc) for rsc in rscs]
-to_dict = lambda rsc: {
-    k: getattr(rsc, k)
-    for k in dir(rsc)
-    if not k.startswith('_') and isinstance(getattr(rsc, k), simple_types)
-}
+
+
+def to_struct(s):
+    return (to_list if s.name == 'resources' else to_dict)(s)
+
+
+def to_list(rscs):
+    return [to_dict(rsc) for rsc in rscs]
+
+
+def to_dict(rsc):
+    return {
+        k: getattr(rsc, k)
+        for k in dir(rsc)
+        if not k.startswith('_') and isinstance(getattr(rsc, k), simple_types)
+    }
 
 
 # # get some nice respresentation of the rsc classes:
@@ -205,7 +215,8 @@ to_dict = lambda rsc: {
 
 
 # api:
-g = lambda rsc, key, default='': getattr(rsc, key, default)
+def g(rsc, key, default=''):
+    return getattr(rsc, key, default)
 
 
 def gf(rsc, key, default=''):
@@ -237,7 +248,8 @@ def gf(rsc, key, default=''):
 #     return rsc[0]
 
 
-is_fs = lambda rsc: str(g(rsc, 'pkg')).startswith('layers:')
+def is_fs(rsc):
+    return str(g(rsc, 'pkg')).startswith('layers:')
 
 
 def dir_rsc_cfg(rsc):
@@ -272,9 +284,13 @@ def rsc_path(rsc, verify_present=False):
         return path if exists(path + '/' + exe) else None
 
 
-interactive = lambda: '-y' if FLG.force else ''
+def interactive():
+    return '-y' if FLG.force else ''
+
+
 # resources without a package (e.g. client)
-is_no_pkg_rsc = lambda rsc: g(rsc, 'pkg') == False
+def is_no_pkg_rsc(rsc):
+    return g(rsc, 'pkg') is False
 
 
 class Run:
@@ -341,7 +357,7 @@ class Install:
         """Api entry: install a resource"""
         Install.requirements(g(rsc, 'req'))
         if not rsc.installed or g(FLG, 'force_reinstall', ''):
-            if g(rsc, 'pkg') == False:
+            if g(rsc, 'pkg') is False:
                 install_mode = Install.no_pkg
             elif is_fs(rsc):
                 install_mode = Install.FS.filesystem
@@ -717,7 +733,7 @@ def find_resources_files_in_sys_path():
 
     def find_file_in_pth(pth, d, files=files):
         fn = '%s/%s/operations/resources.py' % (pth, d)
-        if exists(fn) and not d in files:
+        if exists(fn) and d not in files:
             files[d] = fn
             S.rsc_dirs[fn] = pth + '/' + d
 
@@ -762,9 +778,8 @@ def complete_attrs(rsc):
     [repl_callable(rsc, k, getattr(rsc, k)) for k in dir(rsc) if not k.startswith('_')]
 
 
-exported_name = lambda rsc, d=None: os.environ.get(
-    f'{rsc.name}_name', d if d else rsc.name
-)
+def exported_name(rsc, d=None):
+    return os.environ.get(f'{rsc.name}_name', d if d else rsc.name)
 
 
 def to_str(rsc):
@@ -837,7 +852,6 @@ def find_resource_defs(_have_mod={}):
     {find_cls_in_pth(d, fn) for d, fn in rsc_files.items()}
 
     def remove_redefined_rscs(rscs=rscs):
-
         # this removes the identical ones:
         all = set(rscs)
         # assert len(all) == len(rscs)
