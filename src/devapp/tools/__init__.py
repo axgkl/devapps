@@ -887,7 +887,7 @@ def dt_human(ts_start, ts_end=None):
 
 
 class AllStatic(type):
-    "turn all methods of this class into static methods"
+    'turn all methods of this class into static methods'
 
     new = None
 
@@ -1074,7 +1074,7 @@ def process_instance_offset(base):
 
 
 def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
-    "API: Write a file. chmod e.g. 0o755 (as octal integer)"
+    'API: Write a file. chmod e.g. 0o755 (as octal integer)'
 
     fn = os.path.abspath(fn)
 
@@ -1180,13 +1180,17 @@ def set_flag_vals_from_env():
 
 
 def shorten(key, prefix, maxlen, all_shorts=None, take=1):
-    take, sold = 1, None
-    for i in range(10):
-        s = autoshort(key, prefix, maxlen + i, take)
-        if s not in all_shorts:
-            return s
-    if s == sold:
-        raise Exception('Unresolvable collision in autoshort names: %s' % key)
+    take, sold, s = 0, None, None
+    while not s or s in all_shorts:
+        take += 1
+        for i in range(10):
+            sold = s
+            s = autoshort(key, prefix, maxlen + i, take)
+            if sold == s:
+                break  # make take +=1
+            if s not in all_shorts:
+                return s
+    raise Exception('Unresolvable collision in autoshort names: %s' % key)
 
 
 def autoshort(key, prefix, maxlen, take=1):
