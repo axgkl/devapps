@@ -242,7 +242,7 @@ def parse_xml_help(xml_help, match, cli_actions=None):
 
         def do_string_enum(c, el):
             c['choices'] = [e.text for e in el]
-            opts = '|'.join([e.text for e in el if e.tag == 'enum_value'])
+            opts = '|'.join([e.text or '' for e in el if e.tag == 'enum_value'])
             c['opts'] = f'<{opts}>'
             m = c['meaning']
             if '>:' in m:  # split off the opts if given in meaning, we have them in opts
