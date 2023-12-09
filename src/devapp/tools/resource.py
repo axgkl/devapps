@@ -344,6 +344,9 @@ def get_instances(rsc):
     return i
 
 
+settings_marker = '# Resource settings:'
+
+
 class Install:
     """Install methods"""
 
@@ -434,7 +437,7 @@ class Install:
             fn = project.root() + '/bin/%s' % fn_name
             have = read_file(fn, '')
             marker = '-AUTOCREATED- '
-            if have and len(have.split('\n' + marker, 1)[0].splitlines()) > 8:
+            if have and len(have.split(settings_marker)[0].split('\n' + marker, 1)) == 1:
                 return app.warn(
                     'Skipping write of starter file, marker was manually removed',
                     fn=fn,
@@ -447,10 +450,11 @@ class Install:
             else:
                 call = call + '\\\n' + args
             i = rsc
+            D = '\n'.join([f'# {l}' for l in rsc.doc.splitlines()]) or ''
             r = [
                 '#!/usr/bin/env bash',
-                '',
-                '# Delete line containing "%s" to avoid overwrites of this file at project init'
+                D,
+                '# Delete line containing "%s" to avoid overwrites of this file by next resource install.'
                 % marker,
                 "_='%s" % time.ctime(),
                 marker,
@@ -463,7 +467,6 @@ class Install:
             units = g(FLG, 'init_create_unit_files', [])
             if g(FLG, 'init_create_all_units'):
                 units.extend(listed(g(rsc, 'systemd', None)))
-
             has_unit = False
             if any([u for u in units if u == cmd]):
                 has_unit = True
@@ -493,12 +496,12 @@ class Install:
             add('# set e.g. in unit files:')
             add('test -n "$INSTANCE" && inst_postfix="-$INSTANCE" || inst_postfix=""')
             add('')
-            add('# Resource settings:')
+            add(settings_marker)
             # for whoever needs that:
             allk = set()
             for m in to_dict(rsc), spec, spec_env:
                 for k, v in sorted(m.items()):
-                    if k == 'cmd_pre':
+                    if k in {'cmd_pre', 'doc'}:
                         continue
                     allk.add(k)
                     if k == 'port':
