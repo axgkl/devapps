@@ -146,8 +146,13 @@ def git_init():
 
 import sys
 
-rscs_dicts = lambda rscs: [api.to_dict(r) for r in rscs]
-rscs_details = lambda rscs: app.info('Resource details', json=rscs_dicts(rscs))
+
+def rscs_dicts(rscs):
+    return [api.to_dict(r) for r in rscs]
+
+
+def rscs_details(rscs):
+    return app.info('Resource details', json=rscs_dicts(rscs))
 
 
 def confirm(d, rscs):
@@ -159,7 +164,7 @@ def confirm(d, rscs):
         n = r.name
         g = api.g
         if FLG.init_create_all_units:
-            matching_units.extend(to_list(g(r, 'systemd', None)))
+            matching_units.extend(to_list(str(g(r, 'systemd', None))))
         # if given one by one:
         units = g(FLG, 'init_create_unit_files', [])
         cmds = api.rsc_cmds(r)
@@ -175,7 +180,7 @@ def confirm(d, rscs):
 
     rsc = '\n - '.join(n(r) for r in rscs)
     mu = list(set(matching_units))
-    units = 'Unit files for:       ' + ('-' if not mu else ', '.join(mu)) + '\n'
+    units = 'Unit files:           ' + ('-' if not mu else ', '.join(mu)) + '\n'
     r = [
         '',
         cu + ' project directory %s' % d,
@@ -191,7 +196,7 @@ def confirm(d, rscs):
 
 
 def verify_systemctl_availability():
-    if not 'linux' in sys.platform.lower():
+    if 'linux' not in sys.platform.lower():
         app.die('System platform must be Linux for unit files')
     if os.system('type systemctl'):
         app.die('Systemd must be present for unit files')
@@ -211,7 +216,7 @@ def start_editor(finder=api.find_resources_files_in_sys_path):
 def delete_all_matching_service_unit_files(match):
     d = os.environ.get('HOME') + '/.config/systemd/user'
     for fn in os.listdir(d):
-        if not match in fn:
+        if match not in fn:
             app.info('Skipping not matching unit', fn=fn)
         fn = d + '/' + fn
         if not os.path.isfile(fn):
@@ -237,6 +242,7 @@ def get_matching_resources():
     r = api.find_resource_defs()
     rscs = S.rscs_defined
     api.add_install_state(rscs)
+
     # matches = lambda r: any([_ in str(api.to_dict(r)) for _ in m])
     def matches(rsc, m=m):
         r = api.to_dict(rsc)
@@ -253,7 +259,7 @@ def get_matching_resources():
         n = negates
         rscs = [r for r in rscs if not any([_ in str(api.to_dict(r)) for _ in n])]
     disabled.rscs = d = [
-        r for r in rscs if r.disabled == True and not matches(r) and not r.installed
+        r for r in rscs if r.disabled is True and not matches(r) and not r.installed
     ]
     if d:
         app.info('Disabled (only via -irm)', resources=[i.name for i in d])
@@ -262,7 +268,6 @@ def get_matching_resources():
 
 
 def run():
-
     if FLG.install or FLG.init_resource_match or FLG.init_at:
         # backwards compat
         FLG.init_at = FLG.init_at or '.'
@@ -397,7 +402,8 @@ Run `ps -fww $(pgrep -f "systemd --user")` to verify success, then try re-init t
 T_SDU_SVD = T_SDU_SVD.replace('_UID_', str(os.getuid()))
 
 
-main = lambda: run_app(run, flags=Flags)
+def main():
+    return run_app(run, flags=Flags)
 
 
 if __name__ == '__main__':

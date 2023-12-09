@@ -458,6 +458,8 @@ class Install:
                 "'",
             ]
             add = r.append
+            if g(rsc, 'systemd', None) is True:
+                rsc.systemd = cmd
             units = g(FLG, 'init_create_unit_files', [])
             if g(FLG, 'init_create_all_units'):
                 units.extend(listed(g(rsc, 'systemd', None)))
@@ -744,6 +746,14 @@ def find_resources_files_in_sys_path():
     return files
 
 
+def doc(rsc, d=''):
+    for r in rsc.mro():
+        d = g(r, '__doc__', '')
+        if d:
+            return d
+    return d
+
+
 def complete_attrs(rsc):
     fn = rsc._filename
 
@@ -765,7 +775,7 @@ def complete_attrs(rsc):
         if vn != v:
             setattr(rsc, k, vn)
 
-    rsc.doc = rsc.__doc__ or ''
+    rsc.doc = doc(rsc)
     rsc.name = rsc.__name__
     rsc.bin_name = exported_name(rsc)
     rsc.module = rsc.__module__.replace('.operations.resources', '')
