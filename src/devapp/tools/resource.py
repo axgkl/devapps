@@ -426,6 +426,19 @@ class Install:
         env['d_bin'] = project.root() + '/bin'
 
         def write(cmd, fcmd, spec, instance=0, scmds=[]):
+            def env_settings_info_for_start_wrapper(rsc):
+                e = os.environ.get
+                r = ''
+                for ek in rsc.environ:
+                    n = f'{rsc.name}_{ek}'
+                    v = e(n)
+                    if v:
+                        v = v.replace("'", "\\'")
+                        r += f'  {n}={v}\n'
+                if r:
+                    r = 'With Env:\n' + r
+                return r
+
             # if cmd == 'dot':
             #    breakpoint()  # FIXME BREAKPOINT
             if isinstance(spec, str):
@@ -459,6 +472,7 @@ class Install:
                 "_='%s" % time.ctime(),
                 marker,
                 '%s' % call,
+                env_settings_info_for_start_wrapper(rsc),
                 "'",
             ]
             add = r.append
