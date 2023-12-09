@@ -770,8 +770,9 @@ def funcname(f):
 env = os.environ
 
 
-def clean_env_key(s):
-    return ''.join([c for c in s if c in string.digits + string.ascii_letters])
+def clean_env_key(s, add=''):
+    S = string.digits + string.ascii_letters + add
+    return ''.join([c for c in s if c in S])
 
 
 def restart_unshared(name):
@@ -887,7 +888,7 @@ def dt_human(ts_start, ts_end=None):
 
 
 class AllStatic(type):
-    'turn all methods of this class into static methods'
+    "turn all methods of this class into static methods"
 
     new = None
 
@@ -1074,7 +1075,7 @@ def process_instance_offset(base):
 
 
 def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
-    'API: Write a file. chmod e.g. 0o755 (as octal integer)'
+    "API: Write a file. chmod e.g. 0o755 (as octal integer)"
 
     fn = os.path.abspath(fn)
 
