@@ -429,7 +429,7 @@ class Install:
             def env_settings_info_for_start_wrapper(rsc):
                 e = os.environ.get
                 r = ''
-                for ek in rsc.environ:
+                for ek in g(rsc, 'environ', ()):
                     n = f'{rsc.name}_{ek}'
                     v = e(n)
                     if v:
