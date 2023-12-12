@@ -41,9 +41,17 @@ class Plugins:
     pass
 
 
-plugins = lambda: [p for p in dir(Plugins) if not p.startswith('_')]
-_short = lambda p: ''.join([k[0] for k in p.split('_') if k])
-shorts = lambda: {_short(k): k for k in plugins()}
+def plugins():
+    return [p for p in dir(Plugins) if not p.startswith('_')]
+
+
+def _short(p):
+    return ''.join([k[0] for k in p.split('_') if k])
+
+
+def shorts():
+    return {_short(k): k for k in plugins()}
+
 
 example = ['']
 
@@ -79,7 +87,7 @@ def main(argv=None):
         sys.exit(1)
     plugin = sys.argv[1] if len(sys.argv) > 1 else 'x'
     plugin = shorts().get(plugin, plugin)
-    if not plugin in plugins():
+    if plugin not in plugins():
         ec = 0 if any([a for a in sys.argv if a in helpflags]) else 1
         usage(ec)
 
@@ -90,7 +98,7 @@ def main(argv=None):
     sys_argv_rm_minus_h_for_hf(argv, plug, plugname)
     from devapp import app
 
-    app.plugin[0] = plugin   # for logging
+    app.plugin[0] = plugin  # for logging
     plug.main()
 
 
@@ -128,7 +136,7 @@ def all_plugin_dirs(name):
             n = '%s/%s/plugins/%s_%s' % (d, l, name, l)
             if exists(n):
                 bname = os.path.basename(n)
-                if not bname in all:
+                if bname not in all:
                     all[bname] = n
 
     [scan_sys_pth(d) for d in sys.path if os.path.isdir(d)]
@@ -145,7 +153,7 @@ def find_plugins(n_app, pth='./plugins', match='*'):
 def add_plugins(dp, match, _have=[]):
     dplugs = os.path.abspath(dp)
     d = os.path.dirname(dplugs)
-    if not d in sys.path:
+    if d not in sys.path:
         sys.path.insert(0, dir_of(dplugs))
     dpre = dplugs.rsplit('/', 1)[-1]
 
