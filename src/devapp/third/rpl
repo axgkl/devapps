@@ -11,7 +11,7 @@ from stat import *
 
 def show_license(*eat):
     print(
-        '''rpl - replace strings in files
+        """rpl - replace strings in files
 Copyright (C) 2004-2005 Goran Weinholt <weinholt@debian.org>
 Copyright (C) 2004 Christian Haggstrom <chm@c00.info>
 Copyright (C) 2016 Kevin Coyner <kcoyner@debian.org>
@@ -29,7 +29,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-'''
+"""
     )
     sys.exit(0)
 
@@ -68,7 +68,7 @@ def get_files(filenames, recurse, suffixen, verbose, hidden_files):
                     sys.stderr.write('Directory: %s skipped.\n' % filename)
                 continue
         elif S_ISREG(perms.st_mode):
-            if suffixen != [] and not True in [filename.endswith(s) for s in suffixen]:
+            if suffixen != [] and True not in [filename.endswith(s) for s in suffixen]:
                 sys.stderr.write('Skipping: %s (suffix not in list)\n' % filename)
                 continue
             new_files += [(filename, perms)]
@@ -84,11 +84,13 @@ def unescape(s):
 
 def blockrepl(instream, outstream, regex, before, after, blocksize=None):
     encoding = locale.getdefaultlocale()[1]
+    # when export LANG="en_US.UTF-8" is missing we'd fail:
+    encoding = 'utf-8'
     patlen = len(before)
     sum = 0
     if not blocksize:
         blocksize = 2 * patlen
-    tonext = u''
+    tonext = ''
     while 1:
         block = instream.read(blocksize)
         if not block:
@@ -101,7 +103,7 @@ def blockrepl(instream, outstream, regex, before, after, blocksize=None):
             tonext = lastpart[-patlen:]
             parts[-1] = lastpart[: -len(tonext)]
         else:
-            tonext = u''
+            tonext = ''
         if sys.version_info < (3,):
             parts = after.join(parts)
         else:
@@ -268,9 +270,7 @@ def main():
 
     # Tell the user what is going to happen
     if opts.dry_run:
-        sys.stderr.write(
-            'Simulating replacement of "%s" with "%s" ' % (old_str, new_str)
-        )
+        sys.stderr.write('Simulating replacement of "%s" with "%s" ' % (old_str, new_str))
     else:
         sys.stderr.write('Replacing "%s" with "%s" ' % (old_str, new_str))
     if opts.ignore_case:
@@ -298,9 +298,7 @@ def main():
         regex = re.compile(re.escape(old_str), opts.ignore_case and re.I or 0)
 
     total_matches = 0
-    files = get_files(
-        files, opts.recurse, opts.suffixen, opts.verbose, opts.hidden_files
-    )
+    files = get_files(files, opts.recurse, opts.suffixen, opts.verbose, opts.hidden_files)
     for filename, perms in files:
         # Open the input file
         try:
