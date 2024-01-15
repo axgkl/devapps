@@ -601,18 +601,19 @@ class Install:
             # if os.system('type micromamba') == 0 or 1:
             if S.is_mamba and mamba and MRP:
                 ctx['conda'] = mamba
-                # FIXME: The activate during docker build is a problem in micromamba which runs as subprocess
-                # Better create the env via micromamba create -n foo -f <yaml file> first
+                # The activate during docker build is a problem in micromamba which runs as subprocess
                 cmd = [
                     '%(conda)s create %(yes)s -n "%(name)s"',
                     f'. "{MRP}/etc/profile.d/micromamba.sh"',
                     'micromamba activate "%(name)s"',
                 ]
+                # in mamba containers we don't have the .sh file
+                # os.system in python often sees not bash but a minimal shell only
+                if not exists(f'. "{MRP}/etc/profile.d/micromamba.sh"'):
+                    cmd[1] = f'eval "$("{mamba}" shell hook --shell=dash)"'
 
             elif S.is_mamba and mamba:
                 ctx['conda'] = mamba
-                # FIXME: The activate during docker build is a problem in micromamba which runs as subprocess
-                # Better create the env via micromamba create -n foo -f <yaml file> first
                 cmd = [
                     '%(conda)s create %(yes)s -n "%(name)s"',
                     'eval "$(%(conda)s shell hook --shell=bash)"',
