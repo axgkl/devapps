@@ -34,7 +34,7 @@ reportSelfClsParameterName = false
 
 [tool.poetry.dependencies]
 # gevent after monkeypatch and structlog clash with 3.6:
-python = "^3.7"
+python = "^3.8"
 #python = "~3.8"
 # absl-py = "^0.10.0"
 # decorator = "^4.4.2"

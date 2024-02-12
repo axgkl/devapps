@@ -35,6 +35,7 @@ class S:
     conda_prefix = None  # env vars replaced
     fs_dir = None  # filesystem install dest
     constants = {}
+    constants_z = {}  # priority of overwriting constants
     rsc_dirs = {}
 
 
@@ -75,12 +76,25 @@ unit_match = 'DevApp Unit'
 T_unit = T_unit.replace('_MATCH_', unit_match)
 
 
-def add_const(key, val, skip_exists=True):
-    """import order matters, i.e. 4A's flows file will overrule lc-py"""
+def add_const(key, val, z=0):
+    """import order matters, i.e. 4A's flows file will overrule lc-py. For this we have z now"""
+    # if key == 'fn_flows':
+    #     breakpoint()  # FIXME BREAKPOINT
     v = S.constants.get(key)
     if v is not None:
-        app.warn('Overwriting constant %s' % key, have=v, new=val)
+        zhave = S.constants_z[key]
+        if z < zhave:
+            app.info(
+                'NOT overwriting constant %s' % key,
+                keeping=v,
+                wanted=val,
+                z=z,
+                zhave=zhave,
+            )
+            return
+        app.info('Overwriting constant %s' % key, have=v, new=val, z=z, zhave=zhave)
     S.constants[key] = val
+    S.constants_z[key] = z
 
 
 def constant(key, dflt=None):
