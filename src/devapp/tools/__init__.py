@@ -4,6 +4,7 @@ Taken from axc2 pretty much as is
 import collections
 import fcntl
 import json
+import pdb
 
 # colors from the os theme for python:
 import os
@@ -125,6 +126,13 @@ def cast(v, bools={'true': True, 'True': True, 'false': False, 'False': False}):
 # --------------------------------------------------------------------------------- tty
 def have_tty():
     return sys.stdin.isatty() and sys.stdout.isatty()
+
+
+def break_if_have_tty():
+    # stopping when on foreground, to inspect context. We jump back in pdb to the calling frame
+    if have_tty():
+        frame = sys._getframe().f_back
+        pdb.Pdb().set_trace(frame)
 
 
 try:
@@ -269,6 +277,12 @@ def termsize():
 
 
 # -------------------------------------------------------------------------- data utils
+
+
+def cast_list(v, sep=','):
+    return [] if v == '[]' else [s.strip() for s in v.split(sep)] if is_str(v) else v
+
+
 def to_list(o):
     o = [] if o is None else o
     t = type(o)
@@ -871,10 +885,6 @@ def start_of(s, chars=100):
     """to not spam output we often do "foo {a': 'b'...."""
     s = str8(s)
     return s[:100] + '...' if len(s) > 100 else ''
-
-
-def cast_list(v, sep=','):
-    return [] if v == '[]' else [s.strip() for s in v.split(sep)] if is_str(v) else v
 
 
 dt_precision = '%.2fs'
