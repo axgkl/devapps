@@ -11,7 +11,10 @@ try:
 except Exception:
     # no gevent. That's ok for many apps.
     pass
-fn_backd = lambda: os.environ['var_dir'] + '/proc_enter.sock'
+
+
+def fn_backd():
+    return os.environ['var_dir'] + '/proc_enter.sock'
 
 
 def start_pywsgi_server(application, bind=None, with_backdoor=None):
