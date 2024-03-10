@@ -32,9 +32,10 @@ from functools import partial
 from inspect import _empty, signature
 
 from devapp import load
-from devapp.app import FLG, app, flag, run_app
+from devapp.app import FLG, app, run_app
 from devapp.spec import tools as spec_tools
 from devapp.tools import has_tty, write_file
+from absl import flags
 
 try:
     import psutil
@@ -44,13 +45,19 @@ except ImportError as ex:
 
 exists = os.path.exists
 FS = spec_tools.FS
-pyenv = lambda k, dflt=None: load.py_env.get(k, dflt)
+
+
+def pyenv(k, dflt=None):
+    dflt = dflt or k
+    return load.py_env.get(k, dflt)
+
+
 proc_argv = []
 env = os.environ
 
-flag.bool('show', False, 'Dry run, only show args')
+flags.DEFINE_bool('show', False, 'Dry run, only show args')
 m = 'Additional $PATH, added to :%s'
-flag.string('add_path', '', (m % env['PATH']).replace(':', '\n-'))
+flags.DEFINE_string('add_path', '', (m % env['PATH']).replace(':', '\n-'))
 
 # always good to have (for md renders and the like):
 if not env.get('term_with'):
@@ -124,13 +131,13 @@ class DAFunctions:
 
         @staticmethod
         def apps(run=None):
-            """ 
-            Printing all app starter files.  
+            """
+            Printing all app starter files.
 
             The `run` argument allows for further processing (e.g. da spec.apps sc.status).
-            I.e. `run` is convenience, for a loop like 
+            I.e. `run` is convenience, for a loop like
             `while read -r n; do $n sc.status; done < <(da -n wifi_single spec.apps | jq -r .[] )`
-            
+
             Example: da spec.apps sc.status
             """
             # TODO: understand run as a list, i.e. pass a full command with args
@@ -182,7 +189,7 @@ DAFunctions.apps = DAFunctions.spec.apps
 
 
 def verify_lib(lib):
-    app.die('Missing library', lib=lib) if not lib in globals() else 0
+    app.die('Missing library', lib=lib) if lib not in globals() else 0
 
 
 def psutil_str_to_dict(v):
@@ -329,8 +336,8 @@ class AppFunctions:
             env: Include process environ
             memory_maps: Include memory_maps (loaded libs)
             filter: filter on substring
-            tree: Include children down to this level 
-            
+            tree: Include children down to this level
+
             """
             l = dict(locals())
             ps = [psutil.Process(pid)] if pid > -1 else cls._proc(all=all)
@@ -350,7 +357,7 @@ class AppFunctions:
         def pid(cls, all=False):
             """
             Returns pid of process matching $app_run_exe_link and 'start'
-            
+
             all: Return ALL started processes with our name, in a list
             (started in any DA_DIR, within the pid namespace)
             """
@@ -492,7 +499,7 @@ def set_da_dir_by_da_name(name, nofail=False):
 
 
 def import_and_expose_da_level_modules():
-    """ import of modules only for da utility, not for apps"""
+    """import of modules only for da utility, not for apps"""
     from devapp.spec import build as sb
     from devapp.tools import exec_file
 
@@ -512,7 +519,7 @@ def devapps_run():
     flag.string('da_name', '$DA_NAME', 'Solution name', short_name='n')
     args = sys.argv
     parse_flags_funcname_and_args(args, for_devapps=True)
-    if not 'DA_DIR' in env:
+    if 'DA_DIR' not in env:
         set_da_dir_and_name_from_current_directory()
     # special case: Help required:
     # the or is for: da -n wifi_single -h
@@ -529,13 +536,14 @@ def devapps_run():
     run_app(f, wrapper=partial(wrapped_app_func, ext_proc=True))
 
 
-is_help_intent = lambda: len(sys.argv) == 2 and sys.argv[-1] in [
-    '-h',
-    '-hh',
-    '--help',
-    '-hhh',
-    '--helpfull',
-]
+def is_help_intent():
+    return len(sys.argv) == 2 and sys.argv[-1] in [
+        '-h',
+        '-hh',
+        '--help',
+        '-hhh',
+        '--helpfull',
+    ]
 
 
 def wrapped_app_func(f, ext_proc=False):
@@ -551,7 +559,7 @@ def wrapped_app_func(f, ext_proc=False):
 
     if FLG.add_path:
         have = env['PATH'].split(':')
-        [have.insert(0, i) for i in reversed(FLG.add_path.split(':')) if not i in have]
+        [have.insert(0, i) for i in reversed(FLG.add_path.split(':')) if i not in have]
         env['PATH'] = ':'.join(have)
     return f()
 
@@ -596,7 +604,6 @@ def app_run(args):
     ApplicationFunctions = AppFunctions
 
     if load.app_mod:
-
         if func_name == 'start':
             # app was importable, for devapps run['start'] = '<modulename>' -> ignored:
             add_prod_flagfile()
@@ -626,8 +633,12 @@ def app_run(args):
     run_app(f, wrapper=partial(wrapped_app_func, ext_proc=True))
 
 
-pidfile = lambda: env['pidfile']
-pidstarter = lambda: env['var_dir'] + '/pidfile.starter'
+def pidfile():
+    return env['pidfile']
+
+
+def pidstarter():
+    return env['var_dir'] + '/pidfile.starter'
 
 
 def add_prod_flagfile():
@@ -684,7 +695,10 @@ def run_proc(args, for_app=False, handle_sigs=False):
     args = [run_helper(a) if isinstance(a, list) else a for a in args]
     args = [str(l) for l in args]
     if FLG.show:
-        s = lambda i: '"%s"' % i if not i.startswith('-') else i
+
+        def s(i):
+            return '"%s"' % i if not i.startswith('-') else i
+
         app.info('Dry Run', cmdline=' '.join([s(a) for a in args]))
         return 0
     # raises:
@@ -778,7 +792,7 @@ RUN = {'argv_orig': [], 'argv': [], 'func_args': [], 'func_name': None}
 
 
 def parametrize_external_process():
-    """ External process -> all flags before "func_name" (which is the process) belong to flags, 
+    """External process -> all flags before "func_name" (which is the process) belong to flags,
     rest is process args, e.g. --log_level debug tree -L 2"""
     argv = RUN['argv_orig']
     pos = argv.index(RUN.get('func_name_aliased') or RUN['func_name'])
@@ -788,7 +802,7 @@ def parametrize_external_process():
 
 
 def parse_flags_funcname_and_args(sys_argv, for_devapps=False):
-    """Fills the RUN structure """
+    """Fills the RUN structure"""
 
     def get_all_flags():
         from absl import app
@@ -813,7 +827,7 @@ def parse_flags_funcname_and_args(sys_argv, for_devapps=False):
                 set_da_dir_and_name_from_cli_param(a, args=l)
             RUN['argv'].append(a)
             f = defined_flags.get(a)
-            if f and not 'Bool' in str(f):
+            if f and 'Bool' not in str(f):
                 if not l:
                     raise Exception('Value required for %s' % a)
                 RUN['argv'].append(l.pop(0))
@@ -862,7 +876,7 @@ def set_da_dir_and_name_from_cli_param(a, args):
         env['DA_NAME'] = env['DA_DIR'].rsplit('/', 1)[-1]
     elif a.startswith('--da_name') or a == '-n':
         env['DA_NAME'] = _cli_val(a, args)
-        if not 'DA_DIR' in env:
+        if 'DA_DIR' not in env:
             set_da_dir_by_da_name(env['DA_NAME'], nofail=True)
 
 
@@ -936,7 +950,7 @@ def with_args(f):
 
         else:
             P = None
-            while sigv and not P in have:
+            while sigv and P not in have:
                 P = sigv.pop(0)
                 have.append(P)
             a += (sig_type(p, P),)
