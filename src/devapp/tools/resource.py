@@ -545,7 +545,7 @@ class Install:
             add('')
             # only for services. Tools not: (e.g. cd mydir && git status -> bum, differentdir)
             if has_unit:
-                add('cd "%s"' % project.root())
+                add('builtin cd "$PROJECT_ROOT"')
             # for client but also possibly other python resources:
             env['PYTHONPATH'] = env.get('PYTHONPATH', '')
             add('export PYTHONPATH="%(d_conf)s:%(PYTHONPATH)s"' % env)
@@ -558,7 +558,8 @@ class Install:
             p += ':' + d
             add('export PATH="$path:%s"' % p)
             add('')
-
+            _ = '$PROJECT_ROOT/.creds_$bin_name'
+            add(f'test -e "{_}" && {{ set -a && . "{_}" && set +a; }}')
             add('return 2>/dev/null # when sourced\n')
 
             if pre_exec:
