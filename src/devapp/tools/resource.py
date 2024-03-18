@@ -499,11 +499,14 @@ class Install:
             if any([u for u in units if u == cmd]):
                 has_unit = True
                 n_svc = Install.write_unit_file(cmd, fn, rsc, instance)
-                scmd = f'systemctl --user --no-pager "$1" "{n_svc}"'
+                scmd = f'systemctl --user --no-pager ${{*:-}} "{n_svc}"'
+                jcmd = f'journalctl --user -u "{n_svc}"'
                 if instances:
-                    _ = f'\n        systemctl --user --no-pager "$1" "{n_svc}" '
-                    scmds.append(_)
+                    jcmd = jcmd.rsplit('-', 1)[0] + '-\\*.service"'  # wildcard
+                    _ = f'\n        systemctl --user --no-pager ${{*:-}} "{n_svc}"'
+                    scmds.append(_)  # adding one more per loop
                     scmd = ''.join(scmds)
+
                 s = """
 
                 case "${1:-}" in
@@ -512,9 +515,14 @@ class Install:
                         _CMD_
                         exit $?
                         ;;
+                    j)
+                        shift && set -x
+                        _JCMD_ "$@"
+                        exit $?
+                        ;;
                 esac
                 """
-                s = s.replace('_CMD_', scmd)
+                s = s.replace('_CMD_', scmd).replace('_JCMD_', jcmd)
                 add(deindent(s))
 
             # env['PATH'] = '%s:$PATH' % g(rsc, 'path')
