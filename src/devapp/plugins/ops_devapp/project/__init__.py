@@ -28,6 +28,7 @@ At install we will (re-)initialize a "project_dir", at location given with --ini
 
 Privilege escalation is not required for any of these steps.
 """
+
 # Could be done far smaller.
 from re import match
 from devapp import gevent_patched
@@ -72,7 +73,7 @@ class Flags(api.CommonFlags):
         d = False
 
     class init_create_all_units:
-        n = 'If set we create unit files for ALL service type resources'
+        n = 'If set we create (user) unit files for service type resources'
         d = False
 
     class init_create_unit_files:
