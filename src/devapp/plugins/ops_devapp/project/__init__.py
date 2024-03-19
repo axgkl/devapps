@@ -45,6 +45,7 @@ from devapp import tools
 from devapp.tools import (
     exists,
     to_list,
+    sp_call,
     repl_dollar_var_with_env_val,
     project,
     read_file,
@@ -81,6 +82,10 @@ class Flags(api.CommonFlags):
 
         n = 'List service unit files you want to have created for systemctl --user.'
         d = []
+
+    class create_system_units:
+        n = 'Instead of user unit files, create system files, in /etc/systemd/system. Implies -icau. 🟥 A sudo password is required!'
+        d = False
 
     class resource_match:
         s = 'm'
@@ -281,6 +286,9 @@ def run():
         app.info('details', json=rscs_dicts(rscs))
         return [r for r in rscs]
 
+    if FLG.create_system_units:
+        FLG.init_create_all_units = True
+
     m = FLG.delete_all_matching_service_unit_files
     if m:
         return do(delete_all_matching_service_unit_files, match=m)
@@ -304,6 +312,7 @@ def run():
 
     rscs = get_matching_resources()
     project.set_project_dir(dir=d)
+
     if FLG.init_create_unit_files:
         do(verify_systemctl_availability)
 
@@ -334,17 +343,29 @@ def run():
         do(api.Install.resource, r, ll=10)
 
     do(git_init)
-    if FLG.init_create_unit_files:
+    typ = 'user' if not FLG.create_system_units else 'system'
+    if FLG.init_create_unit_files and os.environ.get('unit_file_changed'):
+        as_root = FLG.create_system_units
+        # r = sp_call('ls', as_root=True, get_all=True)
         app.info('All project file created.')
-        app.info('Enabling systemd user service units.')
-        if not os.system('systemctl --user --no-pager status | head -n0'):
-            app.info('systemd --user available, calling daemon-reload')
-            if not os.system('systemctl --user daemon-reload'):
-                return app.info('Done init.')
+        app.info(f'Enabling systemd --{typ} service units.')
 
-        app.warn('systemd --user service seems not running', hint=T_SDU_SVD)
+        def run(*a):
+            return sp_call('systemctl', f'--{typ}', *a, as_root=as_root, get_out=True)[
+                'exit_status'
+            ]
+
+        if not run('--no-pager', 'status'):
+            app.info(f'systemd --{typ} available, calling daemon-reload')
+            if not run('daemon-reload'):
+                return app.info('Done daemon-reload.')
+
+        app.error(f'systemd --{typ} service seems not working', hint=T_SDU_SVD)
         # automatic installs must get an error when this happens:
-        app.die('Failing the project init command, please fix systemd --user')
+        _ = f'Failing the project init command, please fix systemd --{typ}'
+        # we don't die. The user unit may still work when started manually and that's of use for the user.
+        # we did print the warning prominently.
+        app.error(_, silent=True)
 
 
 # https://serverfault.com/a/1026914 - this is really relevant,
@@ -398,6 +419,11 @@ ________________________________________________________________________________
 Then enable and start the unit.
 
 Run `ps -fww $(pgrep -f "systemd --user")` to verify success, then try re-init the project.
+
+====================================================================================================
+
+🟥 If this all does not work for you, then consider providing the --create_system_units (-csu) switch, which will install the resources as system services.
+You will be asked for your sudo password then, which is required (except NOPASSWD is set for your user).
 """
 
 T_SDU_SVD = T_SDU_SVD.replace('_UID_', str(os.getuid()))

@@ -12,6 +12,7 @@ import re
 import shutil
 import socket
 import string
+import getpass
 import struct
 import subprocess
 import sys
@@ -26,7 +27,6 @@ from fnmatch import fnmatch
 from functools import partial
 from pprint import pformat
 from threading import current_thread
-
 import toml
 from absl import flags
 from pycond import parse_cond
@@ -75,6 +75,10 @@ def hostname(c=[0]):
         return i
     c[0] = socket.gethostname()
     return c[0]
+
+
+def username():
+    return getpass.getuser()
 
 
 def gitcmd(dir, cmd='git rev-parse --verify HEAD'):
@@ -734,10 +738,14 @@ _sudo_pw = [None]  # None: undef
 
 def sudo_pw():
     fns = env.get('DA_FILE_SUDO_PASSWORD') or env['HOME'] + '/.sudo_password'
-    return env.get('SUDO_PASSWORD') or read_file(fns, '').strip()
+    pw = env.get('SUDO_PASSWORD') or read_file(fns, '').strip()
+    if not pw and have_tty():
+        _ = 'Enter sudo password (leave empty if NOPASSWD is set or sudo not expired): '
+        pw = getpass.getpass(_)
+    return pw
 
 
-def sp_call(*args, as_root='false', get_all=False):
+def sp_call(*args, as_root='false', get_all=False, get_out=False, shell=False):
     """run command - as root if 'true' or True"""
     # todo: as_root = 'auto'
     sp = subprocess
@@ -755,11 +763,19 @@ def sp_call(*args, as_root='false', get_all=False):
         stdin = pw.stdout
     else:
         stdin = sys.stdin
-    proc = sp.Popen(list(args), shell=False, stdin=stdin, stderr=sp.PIPE)
+    stdout = None
+    if get_out:
+        get_all = True
+        stdout = sp.PIPE
+    proc = sp.Popen(list(args), shell=shell, stdin=stdin, stderr=sp.PIPE, stdout=stdout)
     out, err = proc.communicate()
     if not get_all:
         return err
-    return {'exit_status': int(proc.wait()), 'stderr': err, 'stdout': '<term>'}
+    return {
+        'exit_status': int(proc.wait()),
+        'stderr': err,
+        'stdout': '<term>' if not get_out else out,
+    }
 
 
 def exec_file(fn, ctx=None, get_src=None):

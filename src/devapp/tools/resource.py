@@ -11,9 +11,11 @@ from functools import partial
 import importlib
 from devapp.app import app, do, run_app, system
 from devapp.tools import (
+    username,
     offset_port,
     to_list as listed,
     FLG,
+    sp_call,
     project,
     deindent,
     exists,
@@ -66,6 +68,7 @@ RestartSec       = 5
 SendSIGKILL      = yes
 TimeoutStopSec   = 5
 SyslogIdentifier = %(name)s
+%(user)s
 
 [Install]
 WantedBy = default.target
@@ -411,27 +414,59 @@ class Install:
         name = exported_name(rsc, name)
 
         inst_name = f'{name}-{instance}' if instance else name
+        user = ''
+        ddest = dh = os.environ['HOME'] + '/.config/systemd/user'
+        exec = fn
+        if FLG.create_system_units:
+            # here we cannot write directly, will os.system(mv) it after write:
+            dh = '/etc/systemd/system'
+            user = f'User             = {username()}'
+            # selinux only accepts bin files in certain places!
+            exec = '/usr/local/bin/' + '__'.join(fn.split('/')[1:])
         m = {
             'name': inst_name,
             'descr': '%s %s ' % (g(rsc, 'n', inst_name), pn),
             'ctime': time.ctime(),
-            'exec_start': fn,
+            'exec_start': exec,
             'env_instance': instance if instance else '',
+            'user': user,
         }
-        d = os.environ['HOME'] + '/.config/systemd/user'
-        if not exists(d):
-            app.info('creating systemd user dir', dir=d)
-            os.makedirs(d)
+        if not exists(dh):
+            app.info('creating systemd user dir', dir=dh)
+            os.makedirs(dh)
 
         n_svc = '%s-%s.service' % (inst_name, pn)
-        sfn = d + '/' + n_svc
+        sfndest = ddest + '/' + n_svc
+        sfnh = dh + '/' + n_svc
         unit = T_unit % m
-        have = read_file(sfn, dflt='')
-        if unit != have:
-            write_file(sfn, unit)
-            app.info('have written unit file', fn=sfn)
+        have = read_file(sfnh, dflt='')
+        if unit.split('WantedBy', 1)[0] != have.split('WantedBy', 1)[0]:
+            os.environ['unit_file_changed'] = '1'
+            write_file(sfndest, unit)
+            app.info('have written unit file', fn=sfndest)
+            if FLG.create_system_units:
+                app.info(f'Will now try move it to {dh}')
+                r = sp_call('mv', sfndest, sfnh, as_root=True, get_all=True)
+
+                def Die(what, d, r):
+                    return app.die(
+                        f'Could not move {what} file',
+                        wanted_dest=d,
+                        json=r,
+                        hint='sudo password problem?',
+                        silent=True,
+                    )
+
+                Die('unit', sfnh, r) if r['exit_status'] != 0 else 0
+                # selinux only accepts bin files in certain places!
+                app.info('Moving to /usr/local/bin', fn=fn, exec=exec, hint='selinux...')
+                r = sp_call('mv', fn, exec, as_root=True, get_all=True)
+                Die('bin wrapper', exec, r) if r['exit_status'] != 0 else 0
+                app.info('symlinking', fn=fn, exec=exec)
+                os.system(f'ln -s "{exec}"  "{fn}"')
+
         else:
-            app.debug('unit file unchanged', fn=sfn)
+            app.info('unit file unchanged', fn=sfnh)
         return n_svc
 
     def write_starter_and_unit_file(rsc):
@@ -496,14 +531,19 @@ class Install:
             if g(FLG, 'init_create_all_units'):
                 units.extend(listed(g(rsc, 'systemd', None)))
             has_unit = False
+            sudo = ''
+            typ = '--user '
+            if FLG.create_system_units:
+                sudo = 'sudo '
+                typ = ''
             if any([u for u in units if u == cmd]):
                 has_unit = True
                 n_svc = Install.write_unit_file(cmd, fn, rsc, instance)
-                scmd = f'systemctl --user --no-pager ${{*:-}} "{n_svc}"'
-                jcmd = f'journalctl --user -u "{n_svc}"'
+                scmd = f'{sudo}systemctl {typ}--no-pager ${{*:-}} "{n_svc}"'
+                jcmd = f'{sudo}journalctl {typ}-u "{n_svc}"'
                 if instances:
                     jcmd = jcmd.rsplit('-', 1)[0] + '-\\*.service"'  # wildcard
-                    _ = f'\n        systemctl --user --no-pager ${{*:-}} "{n_svc}"'
+                    _ = f'\n        {sudo}systemctl {typ}--no-pager ${{*:-}} "{n_svc}"'
                     scmds.append(_)  # adding one more per loop
                     scmd = ''.join(scmds)
 
