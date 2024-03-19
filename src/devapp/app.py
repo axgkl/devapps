@@ -78,6 +78,9 @@ class App:
     def error(self, msg, **kw):
         kvprint('ERR ', msg, kw)
 
+    def fatal(self, msg, **kw):
+        kvprint('DIE ', msg, kw)
+
     def notify(self, msg, **kw):
         notify(App, msg, **kw)
 
@@ -163,7 +166,7 @@ def set_app(name, log):
     def die(msg, silent=False, **kw):
         """Application decided to bail out"""
         if silent:
-            app.warn(msg, **kw)
+            app.fatal(msg, **kw)
             sys.exit(1)
         raise DieNow(msg, kw)
 
