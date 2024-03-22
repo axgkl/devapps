@@ -76,7 +76,10 @@ def parse_via(url, props=None, default_port=None, add_caps_str=False, cast=False
         m['ssl'] = True
         m['caps'][c.index('aaas')] = 'aaa'
 
-    m.update(parse_qsl(m.pop('query', {})))
+    q = parse_qsl(m.pop('query', {}))
+    if q:
+        m['_query'] = q
+    m.update(q)
 
     # dia:
     if semicolnfos:
@@ -109,7 +112,13 @@ class Conn:
         # print('foo' * 1000)
         print(
             '%s src: %s, via: %s, sink: %s, next: %s'
-            % (' ' * ind, c.src.name, via, sink, c.next.src.name if c.next else '-',)
+            % (
+                ' ' * ind,
+                c.src.name,
+                via,
+                sink,
+                c.next.src.name if c.next else '-',
+            )
         )
         ind = ind + 2
         c.next.show(ind) if c.next else None
