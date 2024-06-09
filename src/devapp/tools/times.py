@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 
 
@@ -61,3 +61,26 @@ class times:
             return time.mktime(time.strptime(s, f'%Y-%m-%dT%H:%M:%S{nanos}Z'))
         # +0200 at the end:
         return time.mktime(time.strptime(s, f'%Y-%m-%dT%H:%M:%S{nanos}%z'))
+
+
+def ago(unixtime):
+    diff = datetime.now() - datetime.fromtimestamp(unixtime)
+    diff_seconds = diff.total_seconds()
+
+    periods = (
+        ('year', 60 * 60 * 24 * 365),
+        ('month', 60 * 60 * 24 * 30),
+        ('day', 60 * 60 * 24),
+        ('hour', 60 * 60),
+        ('min', 60),
+        ('sec', 1),
+    )
+
+    strings = []
+    for period_name, period_seconds in periods:
+        if diff_seconds >= period_seconds:
+            period_value, diff_seconds = divmod(diff_seconds, period_seconds)
+            has_s = 's' if period_value > 1 else ''
+            strings.append('%d %s%s' % (period_value, period_name, has_s))
+
+    return ', '.join(strings) + ' ago'
