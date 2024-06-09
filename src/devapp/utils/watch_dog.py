@@ -7,7 +7,7 @@ ground process - this one.
 Usage:
     See devapp.app.py, search dirwatch
 """
-signal_handled = 1   # here app will continue
+signal_handled = 1  # here app will continue
 import os
 import sys
 import time
@@ -15,6 +15,9 @@ from fnmatch import fnmatch
 from functools import partial
 import signal
 
+# sometimes it does not exit - outside looper can kill it:
+with open('.pid_watch_dog', 'w') as fd:
+    fd.write(str(os.getpid()))
 WD = 'WATCHDOG: '
 
 out = partial(print, file=sys.stderr)
@@ -51,7 +54,7 @@ def start_dir_watch(dir_pid_match_rec):
                     return
             if now() - last() < freq:
                 return
-            time.sleep(0.1)   # give app time to finish write
+            time.sleep(0.1)  # give app time to finish write
             _ = f' => Sending signal {sig}!'
             out(WD + f'Matching event: {event.event_type}  path : {event.src_path} {_}')
             try:
