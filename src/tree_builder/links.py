@@ -6,7 +6,7 @@ def port_from_preset(p):
 
 
 # ----------------------------------------------------------------------------
-from urllib.parse import urlsplit, parse_qsl
+from urllib.parse import urlsplit, parse_qsl, quote
 
 
 def parse_via(url, props=None, default_port=None, add_caps_str=False, cast=False):
@@ -44,6 +44,20 @@ def parse_via(url, props=None, default_port=None, add_caps_str=False, cast=False
         url = 'ip://'
     if not '://' in url:
         url += '://'
+
+    # deal with crazy stuff in password:
+    # Rule: NO ? or @ in user or password
+    pre = url.split('?', 1)
+    quoted_to_orig = []
+    if '@' in pre[0]:
+        scheme, r = pre[0].split('://', 1)
+        orig_upw, r = r.split('@', 1)
+        orig_upw_list = orig_upw.split(':', 1)  # len 1 or 2
+        quoted_upw = ':'.join([quote(i, safe='') for i in orig_upw_list])
+        quoted_to_orig.append([quoted_upw, orig_upw, orig_upw_list])
+        url = f'{scheme}://{quoted_upw}@{r}'
+        if len(pre) > 1:
+            url += f'?{pre[1]}'
 
     u = urlsplit(url)
     hostport = u.netloc
@@ -91,6 +105,16 @@ def parse_via(url, props=None, default_port=None, add_caps_str=False, cast=False
     if cast:
         for k, v in m.items():
             m[k] = cast_str(v) if isinstance(v, str) else v
+
+    # replace user and pass back to originals:
+    r = quoted_to_orig
+    if r:
+        quoted, orig, user_pass = r[0]
+        m['netloc'] = m['netloc'].replace(quoted, orig)
+        if 'username' in m:
+            m['username'] = user_pass[0]
+        if len(user_pass) > 1:
+            m['password'] = user_pass[1]
     return m
 
 
