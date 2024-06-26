@@ -31,3 +31,7 @@ docs/dev/plugins.md.lp.py
 docs/dev/flags.md.lp.py
 docs/install/dev_inst.md.lp.py
 docs/projects/usage.md.lp.py
+src/devapp/tools/git.py
+src/structlogging/r.py
+dump.rdb
+.binenv.lock

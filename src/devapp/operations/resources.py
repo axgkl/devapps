@@ -29,7 +29,7 @@ def verify_tools(path, rsc, **kw):
     for p in rsc.provides:
         d = path + '/' + p
         if not exists(d):
-            app.info('Not found', cmd=d)
+            app.error('Not found', cmd=d)
             return False
     return True
 
