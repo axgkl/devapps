@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# TODO:  🟥 src/devapp/utils/watch_dog.py -> https://github.com/samuelcolvin/watchfiles
 """
 Since entr always requires 2 terminals, one for entr, one for the reloader,
 we've put filewatching capabilities into the devapp itself - spawned as back
@@ -37,7 +38,7 @@ def start_dir_watch(dir_pid_match_rec):
     sig = int(sig or signal_handled)
     freq = int(freq or 1)
     pid = int(pid)
-    if not '*' in match:
+    if '*' not in match:
         match = ('*' + match + '*').replace('**', '*')
     l = dict(locals())
     l.pop('dir_pid_match_rec')
