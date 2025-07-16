@@ -32,16 +32,16 @@ jobs:
       max-parallel: 6
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.7", "3.8"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: AllowSystemdUser
         shell: bash -l {0}
         run: loginctl enable-linger runner
 
       - name: Set up the Miniconda Root Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache_name: miniconda-root-3
         with:
@@ -56,7 +56,7 @@ jobs:
 
       - name: Set up the Miniconda Envs Cache
         # they delete unused ones after 7 days.
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache_name: miniconda-envs-3-${{ env.PROJECT }}_py${{ matrix.python-version }}_${{ hashFiles('pyproject.toml', 'scripts/**') }}
         with:
@@ -83,4 +83,4 @@ jobs:
         shell: bash -l {0}
         env:
           pyver: "${{ matrix.python-version }}"
-        run: "source ./make -a && ${{ env.pyver == '3.7' && 'mkdocs gh-deploy --force' || true }}"
+        run: "source ./make -a && ${{ matrix.python-version == '3.11' && 'mkdocs gh-deploy --force' || 'true' }}"
