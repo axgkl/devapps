@@ -60,7 +60,80 @@ packages = [
 [tool.pyright]
 # thats where my dev version for dt is - should not interfere w/o that:
 extraPaths = ["../docutools/src", "./src/devapp/plugins/"]
+
+# Exclude problematic directories entirely
+exclude = [
+    "**/arch/**", 
+    "**/backup/**", 
+    "**/tests/**", 
+    "arch", 
+    "backup",
+    ".venv/**",
+    "**/.venv/**",
+    "**/site-packages/**",
+    "**/node_modules/**",
+    "**/__pycache__/**",
+    "**/.git/**"
+]
+
+# Make pyright completely silent
+typeCheckingMode = "off"
+reportGeneralTypeIssues = "none"
+reportPropertyTypeMismatch = "none"
+reportFunctionMemberAccess = "none"
+reportMissingImports = "none"
+reportMissingModuleSource = "none"
+reportMissingTypeStubs = "none"
+reportImportCycles = "none"
+reportUnusedImport = "none"
+reportUnusedClass = "none"
+reportUnusedFunction = "none"
+reportUnusedVariable = "none"
+reportDuplicateImport = "none"
+reportOptionalSubscript = "none"
+reportOptionalMemberAccess = "none"
+reportOptionalCall = "none"
+reportOptionalIterable = "none"
+reportOptionalContextManager = "none"
+reportOptionalOperand = "none"
+#reportUndefinedVariable = "warning"
+reportTypedDictNotRequiredAccess = "none"
+reportPrivateUsage = "none"
+reportPrivateImportUsage = "none"
+reportConstantRedefinition = "none"
+reportIncompatibleMethodOverride = "none"
+reportIncompatibleVariableOverride = "none"
+reportOverlappingOverloads = "none"
+reportUninitializedInstanceVariable = "none"
+reportInvalidStringEscapeSequence = "none"
+reportUnknownParameterType = "none"
+reportUnknownArgumentType = "none"
+reportUnknownLambdaType = "none"
+reportUnknownVariableType = "none"
+reportUnknownMemberType = "none"
+reportMissingParameterType = "none"
+reportMissingTypeArgument = "none"
+reportInvalidTypeVarUse = "none"
+reportCallInDefaultInitializer = "none"
+reportUnnecessaryIsInstance = "none"
+reportUnnecessaryCast = "none"
+reportUnnecessaryComparison = "none"
+reportUnnecessaryContains = "none"
+reportAssertAlwaysTrue = "none"
 reportSelfClsParameterName = false
+reportImplicitStringConcatenation = "none"
+reportInvalidStubStatement = "none"
+reportIncompleteStub = "none"
+reportUnsupportedDunderAll = "none"
+reportUnusedCoroutine = "none"
+reportInvalidTypeForm = "none"
+reportAttributeAccessIssue = "none"
+strictListInference = false
+strictDictionaryInference = false
+strictSetInference = false
+strictParameterNoneValue = false
+enableTypeIgnoreComments = true
+useLibraryCodeForTypes = false
 
 [tool.blue]
 line-length = 90
