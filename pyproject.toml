@@ -63,17 +63,17 @@ extraPaths = ["../docutools/src", "./src/devapp/plugins/"]
 
 # Exclude problematic directories entirely
 exclude = [
-    "**/arch/**", 
-    "**/backup/**", 
-    "**/tests/**", 
-    "arch", 
-    "backup",
-    ".venv/**",
-    "**/.venv/**",
-    "**/site-packages/**",
-    "**/node_modules/**",
-    "**/__pycache__/**",
-    "**/.git/**"
+  "**/arch/**",
+  "**/backup/**",
+  "**/tests/**",
+  "arch",
+  "backup",
+  ".venv/**",
+  "**/.venv/**",
+  "**/site-packages/**",
+  "**/node_modules/**",
+  "**/__pycache__/**",
+  "**/.git/**",
 ]
 
 # Make pyright completely silent
@@ -96,7 +96,7 @@ reportOptionalCall = "none"
 reportOptionalIterable = "none"
 reportOptionalContextManager = "none"
 reportOptionalOperand = "none"
-#reportUndefinedVariable = "warning"
+reportUndefinedVariable = "warning"
 reportTypedDictNotRequiredAccess = "none"
 reportPrivateUsage = "none"
 reportPrivateImportUsage = "none"
