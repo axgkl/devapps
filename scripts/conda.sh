@@ -15,6 +15,7 @@ function make_conda_root_env { # creates the root conda env if not present yet
 
 function make_conda_py_env { # creates the venv for the project and poetry installs
     # main conda bin is in path
+    set -x
     local n="${PROJECT}_py${pyver}"
     local p="$(conda_root)/envs/$n"
     eval "$(micromamba shell hook --shell "bash")"
