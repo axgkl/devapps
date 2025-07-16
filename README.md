@@ -31,3 +31,34 @@ and more.
 
 
 Documentation: https://axgkl.github.io/devapps/
+
+## Update 2025-07: Installation
+
+### Modern Installation (Recommended)
+
+For development and contribution, we now support modern tooling:
+
+- **[uv](https://docs.astral.sh/uv/)** for fast Python package and project management
+- **[just](https://just.systems/)** for convenient command running
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install just (if not already installed) 
+# macOS:
+brew install just
+# Or see: https://just.systems/man/en/chapter_1.html
+
+# Clone and setup
+git clone https://github.com/axgkl/devapps.git
+cd devapps
+uv sync --extra dev
+
+# Available commands
+just --list
+```
+
+### Legacy Installation
+
+⚠️ **Note**: Documentation still shows installation using bash scripts and poetry/conda. The modern uv + just approach above is now preferred for development.
