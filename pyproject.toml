@@ -128,6 +128,12 @@ reportUnsupportedDunderAll = "none"
 reportUnusedCoroutine = "none"
 reportInvalidTypeForm = "none"
 reportAttributeAccessIssue = "none"
+reportArgumentType = "none"
+reportReturnType = "none"
+reportAssignmentType = "none"
+reportVariableUnused = "none"
+reportFunctionNotUsed = "none"
+reportClassNotUsed = "none"
 strictListInference = false
 strictDictionaryInference = false
 strictSetInference = false
@@ -159,6 +165,7 @@ select = ["E", "F", "B"] # Enable flake8-bugbear (`B`) rules.
 ignore = [
   "E501", # Never enforce `E501` (line length violations).
   "E741", # short var names
+  "E731", # Do not assign a lambda expression, use a def
 ]
 fixable = ["ALL"]
 unfixable = [
