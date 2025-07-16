@@ -385,14 +385,14 @@ def add_link(ports=None):
         return connect
     offs = getattr(ports, '_offset_', None) or 0
     if not str(offs).isdigit():
-        raise Exception('No numeric port offset: %s' % off)
+        raise Exception('No numeric port offset: %s' % offs)
     offs = int(offs)
     s = lambda k, m: k.startswith(m)
     for k in dir(ports):
         if not s(k, 'ext_') and not s(k, '_'):
             p = int(getattr(ports, k))
             if p + offs > 655535 or p + offs < 10:
-                raise Exception('Port must be 10 < port < 655535. have  %s' % (p + port))
+                raise Exception('Port must be 10 < port < 655535. have  %s' % (p + offs))
             setattr(ports, k, p + offs)
     return connect
 
