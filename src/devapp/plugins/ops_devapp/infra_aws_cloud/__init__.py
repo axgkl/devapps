@@ -18,7 +18,10 @@ from devapp.app import run_app, FLG, app
 from devapp.tools.infra import Provider, Api, Prov, fmt, rm, wait
 from devapp.tools.infra.actions import Actions, Flags, conv2classmethods
 import time
-import hmac, hashlib, requests, base64
+import hmac
+import hashlib
+import requests
+import base64
 from operator import setitem
 from devapp.tools import cache, write_file
 
@@ -254,7 +257,7 @@ class AA:
 def xval(s, tag, d=''):
     # sry - but when I was young, allowing this was a main selling point of XML:
     t = f'<{tag}>'
-    return d if not t in s else s.split(t, 1)[1].split(f'</{tag}>', 1)[0]
+    return d if t not in s else s.split(t, 1)[1].split(f'</{tag}>', 1)[0]
 
 
 class zones:

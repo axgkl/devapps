@@ -1,6 +1,7 @@
 import rx as Rx
 from rx.subject.subject import Subject
-import time, sys
+import time
+import sys
 import subprocess as sp
 from interactive.conf import FLG, argv0
 from rx import operators as rx

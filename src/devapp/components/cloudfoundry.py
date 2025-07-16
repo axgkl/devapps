@@ -55,7 +55,7 @@ def cfg(c=[], all=None):
             'ssl_verify': 'true',
             'timeout': 1,
         }
-    if not FLG.endpoint_name in c[0]:
+    if FLG.endpoint_name not in c[0]:
         t = CloudFoundry.authenticate()
         c[0][FLG.endpoint_name] = t
     if all:

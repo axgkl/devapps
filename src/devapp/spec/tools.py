@@ -72,7 +72,7 @@ class FS:
         # e.g. /etc mounted before /etc/systemd/system copied
         for k in sorted(fs, key=len):
             src, meth = fs[k]['from'], fs[k]['meth']
-            if not meth in run:
+            if meth not in run:
                 continue
             FS.app('info', meth, to=k, frm=src)
             getattr(FS, meth)(frm=src, to=k)
@@ -210,14 +210,14 @@ def full_url_and_path(env, url, mode):
         app.die('Not supported', mode=mode, url=url)
     if url[0] in ('/', ':'):
         url = url[1:]
-    if not ':' in url:
+    if ':' not in url:
         url = ':' + url
     pres, url = url.split(':', 1)
     if not pres:
         pre = 'DA_URL_%s' % mode.upper()
     else:
         pre = 'DA_URL_%s' % pres
-    if not pre in env:
+    if pre not in env:
         app.die(
             'URL shortcut specified but not found in environ',
             url=orig_url,

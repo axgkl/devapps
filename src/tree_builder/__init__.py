@@ -338,8 +338,8 @@ class TypeMetaClass(ItemGetterMetaType):
 
         if R.hirarchy_built:
             out('adding a class', name, bases)
-            if not '_parent' in attrs and not hasattr(b0, '_parent'):
-                while not b0 in R.hirarchy:
+            if '_parent' not in attrs and not hasattr(b0, '_parent'):
+                while b0 not in R.hirarchy:
                     # a helper class (like class Node(Node, Role.Foo) and inner
                     # Node is
                     # R.hirarchy type -> act as if we'd defined all:
@@ -450,11 +450,11 @@ def descr(c):
         if b in R.hirarchy:  # this is a type not a class
             break
         dd = getattr(b, 'descr', None)
-        if dd and not dd in d:
+        if dd and dd not in d:
             d.append(dd)
         else:
             dd = b.__doc__
-            if dd and not dd in d:
+            if dd and dd not in d:
                 d.append(dd)
     return '.'.join(d)
 

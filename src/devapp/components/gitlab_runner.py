@@ -85,7 +85,7 @@ ctx = {'mounts': []}
 
 
 def main(script, *args):
-    if not '.git' in os.listdir(d_repo):
+    if '.git' not in os.listdir(d_repo):
         raise Exception('Not in a checkout dir')
     if not os.path.exists(d_repo + '/' + script):
         raise Exception('Not found: %s' % script)

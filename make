@@ -1,5 +1,8 @@
 # vim: ft=sh
 about='
+2025-07: Went to just, from this bash helper. Keeping this for ref, to add funcs to just later.
+
+
 Development Shortcuts
 
 Purpose: Makefile like automation of standard developer tasks.

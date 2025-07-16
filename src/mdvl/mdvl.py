@@ -184,7 +184,7 @@ def _main(md, f):
         return l, None
 
     def is_rule(l):
-        if not l[:3] in h_rules:
+        if l[:3] not in h_rules:
             return
         ll = len(l)
         return True if l in (ll * '-', ll * '*', ll * '_') else False
@@ -575,7 +575,7 @@ def format_bash(dev_help, cols, lines, script, *args):
             funcs.append({fn: [i, [], [], []]})
             fm[fn] = len(funcs) - 1
 
-    if not '-h' in args[0]:
+    if '-h' not in args[0]:
         match = args[0]
         f = []
         for m in funcs:

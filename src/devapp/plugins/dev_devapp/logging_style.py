@@ -56,7 +56,6 @@ import time
 now = time.time
 
 
-from theming.colorhilite import formatter_by_style
 
 
 def show():

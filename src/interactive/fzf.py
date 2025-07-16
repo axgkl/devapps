@@ -114,7 +114,7 @@ class Fzf:
             '--ansi',
             '--cycle',
             f'--delimiter="{item_delimiter}"',
-            f'--reverse',
+            '--reverse',
             '--height="50%"',
             '--multi',
             f'--preview="{self.preview_cmd}"',

@@ -6,7 +6,10 @@ We do not want to import expensive libs, so main app has to format all for us, w
 print it out.
 """
 
-import interactive, sys, os, time
+import interactive
+import sys
+import os
+import time
 
 esep = interactive.execute_args_sep
 asep = interactive.cb_args_sep
@@ -74,7 +77,6 @@ class fifo:
                     print(s, end='')
 
 
-import os
 
 
 # debug:

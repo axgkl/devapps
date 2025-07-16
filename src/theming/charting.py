@@ -192,7 +192,7 @@ def bar_chart(
                 res += '     (1 tick is %s)\n' % tick_fmt
         return res + '=' * chart_width
 
-    raise NotImplemented
+    raise NotImplementedError
 
 
 if __name__ == '__main__':

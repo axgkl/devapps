@@ -130,7 +130,7 @@ class Actions:
             fs.make_temp_dir(app.selected_action)
             app.info('Selected action: ' + app.selected_action)
         # require_tools('kubectl')
-        if FLG.range and not '{}' in FLG.name:
+        if FLG.range and '{}' not in FLG.name:
             _ = 'Range given but no placeholder "{}" in name - assuming "%s-{}"'
             app.info(_ % FLG.name)
             FLG.name += '-{}'
@@ -144,7 +144,7 @@ class Actions:
         return set_action_func_param_values(A, app, FLG)
 
     def cluster_delete(A, name='*'):
-        if not '*' in name:
+        if '*' not in name:
             name += '*'
         for k in 'droplet', 'volume', 'placement_group', 'network', 'load_balancer':
             f = rm(k, name, skip_non_exists=True)
@@ -163,7 +163,7 @@ class Actions:
         match = FLG.match
         for f, t, feat in sorted(Playbooks.fns(plays)):
             c = read_file(feat)
-            if match and not match in c:
+            if match and match not in c:
                 continue
             descr, body = Playbooks.parse_description_doc_str(c)
             b = f'```bash\n{body}\n```\n'
@@ -383,7 +383,7 @@ class Actions:
         ssh_keys = A.ssh_key_ids(ssh_keys)
         size = P.unalias_size(size)
         P.assert_sane_name(name, True)
-        if not name in DROPS:
+        if name not in DROPS:
             d = dict(locals())
             D = P.droplet
             DROPS[name] = {'name': name}
@@ -509,7 +509,7 @@ def get_network(A, name, ip_range):
     else:
         name = Prov().network.default()  # on DO sth like "fra1-default"
 
-    if not name in netw_have:
+    if name not in netw_have:
         A.network_create(name, ip_range)
         # def for_(why, waiter, tmout=60, dt=3):
 

@@ -13,7 +13,10 @@ from devapp.tools.infra import Provider, Api, Prov, fmt, rm, env
 from devapp.tools.infra.actions import conv2classmethods
 import time
 from devapp.tools.flag import build_action_flags, set_action_func_param_values
-import hmac, hashlib, requests, base64
+import hmac
+import hashlib
+import requests
+import base64
 from operator import setitem
 from devapp.tools import cache, write_file, exists, read_file
 
@@ -68,7 +71,7 @@ def kubectl(*args, exec=None, on_err='die', get_cmd=False, with_ns=True):
     else:
         args = args[0]
     ns = FLG.kube_namespace
-    if with_ns and not ' -n ' in args and not ' --namespace' in args:
+    if with_ns and ' -n ' not in args and ' --namespace' not in args:
         ns = f' -n {ns}' if ns != 'all' else ' -A'
         args += ns
     kc = FLG.kube_config
@@ -188,7 +191,7 @@ class Actions:
         os.system(kcmd)
 
     def api(A, match=''):
-        r = kubectl(f'api-resources', with_ns=False)
+        r = kubectl('api-resources', with_ns=False)
         return [l for l in r.splitlines() if match in l]
 
     def add_contour_gw_api(self, infra_name, region='$region'):

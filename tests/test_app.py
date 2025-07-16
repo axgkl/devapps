@@ -3,7 +3,9 @@
 
 is_auto_doc_file = True
 import pytest
-import os, json, sys
+import os
+import json
+import sys
 from devapp import app as app_module
 from devapp.app import app, run_app
 import devapp.tools

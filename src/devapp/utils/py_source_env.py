@@ -38,7 +38,7 @@ def source(*f, set_sys_path_from_py_path=None, ign_missing=False, insert_env_var
     # . is compatible with sh, source not
     src = '. ' + ' && . '.join(F)
     for i in insert_env_vars:
-        if not '*' in i:
+        if '*' not in i:
             src = ('export %s="%s" && ' % (i, env.get(i, ''))) + src
         else:
             ae = [k for k in env if fnmatch(k, i)]

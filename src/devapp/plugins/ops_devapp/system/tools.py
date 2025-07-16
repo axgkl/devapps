@@ -1,7 +1,7 @@
 from devapp.app import app, FLG
 from devapp.tools import exists, project, write_file, read_file, dir_of, download_file
 from devapp.tools import abspath
-from devapp.app import FLG, app, run_app, do, system
+from devapp.app import run_app, do, system
 import sys
 from functools import partial
 import time
@@ -149,10 +149,9 @@ def tar_any_project_files():
         app.die('Not found', files=f)
     cmd = f'tar cfvz proj_files.tgz {" ".join(f)}'
     do(system, cmd)
-    FLG.transfer_project_files = abspath(f'./proj_files.tgz')
+    FLG.transfer_project_files = abspath('./proj_files.tgz')
 
 
-import sys
 
 from rich.console import Console
 from rich.table import Table

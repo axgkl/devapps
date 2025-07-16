@@ -4,7 +4,8 @@ Waiting for a port
 
 """
 
-import os, sys
+import os
+import sys
 from functools import partial
 import importlib
 from devapp.app import app, do, run_app, system

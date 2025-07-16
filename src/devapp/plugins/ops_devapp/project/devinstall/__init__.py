@@ -249,7 +249,7 @@ def ymldict(nav):
 
 def is_private():
     r = vars.have['repository']
-    if '//gitlab' in r and not 'gitlab.com' in r:
+    if '//gitlab' in r and 'gitlab.com' not in r:
         return True
 
 
@@ -317,9 +317,9 @@ class files:
 
     def write(fn):
         s = get_file_master(fn)
-        if not '\n' in s:
+        if '\n' not in s:
             s = get_file_master(s)
-        if not '\n' in s:
+        if '\n' not in s:
             app.die('Cannot get master file', fn=fn)
 
         f = g(files, 'adapt_' + fn.replace('.', '_').replace('/', '_'))

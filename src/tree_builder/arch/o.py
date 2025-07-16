@@ -110,8 +110,8 @@ class TypeMetaClass(type):
         if b0 in mixins and not hirarchy_built:
             raise Exception("First Base Class can't be a mixin", b0)
         if hirarchy_built:
-            if not '_parent' in attrs:
-                while not b0 in hirarchy:
+            if '_parent' not in attrs:
+                while b0 not in hirarchy:
                     # a helper class (like class Node(Node, Role.Foo) and inner Node is
                     # hirarchy type -> act as if we'd defined all:
                     inh = classes[b0]
@@ -207,12 +207,12 @@ def descr(c):
     alert(type(c))
     for b in c.mro()[:-2]:
         dd = getattr(b, 'descr', None)
-        if dd and not dd in d:
+        if dd and dd not in d:
             d += (dd,)
             break
         else:
             dd = b.__doc__
-            if dd and not dd in d:
+            if dd and dd not in d:
                 d += (dd,)
     return '.'.join(d)
 

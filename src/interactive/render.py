@@ -71,7 +71,7 @@ class ItemsRenderer:
         return widths
 
     def render(self, items_chunk, app: App):
-        raise NotImplemented  # check descendants
+        raise NotImplementedError  # check descendants
 
 
 def format_cell(val, style, item, is_last):

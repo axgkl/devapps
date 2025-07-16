@@ -251,7 +251,7 @@ def render_installer_script_and_scp_files(host):
             copyfile(f'{workdir}/{fn}', f'{dw}/.cache/{fn}')
         return '.cache/' + fn
 
-    files += [cp(f'priv_pips/{p}') for p in pips if not p in host.have_priv_pips]
+    files += [cp(f'priv_pips/{p}') for p in pips if p not in host.have_priv_pips]
     f, fn = FLG.transfer_project_files, dw + '/proj_files.tgz'
     os.unlink(fn) if exists(fn) else 0
     if f:

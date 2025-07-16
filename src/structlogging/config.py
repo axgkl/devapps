@@ -148,7 +148,7 @@ def preprocess_dict_config(C):
                 [
                     loggers[l]['handlers'].append(h)
                     for l in loggers
-                    if re.match(match, l) and not h in loggers[l]['handlers']
+                    if re.match(match, l) and h not in loggers[l]['handlers']
                 ]
 
             [add_handler(C['loggers'], match, hdl) for match, hdl in cfg.items()]

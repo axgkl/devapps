@@ -1,5 +1,7 @@
 from devapp.app import app
-import os, json, sys
+import os
+import json
+import sys
 from devapp.tools import FLG, filter_passwords, exists, project, write_file, read_file
 from devapp.tools import define_flags
 import inspect

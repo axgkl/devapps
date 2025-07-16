@@ -15,7 +15,6 @@ import shutil
 
 
 from devapp.tools import read_file, write_file
-import json
 import sys
 
 

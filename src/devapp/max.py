@@ -49,7 +49,7 @@ def explain_parse_options():
             continue
 
         if line.endswith(')'):
-            if not '|' in line:
+            if '|' not in line:
                 line = '|' + line
             l = line.split('|', 1)
             shorts.append(l[0].strip())

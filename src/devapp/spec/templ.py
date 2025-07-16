@@ -41,7 +41,7 @@ class SmartAdapt:
         r, m = self.r, self.r
         k, dflt = (k + '|' + nil).split('|')[:2]
         ko = k
-        if not '.' in k:
+        if '.' not in k:
             if k.startswith('v:'):
                 return Vault.get(r, k[2:])
             k = 'env.' + k
@@ -174,7 +174,9 @@ class API:
         """TODO: support central token stores, Vault
         secret at is ignored, too shaky with spec dependent hub names
         """
-        import jwt, time, uuid
+        import jwt
+        import time
+        import uuid
 
         # independent of hub name:
         s = r['env']['DA_DIR'] + '/secure/token_secret'

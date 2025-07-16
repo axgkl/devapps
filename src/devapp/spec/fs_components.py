@@ -433,10 +433,10 @@ def _drop_env(repo):
 
 def check_mk_dirs(env):
     for k in ('DA_DIR_OCI', 'DA_DIR_CHECKOUTS'):
-        if not k in env:
+        if k not in env:
             env[k] = env['DA_DIR'] + '/' + k.rsplit('_', 1)[-1].lower()
     for k in ('DA_DIR_REPOS',):
-        if not k in env:
+        if k not in env:
             app.die('Require', env_key=k)
     dirs = ('DA_DIR_REPOS', 'DA_DIR_OCI', 'DA_DIR_CHECKOUTS')
     [app.sh.mkdir('-p', env[k]) for k in dirs if not exists(env[k])]

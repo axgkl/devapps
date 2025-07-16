@@ -4,7 +4,10 @@ Running installed resources.
 
 """
 
-import os, sys, json, time
+import os
+import sys
+import json
+import time
 from functools import partial
 
 from devapp import app
@@ -89,7 +92,7 @@ def alive(p):
 def kill_resource():
     fn, r = S.fn_run, S.running_at_start
     for k, v in r.items():
-        if not FLG.cmd in k and not FLG.killall:
+        if FLG.cmd not in k and not FLG.killall:
             continue
         app.warn('Killing resource', cmd=k, **v)
         os.kill(v['pid'], 15)

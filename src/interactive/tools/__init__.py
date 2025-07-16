@@ -1,7 +1,6 @@
-import os, sys
-import yaml
-import sys
 import os
+import sys
+import yaml
 import json
 import time
 from functools import partial
@@ -180,7 +179,7 @@ def write_file(fn, s, log=0, mkdir=0, chmod=None, mode='w'):
         sep = '\n----------------------\n'
         ps = (
             s
-            if not 'key' in fn and not 'assw' in fn and not 'ecret' in fn
+            if 'key' not in fn and 'assw' not in fn and 'ecret' not in fn
             else '<hidden>'
         )
     e = None

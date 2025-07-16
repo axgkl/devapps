@@ -42,7 +42,7 @@ def parse_via(url, props=None, default_port=None, add_caps_str=False, cast=False
         return url
     if not url:
         url = 'ip://'
-    if not '://' in url:
+    if '://' not in url:
         url += '://'
 
     # deal with crazy stuff in password:
@@ -280,7 +280,7 @@ def find_connected_classes(cls, into):
     for conns, t in (outs, 'sink'), (ins, 'src'):
         for c in conns:
             all = all_clses_by_conn[c][t]
-            [into.append(a) for a in all if not a in into]
+            [into.append(a) for a in all if a not in into]
 
 
 is_str = lambda s: isinstance(s, str)

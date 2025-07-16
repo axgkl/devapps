@@ -72,7 +72,7 @@ def find_py_paths(comp_checkout_dir_check_dir):
     pkgs, eps, pkg_dirs = json.loads(j)
     # todo: create the entrypoints
     # for now only the stuff needed to run and that are the pypaths:
-    pkgs = [p for p in pkgs if not '.' in p]
+    pkgs = [p for p in pkgs if '.' not in p]
     # todo: currently we look only in pkgdirs:
     ds = (pkg_dirs or {'': ''}).values()
     [add(d + '/%s' % v) for v in ds]

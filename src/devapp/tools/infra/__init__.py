@@ -2,10 +2,10 @@
 
 from devapp import gevent_patched as _
 from devapp.app import FLG, app, do, system
-from devapp.app import app, FLG, system, DieNow
+from devapp.app import DieNow
 from devapp.tools import json, dirname, cache
 from devapp.tools import os, sys, write_file, to_list
-from devapp.tools import confirm, exists, read_file, dirname, cast
+from devapp.tools import confirm, exists, read_file, cast
 from devapp.tools.times import times
 from fnmatch import fnmatch
 from functools import partial
@@ -419,7 +419,7 @@ class Playbooks:
             l = [
                 f
                 for f in os.listdir(d)
-                if not '.local' in f and ':' in f and f.endswith('.sh') and not f in h
+                if '.local' not in f and ':' in f and f.endswith('.sh') and f not in h
             ]
             h.extend(l)
         return h
@@ -444,7 +444,7 @@ class Playbooks:
         return r
 
     def parse_description_doc_str(c, doc_begin="\n_='# "):
-        if not doc_begin in c[:100]:
+        if doc_begin not in c[:100]:
             return 'No description', c
         _, c = c.split(doc_begin, 1)
         d = ''
@@ -599,7 +599,7 @@ def list_resources(
             return
 
         if FLG.range:
-            if not d['name'] in os.environ['names']:
+            if d['name'] not in os.environ['names']:
                 return
         else:
             if not fnmatch(d['name'], name):
@@ -608,7 +608,7 @@ def list_resources(
             return
         if tags:
             for t in tags:
-                if not t in d.get('tags', '').split(','):
+                if t not in d.get('tags', '').split(','):
                     return
         if not since:
             return True
@@ -727,8 +727,6 @@ def run_this(cmd):
         DIE.append(True)
 
 
-from functools import partial
-import threading
 
 
 # def dropname_by_id(id, fail=False):
@@ -748,7 +746,7 @@ def configure_playbooks(name, playbooks, prefix='', local=None):
     if not plays:
         app.warn('no init playbooks', logger=name)
         return
-    app.info(f'initing', name=name, plays=plays, logger=name)
+    app.info('initing', name=name, plays=plays, logger=name)
     # if user != 'root' and not 'add_sudo_user' in plays:
     #     app.info('Non root user -> adding add_sudo_user feat', user=user)
     #     plays.insert(0, 'add_sudo_user')
@@ -1030,7 +1028,7 @@ def assert_sane_name(name, create=False):
     s = name_allwd
     if not create:
         s = s.union(set('{}*?'))
-    ok = not any([c for c in name if not c in s])
+    ok = not any([c for c in name if c not in s])
     if not ok or not name:
         app.die(
             'Require "name" with chars only from a-z, A-Z, 0-9, . and -',
@@ -1052,7 +1050,7 @@ class kubectl:
             self(f'--namespace {ns} create secret generic {name} {vals}')
 
     def apply(self, fn, body=None, ns='', on_err='die'):
-        if not '://' in fn:
+        if '://' not in fn:
             if not fn[0] == '/':
                 fn = env.get('dir_project') + f'/{fn}'
             if body:
@@ -1074,7 +1072,7 @@ class kubectl:
                 app.die('kubectl command failed', args=args)
             elif on_err == 'report':
                 return err
-            app.die(f'on_err handler not defined for failing kubectl', args=args)
+            app.die('on_err handler not defined for failing kubectl', args=args)
 
 
 class Provider:

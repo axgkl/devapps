@@ -4,7 +4,17 @@ Starts a command within a pty from a controlling process, which reads "keystroke
 and forwards into the child.
 """
 
-import os, sys, tempfile, termios, fcntl, pty, select, signal, struct, time, threading
+import os
+import sys
+import tempfile
+import termios
+import fcntl
+import pty
+import select
+import signal
+import struct
+import time
+import threading
 from tty import setraw
 
 fd_pty = None

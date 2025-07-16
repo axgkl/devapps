@@ -5,7 +5,8 @@ Listing All Defined Resources
 We scan ALL modules for an operations.resources.py
 """
 
-import os, sys
+import os
+import sys
 from functools import partial
 import importlib
 from devapp.app import app, do, run_app, system

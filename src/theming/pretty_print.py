@@ -88,7 +88,7 @@ class PTable(PrettyTable):
         kw['horizontal_char'] = chr(5)
         kw['junction_char'] = chr(6)
         super(PTable, self).__init__(*a, **kw)
-        if not 'float_format' in kw:
+        if 'float_format' not in kw:
             self.float_format = '6.2'
         self.int_format['Nr'] = '3'
 

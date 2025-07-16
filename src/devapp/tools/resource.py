@@ -4,7 +4,8 @@ Common API for all resources
 """
 # FIXME Do this as state table! Its crying for that
 
-import os, sys
+import os
+import sys
 import json
 import time
 from functools import partial

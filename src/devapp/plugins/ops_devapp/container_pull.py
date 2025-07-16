@@ -299,7 +299,7 @@ def run():
     run = partial(run_in, d=D)
     run('rm -f tags-*.tmp', d=D)
     repo = FLG.repo
-    if not '://' in repo:
+    if '://' not in repo:
         repo = 'dockerio://' + repo
     if not len(repo.split(':')) == 3:
         repo += ':latest'
@@ -312,7 +312,7 @@ def run():
         digest = tag
     # no digest yet
     oimg = image
-    if not '/' in image:
+    if '/' not in image:
         image = 'library/' + image
 
     imageFile = image.replace('/', '_')

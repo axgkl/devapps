@@ -257,7 +257,7 @@ def _try_add_single_conffile(e, r_cfg):
             ]
             # no subdir, we take exactly one file in conf_dir, no axc subdir:
             # (hashi understands conf_dir and parses all .json, so we put into axc)
-            l = [c for c in l if not '__' in c]
+            l = [c for c in l if '__' not in c]
             if len(l) == 1 and 'conffile' not in e:
                 e['conffile'] = e[k + '_dir'] + '/' + l[0]
 
@@ -279,11 +279,11 @@ def add_app_env(r):
     r['env'][_] = rnr = '.'.join(reversed(r['___'].lower().split('.')))
     e['app_run_exe_link'] = '%s/%s' % (wd, e['DA_CLS'])
     e['functions'] = e.get('functions', {})
-    if not 'start' in e['functions']:
+    if 'start' not in e['functions']:
         e['functions']['start'] = [e['app']] + e.get('app_args', [])
 
     se = s + 'exec_start'
-    if not se in e:
+    if se not in e:
         app.info('Adding exec start directive', se='start')
         e[se] = 'start'
     e['app_run_script_path'] = da_dir + '/build/bin/' + rnr
@@ -372,12 +372,12 @@ def set_env(r):
         # better way is to set e.g. add_PATH and add only at runtime:
         if k == 'PATH':
             for p in def_paths(r):
-                P.append(p) if not p in P else 0
+                P.append(p) if p not in P else 0
             for p in solution_libs('bin', r):
                 P.insert(0, p)
         elif k == 'PYTHONPATH':
             for p in def_py_paths(r):
-                P.append(p) if not p in P else 0
+                P.append(p) if p not in P else 0
             for p in solution_libs('python', r):
                 P.insert(0, p)
         if P:
@@ -432,7 +432,7 @@ def render_templates(r):
             continue
         for fn in os.listdir(td):
             if (
-                not '__' in fn  # dir sep. always there
+                '__' not in fn  # dir sep. always there
                 or fn.startswith('.')
                 or not fn.endswith(ends)
                 or fn.endswith('.bak')

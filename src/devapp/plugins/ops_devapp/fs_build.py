@@ -32,7 +32,6 @@ from devapp.tools import (
     write_file,
     walk_dir,
 )
-import json
 import time
 from tempfile import mkdtemp
 import fnmatch
@@ -253,12 +252,12 @@ class State:
             s._selected_spec_dirs.append(c)
             n = parts[-1]
             if not FLG.name or n == FLG.name:
-                if not c in root_dirs:
+                if c not in root_dirs:
                     dirs.add(c)
             if FLG.parents:
                 while '/' in c:
                     c = c.rsplit('/', 1)[0]
-                    if not c in root_dirs:
+                    if c not in root_dirs:
                         dirs.add(c)
         # status fixed for local ones in subsequent images run:
         w['specs'] = [{'dir': i, 'status': 'nonlocal'} for i in sorted(dirs)]
@@ -303,7 +302,7 @@ class State:
                 if '\t' in l[:10] and d in l:
                     l = l.replace(d + '/', '')
                     if '/' in l:
-                        if not 'files' in l.split('/', 1)[0]:
+                        if 'files' not in l.split('/', 1)[0]:
                             continue
                 r.append(l.replace('\t', ' '))
             s['git log since'] = r
@@ -323,7 +322,7 @@ die = lambda *a, **kw: app.die(*a, **kw)
 def repo_and_ns(s):
     m = {}
     lns = s.split('::')
-    if not len(lns) == 2 or not '.' in lns[0]:
+    if not len(lns) == 2 or '.' not in lns[0]:
         die('first part of dir must be registry:namespace')
     m['repository'] = lns[0]
     m['namespace'] = lns[1]
@@ -377,7 +376,7 @@ class buildah:
         S.work_tree['local images'] = m
         for i in l:
             ns = i['names']
-            ns = [n.split(':') for n in ns if not ':latest' in n or len(ns) < 2]
+            ns = [n.split(':') for n in ns if ':latest' not in n or len(ns) < 2]
             ns = sorted(ns, key=itemgetter(1))[-1]
             f = '%Y-%m-%dT%H:%M:%S'
             utc_dt = datetime.strptime(i['createdatraw'].split('.', 1)[0], f)
@@ -525,10 +524,10 @@ class img:
 
         for step in sorted(os.listdir(spec['dir'])):
             breakpoint()  # FIXME BREAKPOINT
-            if not ':' in step:
+            if ':' not in step:
                 step += ':'
             typ, n = step.split(':', 1)
-            if not '.' in typ:
+            if '.' not in typ:
                 continue
             nr, mode = typ.split('.', 1)
             if not nr.isdigit():

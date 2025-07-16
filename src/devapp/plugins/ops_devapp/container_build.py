@@ -100,7 +100,7 @@ def add_layer(ds, lay):
     if F.method == 'tar':
         run_cmd('tar -C  "%s/" %s --force-local -xf "%s"' % (dt, excl, ds + '/' + lay))
         return
-    raise NotImplemented
+    raise NotImplementedError
 
 
 def run():
@@ -190,7 +190,7 @@ def adapt_fs():
             app.log.error('Could not set password. chpasswd utility missing')
     nrc = F.allow_pts_logins
     s = read_file('/etc/securetty', dflt='').splitlines()
-    lines = [l for l in s if not 'pts' in l and not 'console' in l]
+    lines = [l for l in s if 'pts' not in l and 'console' not in l]
     for i in range(0, nrc):
         lines.insert(0, 'pts/%s' % i)
         app.log.info('Adding pts', nr=i)
@@ -306,7 +306,7 @@ def add_plain_dir(ds):
         dirs = (ds, F.target_dir)
         run_cmd('(cd "%s" && tar cf - | cd "%s" && tar xf - )' % dirs)
         return
-    raise NotImplemented
+    raise NotImplementedError
 
 
 main = lambda: run_app(run, flags=Flags)

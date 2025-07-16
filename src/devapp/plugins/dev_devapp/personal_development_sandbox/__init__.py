@@ -57,7 +57,7 @@ class tools:
         def doc(t):
             return [
                 'LazyVim IDE',
-                f'Installs nvim as extracted appimage into ~/.local/bin/',
+                'Installs nvim as extracted appimage into ~/.local/bin/',
                 'Source: {tools._url_nvim}',
                 'kv usage: Repo url (default: github) for the lazy config in --kv. Default is LazyVim/starter',
                 'Example: dev pds i -t lazyvim -k AXGKl/pds_lazy.git',

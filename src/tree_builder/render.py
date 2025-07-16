@@ -133,7 +133,7 @@ def to_class_tree(root, **cfg):
                 r.append('%s%s = %s%s%s' % (ind * level, k, apo, v, apo))
 
     res = walk_tree(root, pre, None, match=has_parent, cfg=cfg)
-    res = [r for r in res if not 'tree_builder' in r]
+    res = [r for r in res if 'tree_builder' not in r]
     cfg['into'] = ('build_type_hirarchy', 'build_tree')
     cfg['skip_line_with'] = 'tree_builder'
     cfg['replace'] = (('(T, ', '('),)
@@ -161,7 +161,7 @@ def to_html(root, **cfg):
 
     def pre(c, r, level, cfg):
         cc = cfg['css_clses']
-        if not c.type in cc:
+        if c.type not in cc:
             cc.append(c.type)
         classes = ()
         v = getattr(c, 'criticality', None)
@@ -257,7 +257,7 @@ def print_out(
     if into:
         if isinstance(into, str):
             into = (into, into)
-        if not into[0] in tmpl or not into[1] in tmpl:
+        if into[0] not in tmpl or into[1] not in tmpl:
             # put at beginning then:
             tmpl = '\n%s\n%s\n%s' % (into[0], into[1], tmpl)
         pre, old = ('\n' + tmpl).split('\n' + into[0], 1)[:2]
@@ -270,7 +270,7 @@ def print_out(
     if skip_line_with:
 
         def sk(s):
-            return '\n'.join([r for r in s.splitlines() if not skip_line_with in r])
+            return '\n'.join([r for r in s.splitlines() if skip_line_with not in r])
 
         pre, post = sk(pre), sk(post)
 
