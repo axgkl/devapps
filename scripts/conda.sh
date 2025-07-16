@@ -17,6 +17,7 @@ function make_conda_py_env { # creates the venv for the project and poetry insta
     # main conda bin is in path
     local n="${PROJECT}_py${pyver}"
     local p="$(conda_root)/envs/$n"
+    eval "$(micromamba shell hook --shell "bash")"
     call micromamba activate
     test -e "$p" || {
         echo "Installing $p (with tools: $conda_project_tools)"
