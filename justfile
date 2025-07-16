@@ -16,13 +16,9 @@ test *args:
 build:
     uv build
 
-# Publish to PyPI (requires authentication)
+# Publish to PyPI using pass for token
 publish:
-    uv publish
-
-# Publish to PyPI test instance
-publish-test:
-    uv publish --publish-url https://test.pypi.org/legacy/
+    uv publish --token "$(pass pypitoken)"
 
 # Install/sync dependencies
 sync:
