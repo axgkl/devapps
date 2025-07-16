@@ -103,8 +103,11 @@ def parse_via(url, props=None, default_port=None, add_caps_str=False, cast=False
     if add_caps_str:
         m['caps_str'] = '+'.join(m['caps'])
     if cast:
+        never_cast = {'scheme', 'netloc', 'hostname'}
         for k, v in m.items():
-            m[k] = cast_str(v) if isinstance(v, str) else v
+            if k in never_cast or not isinstance(v, str):
+                continue
+            m[k] = cast_str(v)
 
     # replace user and pass back to originals:
     r = quoted_to_orig
