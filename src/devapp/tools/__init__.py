@@ -1,6 +1,7 @@
 """
 Taken from axc2 pretty much as is
 """
+
 import collections
 import fcntl
 import json
@@ -117,7 +118,10 @@ def flatten(d, sep='_'):
 
 def cast(v, bools={'true': True, 'True': True, 'false': False, 'False': False}):
     if v and v[0] in ('{', '['):
-        return json.loads(v)
+        try:
+            return json.loads(v)
+        except Exception as _:
+            return v  # e.g. a ipv6 addy is in [..]
     try:
         return int(v)
     except Exception:
@@ -991,11 +995,11 @@ def color(s, col, mode=shl):
 
 
 # faster than calling color func:
-sm = '%s%%s\x1B[0m' % ('\x1B%s' % osenv('M', '')[2:])
-si = '%s%%s\x1B[0m' % ('\x1B%s' % osenv('I', '')[2:])
-sl = '%s%%s\x1B[0m' % ('\x1B%s' % osenv('L', '')[2:])
-sr = '%s%%s\x1B[0m' % ('\x1B%s' % osenv('R', '')[2:])
-sgr = '%s%%s\x1B[0m' % '\x1B[1;38;5;154m'
+sm = '%s%%s\x1b[0m' % ('\x1b%s' % osenv('M', '')[2:])
+si = '%s%%s\x1b[0m' % ('\x1b%s' % osenv('I', '')[2:])
+sl = '%s%%s\x1b[0m' % ('\x1b%s' % osenv('L', '')[2:])
+sr = '%s%%s\x1b[0m' % ('\x1b%s' % osenv('R', '')[2:])
+sgr = '%s%%s\x1b[0m' % '\x1b[1;38;5;154m'
 
 
 def M(s, mode=shl):
