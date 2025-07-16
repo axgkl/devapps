@@ -1,118 +1,70 @@
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
+[project]
 name = "devapps"
-version = "2024.06.26"
+version = "2025.07.18"
 description = "Apps - End to End."
-authors = ["Gunther Klessinger <g_kle_ss_ing_er@gmx.de>"]
-license = "BSD"
+authors = [{ name = "Gunther Klessinger", email = "g_kle_ss_ing_er@gmx.de" }]
+license = { text = "BSD" }
 readme = "README.md"
-repository = "https://github.com/AXGKl/devapps"
-homepage = "https://axgkl.github.io/devapps"
 keywords = []
-
-packages = [
-  { include = "ax", from = "src" },
-  { include = "devapp", from = "src" },
-  { include = "mdvl", from = "src" },
-  { include = "structlogging", from = "src" },
-  { include = "theming", from = "src" },
-  { include = "tree_builder", from = "src" },
+requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
 ]
 
+dependencies = [
+  "toml",
+  "absl-py",
+  "jsondiff",
+  "rich",
+  "structlog>=24.1.0",
+  "inflection",
+  "requests",
+  "pycond",
+]
+
+[project.optional-dependencies]
+dev = ["docutools"]
 
 [project.urls]
+Homepage = "https://axgkl.github.io/devapps"
+Repository = "https://github.com/AXGKl/devapps"
 packagehome = "https://pypi.com/"
 discusshome = "https://join.skype.com/"
 
-[tool.pyright]
-# thats where my dev version for dt is - should not interfere w/o that:
-extraPaths = ["../docutools/src", "./src/devapp/plugins/"]
-reportSelfClsParameterName = false
-
-[tool.poetry.dependencies]
-# gevent after monkeypatch and structlog clash with 3.6:
-python = "^3.8"
-#python = "~3.8"
-# absl-py = "^0.10.0"
-# decorator = "^4.4.2"
-# jsondiff = "^1.2.0"
-# psutil = "^5.7.2"
-# bpytop = "^1.0.50"
-# Pygments = "^2.7.1"
-# httpx = "^0.17.1"
-# PyJWT = "^1.7.1"
-# structlog = "^20.1.0"
-# ujson = "^4.0.1"
-# gevent = "^20.9.0"
-# humanize = "^3.0.1"
-# inflection = "^0.5.1"
-# lz4 = "^3.1.0"
-# msgpack = "^1.0.0"
-# Rx = "^3.1.1"
-# snoop = "^0.2.5"
-# tabulate = "^0.8.7"
-# requests = "^2.24.0"
-# pycond = "^2*"
-# PyYAML = "^5.3.1"
-
-toml = "*"
-#python    = "*"
-absl-py = "*"
-jsondiff = "*"
-rich = "*"
-structlog = "^24.1.0"
-inflection = "*"
-requests = "*"
-pycond = "*"
-
-
-[tool.poetry.dev-dependencies]
-#docutools = { path = "../docutools/", develop = true }
-docutools = "*"
-#autoflake = "^1.4"
-#axblack = "^20201010"
-## one of last versions with site-packages/black.py - overridden by axblack:
-#black = "18.6b4"
-#duty = "^0.5.0"
-#flakehell = "^0.6.0"
-#flake8-black = "^0.2.1"
-#flake8-builtins = "^1.5.3"
-#flake8-tidy-imports = "^4.1.0"
-#flake8-variables-names = "^0.0.3"
-#flake8-pytest-style = "^1.3.0"
-#git-changelog = "^0.4.0"
-# for duty (an invoke clone) pulling async pypi data
-#ipython = "^7.2"
-# TODO: accept v5 once https://github.com/wemake-services/wemake-python-styleguide/issues/1584 is resolved
-#isort = {version = "<5", extras = ["pyproject"]}
-#jinja2-cli = "^0.7.0"
-##markdown-include = "^0.6.0"
-##mkdocs = "^1.1.2"
-##mkdocs-material = "^6.1.0"
-###mkdocs-pymdownx-material-extras = "^1.1.1"
-##mkdocstrings = "^0.13.1"
-##mypy = "^0.782"
-##plantuml_markdown = "^3.4.2"
-##pytest = "^6.0.1"
-##pytest-cov = "^2.10.1"
-##pytest-randomly = "^3.4.1"
-##pytest-sugar = "^0.9.4"
-#pytest-xdist = "^2.1.0"
-
-[tool.poetry.scripts]
+[project.scripts]
 myapp = "devapp.tools.plugin:main"
 ops = "devapp.tools.plugin:main"
 app = "devapp.tools.plugin:main"
 dev = "devapp.tools.plugin:main"
 fui = "interactive.cli:main"
 
+[tool.hatch.build.targets.wheel]
+packages = [
+  "src/ax",
+  "src/devapp",
+  "src/mdvl",
+  "src/structlogging",
+  "src/theming",
+  "src/tree_builder",
+]
+
+[tool.pyright]
+# thats where my dev version for dt is - should not interfere w/o that:
+extraPaths = ["../docutools/src", "./src/devapp/plugins/"]
+reportSelfClsParameterName = false
+
 [tool.blue]
 line-length = 90
 exclude = "tests/fixtures"
-
 
 [tool.isort]
 line_length = 90
@@ -141,7 +93,6 @@ unfixable = [
   "F401", # Unused Import
   "F841", # variable assigned but not used 
 ]
-
 
 [tool.ruff.flake8-quotes]
 docstring-quotes = "double"
