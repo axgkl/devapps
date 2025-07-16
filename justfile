@@ -45,7 +45,7 @@ typecheck:
     uv run pyright
 
 # Check git status - fail if uncommitted changes
-git-status:
+git-check-status:
     #!/usr/bin/env bash
     if [[ -n $(git status --porcelain) ]]; then
         echo "❌ Error: You have uncommitted changes. Commit or stash them before release."
@@ -73,5 +73,5 @@ tag:
     git tag "$VERSION"
     git push origin "$VERSION"
 
-# Prepare for release (clean, check, build, tag)
-release: git-status clean check build tag publish
+# Release (clean, check, build, tag, publish)
+release: git-check-status clean check build tag publish
