@@ -38,6 +38,7 @@ mkdocs_port="${mkdocs_port:-8000}"
 d_cover_html="${d_cover_html:-build/coverage/overall}"
 fn_changelog="${fn_changelog:-docs/about/changelog.md.lp.py}"
 PROJECT="${PROJECT:-$(basename "$here")}"
+MAMBA_ROOT_PREFIX="$HOME/micromamba"
 set +a
 
 skip_func_after_hook="42"
