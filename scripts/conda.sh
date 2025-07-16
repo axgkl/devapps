@@ -6,7 +6,7 @@ function make_conda_root_env { # creates the root conda env if not present yet
     echo "Please confirm all question unless you know what you are doing."
     "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
     . "$HOME/.$(basename $SHELL)rc"
-    eval "$(micromamba shell hook --shell "$0")"
+    eval "$(micromamba shell hook --shell "bash")"
     call micromamba activate
     call eval micromamba install --yes $root_tools ${conda_root_tools:-}
     call micromamba info
