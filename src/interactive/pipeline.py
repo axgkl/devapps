@@ -11,7 +11,7 @@ from functools import partial
 from interactive import item_delimiter
 from interactive.fifo import Fifo
 from interactive.menu import Menu, Items
-from threading import current_thread   # debug
+from threading import current_thread  # debug
 import signal
 
 # from dataclasses import dataclass, field, asdict

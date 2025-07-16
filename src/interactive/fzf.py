@@ -43,7 +43,7 @@ class Fzf:
     cmd: str = ''
     result: list = None
     result_type: int = 0
-    proc: object = None   # the fzf process while running
+    proc: object = None  # the fzf process while running
     preview: str = ''
 
     preview_cmd: str = ''
@@ -186,7 +186,7 @@ class Fzf:
 
     def parse_result(self, items: Items):
         rres = self.res_raw
-        ec = rres.pop(0)   # exit code
+        ec = rres.pop(0)  # exit code
         res = FzfResult(exitcode=ec)
         if ec != const.ec_130_ctrl_c:
             res.nrs = [int(l.split(item_delimiter, 1)[0]) for l in rres[1:-1]]

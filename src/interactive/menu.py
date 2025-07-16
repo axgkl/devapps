@@ -15,8 +15,8 @@ class Menu:
     d_tmp: str = ''
     renderer = 'auto'
     renderer_instance: ItemsRenderer = None
-    preview_win_pos: str = None   # default left
-    preview_win_size: str = None   # default 50%
+    preview_win_pos: str = None  # default left
+    preview_win_size: str = None  # default 50%
     # TODO: no-hscroll / fully searchable
 
     @classmethod
@@ -85,7 +85,7 @@ class Menu:
 
     @classmethod
     def set_renderer_layout(M, app: App):
-        return M.renderer_instance.set_layout(app)   # sets up the renderer
+        return M.renderer_instance.set_layout(app)  # sets up the renderer
 
     @classmethod
     def build_fzf_res(M, app: App):
@@ -101,7 +101,7 @@ class Menu:
 
     @classmethod
     def on_accept(M, msg: FifoMsg):
-        breakpoint()   # FIXME BREAKPOINT
+        breakpoint()  # FIXME BREAKPOINT
 
     # @classmethod
     # def get_methods(M, starts_with=''):

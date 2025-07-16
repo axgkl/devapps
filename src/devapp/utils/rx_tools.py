@@ -145,7 +145,7 @@ def show(ev, add_dt=False):
 
 def pdb(ev):
     show(ev)
-    print('''Breakpoint inserted''')
+    print("""Breakpoint inserted""")
     breakpoint()
     return ev
 

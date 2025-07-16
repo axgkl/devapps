@@ -21,7 +21,6 @@ def clean(s):
 
 class TestUnicode(unittest.TestCase):
     def test_unisplit(self):
-
         # cannot make an incomplete bytearray witout using b which crashes
         # the python2 compiler. The function is anyway only really needed in2
         if not PY2:
@@ -40,7 +39,6 @@ class TestUnicode(unittest.TestCase):
         assert b1 == unic.bytes_('\xe2\x91')
 
     def test_str_split(self):
-
         # cannot make an incomplete bytearray witout using b which crashes
         # the python2 compiler. The function is anyway only really needed in2
         if not PY2:
@@ -52,7 +50,6 @@ class TestUnicode(unittest.TestCase):
             u = unic.unic(b)
         eq = self.assertEqual
         for i in 0, 1, 2, 10, 100:
-
             res = unic.read_uni_chars_off_str(b, i)
 
             orig = unic.unic(s)
@@ -106,7 +103,7 @@ class TextFormatting(unittest.TestCase):
     def test_map1(s):
         ax = dict_to_txt(s.z, fmt={'ax': 1})
         assert unspace(ax) == unspace(
-            '''
+            """
 data:
     address:
         bytes:  1.1
@@ -118,21 +115,21 @@ data:
         1
         someid
     title:  home
-'''
+"""
         )
 
     def test_html(s):
-        """ s.z =
-{'data': {'address': {'bytes': 1.1,
-                      'city': 'anycity',
-                      'on': True,
-                      'postal': 1234,
-                      'street': 'some road'},
-          'id': [1, 'someid'],
-          'title': 'home'}}
+        """s.z =
+        {'data': {'address': {'bytes': 1.1,
+                              'city': 'anycity',
+                              'on': True,
+                              'postal': 1234,
+                              'street': 'some road'},
+                  'id': [1, 'someid'],
+                  'title': 'home'}}
         """
         assert clean(obj_to_html_list(s.z)) == clean(
-            '''
+            """
 <ul>
     <li>data:</li>
         <ul>
@@ -152,12 +149,12 @@ data:
             <li>title: home</li>
         </ul>
 </ul>
-'''
+"""
         )
 
     def test_plain(s):
         assert unspace(dict_to_txt(s.z)) == unspace(
-            '''
+            """
 data:
   address:
     bytes:1.1
@@ -169,14 +166,14 @@ data:
     1
     someid
   title:home
-'''
+"""
         )
         s.assertNotIn(dict_to_txt(s.z), '\t')
 
     def test_plain_ax(s):
         ax = dict_to_txt(s.z, fmt={'ax': 1})
         assert unspace(ax) == unspace(
-            '''
+            """
 data:
     address:
         bytes:  1.1
@@ -188,7 +185,7 @@ data:
         1
         someid
     title:  home
-'''
+"""
         )
         assert len(ax.split('\t')) == 27
 
@@ -196,7 +193,7 @@ data:
         t = [1, [2, 3, 4], 3]
         assert (
             dict_to_txt(t, fmt={'ax': 1}).strip()
-            == '''
+            == """
 1
 -
 2
@@ -204,14 +201,14 @@ data:
 4
 -
 3
-'''.strip()
+""".strip()
         )
 
     def test_wiki(s):
         p = dict_to_txt(s.z, fmt={'wiki': 1})
         assert (
             p.strip()
-            == '''
+            == """
  || data ||  ||
  ||  ||  || address ||  ||
  ||  ||  ||  || bytes || 1.1 ||
@@ -223,13 +220,13 @@ data:
  ||  ||  || 1 ||
  ||  ||  || someid ||
  ||  || title || home ||
-'''.strip()
+""".strip()
         )
 
     def test_html2(s):
         html = dict_to_txt(s.z, fmt={'html': 1})
         assert clean(html) == clean(
-            '''
+            """
 <table >
   <tr ><td >data</td><td ></td><td colspan="100" ></td></tr>
   <tr ><td ></td><td>
@@ -255,14 +252,14 @@ data:
       </table>
       </td><td colspan="100" ></td></tr>
 </table>
-'''
+"""
         )
 
     def test_html2_style(s):
         html = dict_to_txt(s.z, fmt={'html': 1, 'styles': {}})
         assert clean(html).startswith(
             clean(
-                '''
+                """
 <table class="table0">
   <tr class="tr0"><td class="td10">data</td><td class="td20"></td><td colspan="100" class="td30"></td></tr>
   <tr class="tr0"><td class="td10"></td><td>
@@ -270,7 +267,7 @@ data:
         <tr class="tr1"><td class="td11">address</td><td class="td21"></td><td colspan="100" class="td31"></td></tr>
         <tr class="tr1"><td class="td11"></td><td>
             <table class="table2">
-'''
+"""
             )
         )
 
@@ -278,7 +275,7 @@ data:
         m = {'1': '2', 'sub': {1: '2', 2: 3}}
         html = dict_to_txt(m, fmt={'html': 1, 'styles': {'td': 'report3'}})
         assert clean(html) == clean(
-            '''
+            """
 <table class="table0">
   <tr class="tr0"><td class="report3">1</td><td class="report3">2</td><td colspan="100" class="report3"></td></tr>
   <tr class="tr0"><td class="report3">sub</td><td class="report3"></td><td colspan="100" class="report3"></td></tr>
@@ -289,7 +286,7 @@ data:
       </table>
       </td><td colspan="100" class="report3"></td></tr>
 </table>
-'''
+"""
         )
 
     def test_mix(s):
@@ -300,16 +297,15 @@ data:
         m = ['foo', ['foo', 'bar']]
         assert (
             dict_to_txt(m, fmt={'ax': 1}).strip()
-            == '''
+            == """
 foo
 -
 foo
 bar
-    '''.strip()
+    """.strip()
         )
 
     def test_dict5(s):
-
         m = {
             'Operations': [
                 {

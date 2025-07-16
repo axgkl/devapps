@@ -9,7 +9,7 @@ def stripped_traceback(
     monkey_match='in monkey_exec',
     logging_exec_match='logging_exec',
 ):
-    """ remove internals from a traceback.format_exc() structure
+    """remove internals from a traceback.format_exc() structure
     Default is to remove Zope internals.
     """
     formatted_exc = formatted_exc or traceback.format_exc()

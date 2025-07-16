@@ -4,6 +4,7 @@ Service Lifecycle Operations
 
 Only for services where systemd units had been created
 """
+
 # Could be done far smaller.
 from re import match
 from devapp import gevent_patched

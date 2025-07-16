@@ -12,7 +12,6 @@
 # stream of specs - from anywhere, we will  as daemon some day:
 # before that its just a one item stream, with item pushed at proc stasrt:
 
-
 # fmt:off
 import json
 import os
@@ -269,7 +268,7 @@ def req_unshare(r):
 
 
 def add_app_env(r):
-    """ man systemd.directives """
+    """man systemd.directives"""
     e, da_dir = r['env'], env['DA_DIR']
     s = 'service_'
     if not e.get('app'):
@@ -610,7 +609,7 @@ def add_app_run_script_to_build_dir(r):
     Single commands, runnable from even outside conda:
     TODO: we could replace this thing with a 2 liner function per service as well
     """
-    s = '''#!%(DA_DIR)s/run/%(DA_CLS)s
+    s = """#!%(DA_DIR)s/run/%(DA_CLS)s
     # Offers to be run from the host w/o conda, w/o env.sh sourced, like in
     # systemd-unit => We source the env in python:
     import sys
@@ -619,7 +618,7 @@ def add_app_run_script_to_build_dir(r):
     load.app_load(fn_env="%(DA_DIR)s/build/%(DA_CLS)s/env.json")
     from devapp import run
     run.app_run(args=sys.argv)
-    '''
+    """
     s = s.replace('\n    ', '\n')
     fn = fn_app_run_script % r['env']
     write_file(fn, s % r['env'], mkdir=True)
@@ -775,7 +774,10 @@ def build(dir=None, from_dir=None, cls_match=None):
         execute_persistent_fs_changes,
         write_env,
         create_var_dir,
-        do_if(named_link_to_python, if_=lambda r: r['env'].get('app_run_exe_link'),),
+        do_if(
+            named_link_to_python,
+            if_=lambda r: r['env'].get('app_run_exe_link'),
+        ),
     ).run()
     # only outside possible:
     if os.environ.get('CONTAINER_NAME'):

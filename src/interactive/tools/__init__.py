@@ -17,6 +17,7 @@ g = lambda o, k, d=None: getattr(o, k, d)
 is_ = isinstance
 props = lambda o: [(k, g(o, k)) for k in sorted(dir(o)) if not k[0] == '_']
 
+
 # ------------------------------------------------------------------- rendering utils:
 def perc(perc: str, of: int):
     perc = int(perc[:-1])

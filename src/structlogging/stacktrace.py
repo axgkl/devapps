@@ -3,6 +3,7 @@ Stracktrace Tools
 
 for console and json
 """
+
 import sys
 from functools import partial
 from io import StringIO

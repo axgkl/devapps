@@ -136,7 +136,6 @@ dirname = os.path.dirname
 
 
 def gen_func_doc():
-
     """We generate the markdown docs while running pytest process
     - we generate graph specs and write flow files for out of process analysis
 

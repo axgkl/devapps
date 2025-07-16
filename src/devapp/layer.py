@@ -8,7 +8,6 @@ Strategy to be robust:
 
 """
 
-
 import os
 from json import dumps, loads
 

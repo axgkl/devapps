@@ -4,7 +4,7 @@ from theming.unicode_chars import UCs
 
 
 class BPFormat(object):
-    """ bpython (curses?) format strings.
+    """bpython (curses?) format strings.
     Note: if it turns out they are curses complient then subclass.
 
     \x01 represents a colour marker, which
@@ -46,7 +46,7 @@ class BPFormat(object):
 
     @staticmethod
     def format(s, col, bg=None, bold=False, inverse=False, reset=True):
-        """ format('foo', 'green')"""
+        """format('foo', 'green')"""
         r = BPFormat.reset
         if not reset:
             r = ''

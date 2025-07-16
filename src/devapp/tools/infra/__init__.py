@@ -111,7 +111,7 @@ class wait:
                 tm = now()
                 still = 'still '
             time.sleep(dt)
-            if DIE:   # failure elsewhere, in concurrent task
+            if DIE:  # failure elsewhere, in concurrent task
                 app.die('abort, detected failure in concurrent task', fail=DIE)
         app.die(f'Timeout waiting for {why}', logger=l)
 
@@ -191,7 +191,6 @@ class fmt:
     def droplet_id_to_name(key, d, into):
         ids, r = to_list(d.get(key, '')), []
         for id in ids:
-
             if id:
                 d = [k for k, v in DROPS.items() if v.get('id') == id]
                 r.append(str(id) if not d else d[0])
@@ -221,7 +220,6 @@ class fmt:
                 t.append(int(sum([d.get(k, 0) for d in all])))
 
         def auto(col, dicts=all):
-
             if dicts:
                 try:
                     float(dicts[0].get(col, ''))
@@ -337,7 +335,6 @@ from inspect import signature
 
 
 class paral:
-
     # def actions_spawner_when_parallel(
     #     parallel={'droplet_create', 'droplet_init', 'volume_create'}
     # ):

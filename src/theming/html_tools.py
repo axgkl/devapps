@@ -8,7 +8,7 @@ src_slash_start_dbl = re.compile(' src *= *"/', re.IGNORECASE)
 
 
 def rewrite_links(url, src, rewrites={}):
-    """ fix absolute and relative links """
+    """fix absolute and relative links"""
     prot, empty, host, path = url.split('/', 3)
     host = prot + '//' + host
     path = '/' + path
@@ -52,7 +52,7 @@ def neutralize_script_tags(src):
 
 
 if __name__ == '__main__':
-    src = '''
+    src = """
 <a href = "/foo.html">
 <a href="/nospace.html">
 <a href = '/foo.html'>
@@ -73,31 +73,31 @@ if __name__ == '__main__':
 <a src = "../../../foo4.html">
 
 <scripT attrs>evil stuff</sCriPt>
-    '''
+    """
     src = neutralize_script_tags(src)
     res = rewrite_links('http://my.host/l1/l2/l3', src)
 
-    assert '''<a href = "http://my.host/foo.html">''' in res
-    assert '''<a href = "http://my.host/nospace.html">''' in res
-    assert '''<a href = 'http://my.host/foo.html'>''' in res
-    assert '''<a href = 'http://my.host/nospace.html'>''' in res
-    assert '''<a src = "http://my.host/foo.html">''' in res
-    assert '''<a src = 'http://my.host/foo.html'>''' in res
+    assert """<a href = "http://my.host/foo.html">""" in res
+    assert """<a href = "http://my.host/nospace.html">""" in res
+    assert """<a href = 'http://my.host/foo.html'>""" in res
+    assert """<a href = 'http://my.host/nospace.html'>""" in res
+    assert """<a src = "http://my.host/foo.html">""" in res
+    assert """<a src = 'http://my.host/foo.html'>""" in res
 
-    assert '''<a src = 'http://my.host/l1/l2/l3/foo1.html'>''' in res
-    assert '''<a src = "http://my.host/l1/l2/l3/foo1.html">''' in res
+    assert """<a src = 'http://my.host/l1/l2/l3/foo1.html'>""" in res
+    assert """<a src = "http://my.host/l1/l2/l3/foo1.html">""" in res
 
-    assert '''<a src = 'http://my.host/l1/l2/foo2.html'>''' in res
-    assert '''<a src = "http://my.host/l1/l2/foo2.html">''' in res
+    assert """<a src = 'http://my.host/l1/l2/foo2.html'>""" in res
+    assert """<a src = "http://my.host/l1/l2/foo2.html">""" in res
 
-    assert '''<a src = 'http://my.host/l1/foo3.html'>''' in res
-    assert '''<a src = "http://my.host/l1/foo3.html">''' in res
+    assert """<a src = 'http://my.host/l1/foo3.html'>""" in res
+    assert """<a src = "http://my.host/l1/foo3.html">""" in res
 
-    assert '''<a src = 'http://my.host/foo4.html'>''' in res
-    assert '''<a src = "http://my.host/foo4.html">''' in res
+    assert """<a src = 'http://my.host/foo4.html'>""" in res
+    assert """<a src = "http://my.host/foo4.html">""" in res
 
     assert (
-        '''<!-- SCRIPT NEUTRALIZED BY DEVAPPS attrs>evil stuff-- END SCRIPT NEUTRALIZED BY DEVAPPS>'''
+        """<!-- SCRIPT NEUTRALIZED BY DEVAPPS attrs>evil stuff-- END SCRIPT NEUTRALIZED BY DEVAPPS>"""
         in res
     )
 

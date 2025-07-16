@@ -9,11 +9,10 @@ by BlackJack @ python-forum.de
 http://python.sandtner.org/viewtopic.php?p=16273#16273
 """
 
-
 import re
 
 ansi_re = re.compile(
-    '\033\\[' '([\\d;]*)' '([a-zA-Z])'  # Escape characters.  # Parameters.
+    '\033\\[([\\d;]*)([a-zA-Z])'  # Escape characters.  # Parameters.
 )  # Command.
 #
 # Map ANSI colors to HTML 3.2 color names.
@@ -111,7 +110,7 @@ class Ansi2HtmlWriter:
 
 
 if __name__ == '__main__':
-    testString = '''\033[00m\033[01;34mbin\033[00m
+    testString = """\033[00m\033[01;34mbin\033[00m
 \033[01;34mboot\033[00m
 \033[01;36mcdrom\033[00m
 \033[01;34mdaten\033[00m
@@ -135,7 +134,7 @@ if __name__ == '__main__':
 \033[01;34musr\033[00m
 \033[01;34mvar\033[00m
 \033[01;36mvmlinuz\033[00m
-\033[01;36mvmlinuz.old\033[00m'''
+\033[01;36mvmlinuz.old\033[00m"""
 
     import sys
 

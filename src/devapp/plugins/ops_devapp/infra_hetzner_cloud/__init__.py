@@ -35,7 +35,6 @@ Most playbooks are tested against a Fedora host filesystem (the default image)
 See Actions at -h
 """
 
-
 from devapp.app import run_app, FLG, app
 from devapp.tools.infra import Provider, Api, Prov, fmt, rm
 from devapp.tools.infra.actions import Actions, Flags, conv2classmethods
@@ -48,7 +47,7 @@ from devapp.tools import write_file, os
 
 class Actions(Actions):
     class _cli(Actions._cli):
-        image = 'i', 'fedora-37'   # 'fedora-36-x64'
+        image = 'i', 'fedora-37'  # 'fedora-36-x64'
         region = 'w', 'hel1', '*w*here to create the resource'
         network_name = 'nn', '', 'name of subnet this cluster is within'
 
@@ -140,7 +139,7 @@ def fmt_price(key, d, into):
     else:
         st = d['server_type']
         into[fmt.key_typ] = fmt.typ(st['cores'], int(st['memory']), st['disk'])
-        reg = d['datacenter']['location']['name']   # droplet
+        reg = d['datacenter']['location']['name']  # droplet
         into[fmt.key_curncy] = monthly(st, reg)
         fmt.price_total(key, d, into, monthly(st, reg, 'hourly'))
 
@@ -160,7 +159,7 @@ class HProv(Provider):
     name = 'Hetzner'
     secrets = 'hcloud_api_token'
     base_url = 'https://api.hetzner.cloud/v1'
-    vol_price_gig_month = 0.0476   # https://www.hetzner.com/cloud/#pricing
+    vol_price_gig_month = 0.0476  # https://www.hetzner.com/cloud/#pricing
     pgroup = None
     Actions = Actions
 
@@ -182,7 +181,7 @@ class HProv(Provider):
             fmt_region('', d, r)
         if 'labels' in d:
             fmt_tags('labels', d, r)
-        if 'targets' in d:   # loadbalancer
+        if 'targets' in d:  # loadbalancer
             fmt_target_to_servers('', d, r)
         if 'servers' in d:
             fmt.droplet_id_to_name('servers', d, r)

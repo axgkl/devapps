@@ -103,8 +103,8 @@ def split_off_incompl(chunk, pre=None):
 # ---------------------------------------------------------- oldish stuff below
 # remove when surely uneeded
 class UCs:
-    """ unicode characteres. type new ones in vi (insert mode) like:
-        strg-v u 2500
+    """unicode characteres. type new ones in vi (insert mode) like:
+    strg-v u 2500
     """
 
     # for table prettyfying:

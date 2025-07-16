@@ -4,7 +4,6 @@ Simple process maintainance tools (intended for CI tests)
 
 """
 
-
 import os, sys, json, time
 from functools import partial
 

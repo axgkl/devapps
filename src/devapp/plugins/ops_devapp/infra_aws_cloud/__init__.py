@@ -77,7 +77,7 @@ class Actions(Actions):
     ):
         v, k = version, AWSProv.kubectl
         url = f'https://github.com/cert-manager/cert-manager/releases/download/v{v}/cert-manager.yaml'
-        k.apply(url)   # creates ns
+        k.apply(url)  # creates ns
         _ = {'secret-access-key': Api.secrets['aws_secret']}
         k.add_secret(name='prod-route53-credentials-secret', ns='cert-manager', kv=_)
         email = FLG.kube_add_cert_manager_email
@@ -218,7 +218,7 @@ class AA:
     """The Funny AWS API"""
 
     base = 'https://route53.amazonaws.com/2012-02-29'
-    base_doc = 'https://route53.amazonaws.com/doc/2012-02-29'   # for posts
+    base_doc = 'https://route53.amazonaws.com/doc/2012-02-29'  # for posts
 
     def sign(s):
         _ = Api.secrets['aws_secret'].encode('utf-8')

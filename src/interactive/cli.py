@@ -34,7 +34,10 @@ No unnecessary imports if we are ALSO called by fzf for previews
 """
 
 
-def is_execute(a): return a[1].startswith(execute_args_sep)
+def is_execute(a):
+    return a[1].startswith(execute_args_sep)
+
+
 #  is_preview = lambda a: a[1].startswith(preview_args_sep)
 
 
@@ -59,6 +62,7 @@ def main():
     from absl import app
 
     from interactive.app import load_app, start, fn_app_ctrl_fifo
+
     fn_app_ctrl_fifo[0] = fn_fifo
 
     for s, f in ('-hf', '--helpfull'), ('-h', '--help'):

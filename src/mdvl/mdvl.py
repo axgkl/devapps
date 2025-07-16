@@ -27,6 +27,7 @@
 
 See also https://www.bing.com/search?q=github+mdvl
 """
+
 __version__ = '2017.07.16.7'  # count up for new pip versions
 __author__ = 'Gunther Klessinger'
 
@@ -40,6 +41,7 @@ debug = os.environ.get('mdvl_debug')
 # check environ for value and cast into bools if necessary:
 _b = {'True': True, 'False': False}
 env = lambda k, d=None: _b.get(k, os.environ.get(k, d))
+
 
 # ----------------------------------------------------------------- Config Mgmt
 class Cfg:
@@ -76,7 +78,7 @@ class Colors(Cfg):
     x_ -> x with ansi escapes in __init__, with env precedence
     """
 
-    O = '\x1B[0m'
+    O = '\x1b[0m'
     GRAY = 240
     CODE = 5
     L = env('L', 5)
@@ -95,7 +97,7 @@ class Colors(Cfg):
         #    breakpoint()
         e = 1 if k[0] == 'H' else 0
         if v.isdigit():
-            v = '\x1B[%s;38;5;%sm' % (e, v)
+            v = '\x1b[%s;38;5;%sm' % (e, v)
         else:
             v = '\x1b[' + v.split('[', 1)[1]
         return v
@@ -235,7 +237,6 @@ def _main(md, f):
     lines.append('')
 
     while lines:
-
         line = lines.pop(0)
         if is_empty(line):
             out.append('')
@@ -273,7 +274,6 @@ def _main(md, f):
         # now we find all other lines belonging to that text block and
         # concat (pop from lines) all of them:
         while lines and not line.endswith('  ') and not is_header(line):
-
             src_line_nr += 1
             nl, l0 = lines[0], line.lstrip()  # next line, this line
 
@@ -364,9 +364,7 @@ def _main(md, f):
         r'([^{c}]+){c}([^{c}]+){c}?'.format(c=c),
         r'\1%s\2%s' % (r, g[cur_colr]),
         ' ' + s,
-    )[
-        1:
-    ]  # removing space again
+    )[1:]  # removing space again
 
     # Star must be replaced, else the re would not work :((
     # currently no way to find single stars and not process them..

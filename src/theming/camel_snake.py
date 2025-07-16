@@ -17,7 +17,7 @@ from .inflect import (
 
 
 def convert_keys(m, to=None, recurse=1, in_place=0):
-    """ The main function to be used.
+    """The main function to be used.
     Converts the structure m to intended key format
     The conversion is NOT done inplace, new structures are returned
 
@@ -102,7 +102,7 @@ def _convert_keys(m, converter, recurse, in_place):
 
 
 def camel_1(string):
-    """ this does numbers seperated, Foo12Bar -> foo_12_bar """
+    """this does numbers seperated, Foo12Bar -> foo_12_bar"""
     string = string.replace(' ', '')
     string = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', string)
     string = re.sub('(.)([0-9]+)', r'\1_\2', string)
@@ -211,7 +211,7 @@ def convert(s, remove_spaces=1):
 
 
 def convertSnake(j):
-    """ this is convert FROM snake to json(camel) """
+    """this is convert FROM snake to json(camel)"""
     out = {}
     for k in j:
         new_k = k.split('_')
@@ -220,7 +220,7 @@ def convertSnake(j):
 
 
 def convertJSON(j, remove_spaces=1):
-    """ this is convert FROM JSON to snake """
+    """this is convert FROM JSON to snake"""
     out = {}
     for k in j:
         newK = convert(k, remove_spaces)

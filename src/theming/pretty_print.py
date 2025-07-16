@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-""" simple conversion functions """
+"""simple conversion functions"""
+
 import html
 import json
 import string
@@ -40,7 +41,7 @@ def repl_unprintable(res):
 
 
 def show_unprintable(res):
-    """ show line ends and tabs:  \r \n \t \r\n """
+    """show line ends and tabs:  \r \n \t \r\n"""
     res = res.replace('\r\n', '\\r\\n|_AX_RN_|')
     res = res.replace('\t', '\\t\t')
     res = res.replace('\r', '\\r\r')
@@ -62,7 +63,7 @@ def printout(m, get=0):
 
 
 def mtrim(s, l):
-    """ foobazbar -> 'fo..ar' if l=6 """
+    """foobazbar -> 'fo..ar' if l=6"""
     s = str(s)
     if len(s) <= l - 2:
         # no need to trim:
@@ -72,8 +73,8 @@ def mtrim(s, l):
 
 
 class PTable(PrettyTable):
-    """ reformatting a prettytable with better borders.
-    note: without calling print_fancy this class makes no sense """
+    """reformatting a prettytable with better borders.
+    note: without calling print_fancy this class makes no sense"""
 
     encoding = 'UTF-8'
 
@@ -92,7 +93,7 @@ class PTable(PrettyTable):
         self.int_format['Nr'] = '3'
 
     def print_fancy(self, get=0, fancy=1, title=None, dt=None):
-        """ replace asci borders with unicode """
+        """replace asci borders with unicode"""
         r = str(self)
         v, h, j = '|', '-', '+'
         if fancy:
@@ -157,7 +158,7 @@ def dict_to_txt(dictObj, hir=0, fmt={}):
         """ hirarchical html map of maps - see tests """
 
         def s(pref1, pref2, hir):
-            """ flexible parametrization of styles """
+            """flexible parametrization of styles"""
             sm = fmt.get('styles')
             if sm == None or isinstance(sm, string_types):
                 # must have a styles MAP:

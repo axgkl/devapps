@@ -75,7 +75,7 @@ print bar_chart(my_map, mode ='0:Vals,1:Main',  val_descr_list = ['\tTotal Run T
 
 
 def get_val_str(val):
-    """ return the value as double precision string with max len 7 """
+    """return the value as double precision string with max len 7"""
     if val > 10 and val < 1000000:
         return int(val)
     return '%.2g' % val
@@ -111,9 +111,9 @@ def bar_chart(
     chart_width=70,
 ):
     """
-        Creates ascii charts of python objects like maps or lists
-        on the console
-        """
+    Creates ascii charts of python objects like maps or lists
+    on the console
+    """
     if mode == '0:Vals,1:Main':
         # if m like: {'Main1': {'V1': [1,3,2]}, 'V2':[5, 1, 1], ...}
         # we will draw sth like:
@@ -196,7 +196,6 @@ def bar_chart(
 
 
 if __name__ == '__main__':
-
     print(normalize_vals([0.1, 34, 2], 70))
     print(normalize_vals([1, 39879709784, 0.000000078782], 70, '%.5e'))
     print('\n\n\n')

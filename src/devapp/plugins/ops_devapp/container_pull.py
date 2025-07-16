@@ -5,6 +5,7 @@ Pulling Container Filesystems from Registries.
 dpull: Pull oci image layers from an oci registry.
 This is a working literal translation of the jq based moby-download frozen image tool.
 """
+
 # Could be done far smaller.
 from devapp import gevent_patched
 import hashlib
@@ -248,7 +249,9 @@ def do_v1():
     log('History', history=history)
     image_id = history[0]['id']
     log(
-        'Downloading', imageIdentifier=ctx['imageIdentifier'], layers=len(history),
+        'Downloading',
+        imageIdentifier=ctx['imageIdentifier'],
+        layers=len(history),
     )
     nr = 0
     for h in history:
@@ -336,7 +339,8 @@ main = lambda: run_app(
     run,
     flags=Flags,
     kw_log=dict(
-        log_dev_fmt_coljson=['res'], censor=(['res', 'token'], ['res', 'access_token']),
+        log_dev_fmt_coljson=['res'],
+        censor=(['res', 'token'], ['res', 'access_token']),
     ),
 )
 

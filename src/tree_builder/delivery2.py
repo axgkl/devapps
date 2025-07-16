@@ -67,105 +67,114 @@ allow([Service], on=(Role, Container))
 
 
 class Zeo(Service):
-    'Object DB for AXESS'
+    "Object DB for AXESS"
 
 
 class MySQL(Service):
-    'SQL DB for AXESS'
+    "SQL DB for AXESS"
 
 
 class Redis(Service):
-    'Local KV Store, Job Queue for AXESS/AXD'
+    "Local KV Store, Job Queue for AXESS/AXD"
 
 
 class Nginx(Service):
-    'Proxy, Static Content'
+    "Proxy, Static Content"
 
 
 class NBI(Service):
-    'Tibco In'
+    "Tibco In"
 
 
 class Callback(Service):
-    'Job Responses'
+    "Job Responses"
 
 
 class Portal(Service):
-    'HET Portal'
+    "HET Portal"
 
 
 class Debug(Service):
-    'Debugging / Testing'
+    "Debugging / Testing"
 
 
 class Phase0(Service):
-    'Unauth Field'
+    "Unauth Field"
 
 
 class Phase1(Service):
-    'Authenticated Field'
+    "Authenticated Field"
 
 
 class TR069(Service):
-    'TR069'
+    "TR069"
 
 
 class GUI(Service):
-    'Admin GUI'
+    "Admin GUI"
 
 
 class Configurator(Service):
-    'TR069 ConnRequests Out'
+    "TR069 ConnRequests Out"
 
 
 class AXD_A1(Service):
-    'Broadsoft Ocip / Tibco Out'
+    "Broadsoft Ocip / Tibco Out"
 
 
 class AXD_A2(Service):
-    'Genband Out'
+    "Genband Out"
 
 
 class AXD_System(Service):
-    'Local Jobs'
+    "Local Jobs"
 
 
 class Notebook(Service):
-    'Interactive NBI'
+    "Interactive NBI"
 
 
 class Repo(Service):
-    'Repositories'
+    "Repositories"
 
 
 class ConsulClient(Service):
-    'Local HealthChecker / Reporter'
+    "Local HealthChecker / Reporter"
 
 
 class ConsulServer(Service):
-    'Datacenter Wide Truth Provider / KV Store'
+    "Datacenter Wide Truth Provider / KV Store"
 
 
 class L0Master(Service):
-    'Triggers Cluster L0 Jobs, RPC GUI'
+    "Triggers Cluster L0 Jobs, RPC GUI"
 
 
 class L0Agent(Service):
-    'Runs Cluster L0 Jobs'
+    "Runs Cluster L0 Jobs"
 
 
 class DCStatus(Service):
-    'Final Datacenter Status Based on All Results'
+    "Final Datacenter Status Based on All Results"
 
 
 class AXESS(
-    SvcGroup, NBI, Callback, Portal, Debug, Phase0, Phase1, TR069, GUI, Configurator,
+    SvcGroup,
+    NBI,
+    Callback,
+    Portal,
+    Debug,
+    Phase0,
+    Phase1,
+    TR069,
+    GUI,
+    Configurator,
 ):
-    'HTTP App Server'
+    "HTTP App Server"
 
 
 class AXD(SvcGroup, AXD_A1, AXD_A2, AXD_System):
-    'Outgoing Job Runner'
+    "Outgoing Job Runner"
 
 
 # common props:
@@ -181,64 +190,64 @@ class ContNB(Container, AXESS, AXD, Notebook, Nginx):
 
 
 class Cont:
-    'NSpawn Virtual Nodes'
+    "NSpawn Virtual Nodes"
 
     class ACS(Container, Nginx):
-        'DevMgmt'
+        "DevMgmt"
 
     class NB_MBC(ContNB):
-        'Stateless MBC'
+        "Stateless MBC"
 
     class NB_SME(ContNB):
-        'Stateless SME'
+        "Stateless SME"
 
     class NB_ST(ContNB):
-        'Stateless Siptrunk'
+        "Stateless Siptrunk"
 
     class DB(Container, Zeo, MySQL, Redis):
-        'Database / State'
+        "Database / State"
 
 
 class Role:
     class L0(Role, L0Agent):
-        'Operational Layer / Cluster O&M Jobs'
+        "Operational Layer / Cluster O&M Jobs"
 
     class L1(Role, ConsulClient):
-        'Consul Layer'
+        "Consul Layer"
 
     class MBC(Role):
-        'SmartBCon'
+        "SmartBCon"
 
     class SME(Role):
-        'SmallMediumEnterprise'
+        "SmallMediumEnterprise"
 
     class ST(Role):
-        'SipTrunk'
+        "SipTrunk"
 
 
 # helper
 class N(Node, Role.L0, Role.L1):
-    'Phys. Node'
+    "Phys. Node"
 
 
 class ACS(N, Role.MBC, Cont.ACS, Role.SME, Cont.ACS):
-    'MBC Field'
+    "MBC Field"
 
 
 class M(N, Role.MBC, Cont.NB_MBC, Cont.DB):
-    'MBC NB'
+    "MBC NB"
 
 
 class S(N, Role.SME, Cont.NB_SME, Cont.DB):
-    'SME NB'
+    "SME NB"
 
 
 class E(N, Role.ST, Cont.NB_ST, Cont.DB):
-    'ST  NB'
+    "ST  NB"
 
 
 class C(N):
-    'O&M Master'
+    "O&M Master"
 
 
 add_to(C.L0, Service=(L0Master, Repo))
@@ -246,47 +255,47 @@ add_to(M.L1, S.L1, E.L1, Service=[ConsulServer, DCStatus])
 
 
 class NB(Tier, M, S, E):
-    'Northbound Tier'
+    "Northbound Tier"
 
 
 class SB(Tier, ACS):
-    'Southbound Tier'
+    "Southbound Tier"
 
 
 class L0Master(Tier, C):
-    'O&M'
+    "O&M"
 
 
 class Zuerich(Datacenter, L0Master, NB, SB):
-    'Primary'
+    "Primary"
 
 
 class Olten(Datacenter, L0Master, NB, SB):
-    'HotStandby'
+    "HotStandby"
 
 
 class Cluster(Cluster, Zuerich, Olten):
-    'Cluster'
+    "Cluster"
 
 
 class Dev(Cluster):
-    'Development'
+    "Development"
 
 
 class A(Cluster):
-    'Staging'
+    "Staging"
 
 
 class B(Cluster):
-    'PreProduction'
+    "PreProduction"
 
 
 class Prod(Cluster):
-    'Production'
+    "Production"
 
 
 class Swisscom(Project, Dev, A, B, Prod):
-    'Enterprise Voice'
+    "Enterprise Voice"
 
 
 postconfigure(Swisscom)

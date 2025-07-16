@@ -7,7 +7,6 @@ Currently only: Fetch private pips into a folder and create an index.
 ops pkgs fetch --into=./d --private_pips lc-wifi=1.2.3 lc-python
 """
 
-
 # Could be done far smaller.
 from devapp.app import FLG, app, run_app, do, system
 import json

@@ -62,7 +62,7 @@ DEF_STYLES = {
 
 
 def get_tag_val(tag, xml_str, match=None):
-    """ quick access to tag values via string splitting
+    """quick access to tag values via string splitting
     FIXME: use regex...
     """
 
@@ -184,8 +184,8 @@ def col_format(s, el, mode='tag', style={}):
 
 
 def check_special_clients(s, el, mode, style):
-    """ that's the main reason why we do this mess instead of
-    usual xml formatting via xsl bla: """
+    """that's the main reason why we do this mess instead of
+    usual xml formatting via xsl bla:"""
     # special handling for some prominent clients:
     # those things are the reason y i don't use xslt:
     # the tr-069 command line client:
@@ -215,7 +215,7 @@ def check_special_clients(s, el, mode, style):
 
 
 class MyElement(minidom.Element):
-    """ pretty much the original, except the format calls """
+    """pretty much the original, except the format calls"""
 
     def __init__(self, el, fmt):
         self.tagName = getattr(el, 'tagName', None)
@@ -228,7 +228,7 @@ class MyElement(minidom.Element):
         self.fmt, self.style = fmt
 
     def writexml(self, writer, indent='', addindent='', newl=''):
-        """ this goes plain stupid through an xml tag with its attrs and text"""
+        """this goes plain stupid through an xml tag with its attrs and text"""
         style = self.style
         close_tag = self.fmt('>', self, 'tag', style)
         # indent = current indentation

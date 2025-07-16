@@ -4,6 +4,7 @@ from build/bin/<app run script>
 - early load of app module, for gevent and other imports
 
 """
+
 import importlib
 import json
 import os
@@ -42,7 +43,7 @@ def export_env():
 
 
 def if_app_is_module_then_load_it():
-    """ we remember the finding in a var file app_type"""
+    """we remember the finding in a var file app_type"""
     global app_type
     app = py_env.get('app')
     if not app:

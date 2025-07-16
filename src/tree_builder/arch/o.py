@@ -38,7 +38,7 @@ def out(*msg):
 
 
 class MixinTypeMetaClass(type):
-    """ outside the hirarchy but still a type.
+    """outside the hirarchy but still a type.
     not in use currently, was e.g. for Label types like ServiceGroup=foo
     (later we added svc group into the hirarchy)
     """
@@ -54,7 +54,7 @@ class MT(object):
 
 
 def build_type_hirarchy(root):
-    """ e.g. Project"""
+    """e.g. Project"""
     out(hirarchy, 'fooo')
     if root not in hirarchy:
         raise Exception(root, 'not in hirarchy')
@@ -69,7 +69,7 @@ def build_type_hirarchy(root):
 
 
 def add_to(*dests, **kw):
-    'convenience wrapper for add_cls - from spec'
+    "convenience wrapper for add_cls - from spec"
     dests = _list(dests)
     for parent in dests:
         for k, childs in kw.items():
@@ -80,7 +80,7 @@ def add_to(*dests, **kw):
 
 
 def add_cls(parent, child):
-    """ called from the spec """
+    """called from the spec"""
     check_allow_add(parent, child)
     out('    adding %s to %s' % (child, parent))
     new_sub = type(child.__name__, (child,), {'_parent': parent})
@@ -218,7 +218,7 @@ def descr(c):
 
 
 def build_tree(ncls):
-    """ configure all prebound classes, add tree attrs to the others (_parent) """
+    """configure all prebound classes, add tree attrs to the others (_parent)"""
     global hirarchy_built
 
     def pre(c, r, hir, cfg):
@@ -239,15 +239,14 @@ oltens = []
 
 
 def set_bases_as_attrs(name, b0, orig_bases, attrs):
-    """ type hirarchy is built at this point
+    """type hirarchy is built at this point
     Our job now is to pop those bases (and add them as subclasses which
     registered already).
     If registered as mixin then we create new mixins or resolve - see below
     """
 
     def add_local(b0, name, sub, parent_attrs, lms=None):
-        """
-        """
+        """ """
         try:
             check_allow_add(b0, sub)
         except HirarchyErr as ex:

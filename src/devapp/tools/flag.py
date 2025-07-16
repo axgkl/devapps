@@ -1,6 +1,7 @@
 """
 Tools around flag handling
 """
+
 from inspect import signature, _empty
 from functools import partial
 import sys

@@ -1,6 +1,7 @@
 """
 Just a way to have clean import sequences at app module inits
 """
+
 import os
 
 try:

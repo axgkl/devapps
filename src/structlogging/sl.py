@@ -11,7 +11,6 @@ Usage:
     The app may use flags: --log_level=20
 """
 
-
 import json
 import os
 import sys

@@ -154,7 +154,7 @@ def preprocess_dict_config(C):
             [add_handler(C['loggers'], match, hdl) for match, hdl in cfg.items()]
 
         def set_log_dir(C, dir_):
-            """prefix all filenames with that dir if """
+            """prefix all filenames with that dir if"""
             for h in C['handlers'].values():
                 fn = h.get('filename')
                 if fn and not fn.startswith('/'):

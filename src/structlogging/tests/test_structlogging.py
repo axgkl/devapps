@@ -29,15 +29,13 @@ def cfg_insert_proc(_, __, ev, **cfg):
 
 class TestStructlogging(unittest.TestCase):
     def setUp(self):
-        """
-        """
+        """ """
         self.p1 = partial(cfg_insert_proc, p1='p1')
         self.p2 = partial(cfg_insert_proc, p2='p2')
         self.p3 = lambda _, __, ev: str(ev)
 
     def tearDown(self):
-        """
-        """
+        """ """
 
     def test_basic1(self):
         l = sl.wrap_logger(RL(), processors=[self.p1, self.p2])

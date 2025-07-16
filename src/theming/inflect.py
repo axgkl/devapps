@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    inflection
-    ~~~~~~~~~~~~
+inflection
+~~~~~~~~~~~~
 
-    A port of Ruby on Rails' inflector to Python.
+A port of Ruby on Rails' inflector to Python.
 
-    :copyright: (c) 2012-2015 by Janne Vanhala
+:copyright: (c) 2012-2015 by Janne Vanhala
 
-    :license: MIT, see LICENSE for more details.
+:license: MIT, see LICENSE for more details.
 """
+
 import re
 import unicodedata
 
@@ -105,9 +106,7 @@ def _irregular(singular, plural):
         PLURALS.insert(
             0, (r'(?i)(%s)%s$' % (singular[0], singular[1:]), r'\1' + plural[1:])
         )
-        PLURALS.insert(
-            0, (r'(?i)(%s)%s$' % (plural[0], plural[1:]), r'\1' + plural[1:])
-        )
+        PLURALS.insert(0, (r'(?i)(%s)%s$' % (plural[0], plural[1:]), r'\1' + plural[1:]))
         SINGULARS.insert(
             0, (r'(?i)(%s)%s$' % (plural[0], plural[1:]), r'\1' + singular[1:])
         )
@@ -242,7 +241,11 @@ def ordinal(number):
     if number % 100 in (11, 12, 13):
         return 'th'
     else:
-        return {1: 'st', 2: 'nd', 3: 'rd',}.get(number % 10, 'th')
+        return {
+            1: 'st',
+            2: 'nd',
+            3: 'rd',
+        }.get(number % 10, 'th')
 
 
 def ordinalize(number):

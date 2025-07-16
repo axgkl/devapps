@@ -49,7 +49,7 @@ class const:
     # evt types:
     signal = 'signal'
     app_start = 'app_start'
-    first_items = 'first_items'   # different stream then stream updates
+    first_items = 'first_items'  # different stream then stream updates
     fzf_keyb_interrupt = 'fzf ctrl-c pressed'
 
 
@@ -88,16 +88,17 @@ import signal
 #
 Events = Subject()
 
+
 # ---------------------------------------------------------------
 class S:
-    App = None   # having subclasses for the various lists
+    App = None  # having subclasses for the various lists
     app_disposable = None
 
 
 class DataObj:
     @classmethod
     def make_data_obj(F, UserClass):
-        breakpoint()   # FIXME BREAKPOINT
+        breakpoint()  # FIXME BREAKPOINT
         f = set(F.__dataclass_fields__.keys())
         kw = {k: g(UserClass, k) for k in dir(UserClass) if k in f}
         kw['name'] = kw.get('name') or UserClass.__name__
@@ -127,7 +128,7 @@ class Menu(DataObj):
     first_items: list = field(default_factory=list)
     fzf_lines: list = field(default_factory=list)
     name: str = ''
-    d_tmp: str = ''   # menu specific tempdir for fifos and cache
+    d_tmp: str = ''  # menu specific tempdir for fifos and cache
 
     @classmethod
     def prepare_fs(M, evt):
@@ -183,7 +184,7 @@ class Term:
 
 @dataclass
 class Preview:
-    fifo_in: str = ''   # sent FROM the fzf spawned preview subproc
+    fifo_in: str = ''  # sent FROM the fzf spawned preview subproc
 
     @classmethod
     def start_fifos(P, evt):
@@ -195,7 +196,7 @@ class Preview:
     @classmethod
     def handle_fifo_incomming(P, msg, evt):
         Fzf.kill_proc(evt)
-        breakpoint()   # FIXME BREAKPOINT
+        breakpoint()  # FIXME BREAKPOINT
         i = 23
 
 
@@ -204,13 +205,13 @@ class Fzf:
     cmd: str = ''
     result: list = field(default_factory=list)
     result_type: int = 0
-    proc: object = None   # the fzf process while running
+    proc: object = None  # the fzf process while running
     preview: str = ''
 
     @classmethod
     def kill_proc(F, evt, signal=15):
         proc = evt.fzf.proc
-        evt.fzf.proc = signal   # so that run knows what happened
+        evt.fzf.proc = signal  # so that run knows what happened
         if not proc:
             return evt
         if signal == 9:
@@ -246,7 +247,7 @@ class Fzf:
 
     @classmethod
     def build_cmd(F, evt):
-        breakpoint()   # FIXME BREAKPOINT
+        breakpoint()  # FIXME BREAKPOINT
         f = evt.fzf
         l = [
             'fzf',
@@ -372,7 +373,6 @@ def build_main_stream():
 
 
 def start(App):
-
     S.App = App
     s = build_main_stream()
     S.app_disposable = s.subscribe(print, print, print)

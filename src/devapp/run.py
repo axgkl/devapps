@@ -1,6 +1,6 @@
 """
 
-sys.argv: 
+sys.argv:
     build/bin/<run_script> --log_fmt=10 foo bar -baz
 
 Remember: run_script func-calls our def app_run(), with these as sys.args
@@ -19,6 +19,7 @@ RIGHT: --log_level=info
 
 (otherwise we'll try to lookup 'info' in the app module)
 """
+
 import json
 
 # pylint: disable=E0211

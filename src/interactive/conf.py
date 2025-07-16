@@ -3,7 +3,7 @@ from absl import flags
 # import tempfile
 from interactive.tools import os, sys, json, time, env
 
-exe = sys.argv[0]   # preview command
+exe = sys.argv[0]  # preview command
 argv0 = exe.rsplit('/', 1)[-1].split('.py', 1)[0]
 
 mn = 'Notification app. Called with 2 args: msg and kws'

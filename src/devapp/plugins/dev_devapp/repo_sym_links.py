@@ -25,7 +25,7 @@ Saying:
 
 - will move all importable(!) package folders from devapps and docutools and the 2 other
   repos to a backup dir (in site-packages/repo_sym_link_backup)
-- symlink the repo versions into your site-packages dir 
+- symlink the repo versions into your site-packages dir
 
 Result:
 
@@ -48,6 +48,8 @@ from json import dumps, loads
 import devapp
 
 d_sitep = None
+
+
 def d_backup():
     return d_sitep + '/backup_repo_symlinks'
 
@@ -57,6 +59,7 @@ dirs = os.listdir
 here = os.getcwd()
 
 H = os.environ['HOME']
+
 
 def repl_home(r):
     return loads(dumps(r).replace(H, '~'))

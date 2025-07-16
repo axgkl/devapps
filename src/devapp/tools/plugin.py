@@ -4,6 +4,7 @@ Tool to quickly build and app with plugins.
 
 Usage: See lc.py
 """
+
 import os
 import sys
 from fnmatch import fnmatch

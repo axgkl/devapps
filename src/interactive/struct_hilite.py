@@ -61,7 +61,6 @@ def coljhighlight(
     no_indent_len=0,
     _checked=[0],
 ):
-
     global jsl
     if not jsl:
         jsl = JsonLexer()

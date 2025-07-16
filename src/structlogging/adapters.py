@@ -31,7 +31,7 @@ def adapt_gevent_pywsgi(server, logger):
             self.requestline or '',
             length=self.response_length or '-',
             status=(self._orig_status or self.status or '000').split()[0],
-            **ip
+            **ip,
         )
 
     server.handler_class.log_request = log_4_gevent_pywsgi

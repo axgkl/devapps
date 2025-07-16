@@ -34,7 +34,7 @@ def color(hir):
 
 
 def to_primitives(root, **cfg):
-    t = '''
+    t = """
      new primitives.orgdiagram.ItemConfig({
                     id: %(id)s,
                     parent: %(parentid)s,
@@ -42,7 +42,7 @@ def to_primitives(root, **cfg):
                     description: "%(hir)s %(name)s",
                     itemTitleColor: tinycolor("%(color)s").toHexString()
                 }),
-    '''
+    """
 
     def pre(c, r, level, cfg, t=t):
         i = {}
@@ -58,9 +58,7 @@ def to_primitives(root, **cfg):
         h = [('_id', c._id)]
         for k, v in simple_props(c):
             h.append((k, v))
-        i['html'] = ',&nbsp;'.join(
-            ['<span title="%s">%s</span>' % (k, v) for k, v in h]
-        )
+        i['html'] = ',&nbsp;'.join(['<span title="%s">%s</span>' % (k, v) for k, v in h])
         ics[c] = id
         i['parent'] = 'null'
         p = getattr(c, '_parent', None)
@@ -186,7 +184,7 @@ def to_html(root, **cfg):
     # setup css, using less:
     css = [
         ', '.join([f for f in [t.type for t in hirarchy]])
-        + ''' {
+        + """ {
         display:      inline-block;
         border-style: solid;
         border-width: 3px;
@@ -194,7 +192,7 @@ def to_html(root, **cfg):
         }
     .critical {border-color: red}
     .warning {border-color: yellow}
-    '''
+    """
     ]
 
     base = {'hue': 10, 'sat': 80, 'lum': 60, 'sat_bg': 30, 'lum_bg': 90}
@@ -210,7 +208,12 @@ def to_html(root, **cfg):
 
         css += ['%(type)s:before {content: "%(type)s:" attr(t);%(col)s}' % m]
         css += [
-            ''.join(['%(type)s {background-%(col_bg)s; ' % m, 'border-%(col)s}' % m,])
+            ''.join(
+                [
+                    '%(type)s {background-%(col_bg)s; ' % m,
+                    'border-%(col)s}' % m,
+                ]
+            )
         ]
         m['hue'] += hue_add
 

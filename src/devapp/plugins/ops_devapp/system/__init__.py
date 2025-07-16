@@ -2,6 +2,7 @@
 """
 # System Building
 """
+
 # TODO: set up ssh -R to tinyproxy for airight deploys in ssh mode
 import devapp.gevent_patched
 from .tools import run_app, do, FLG, load_spec, app, g, waitfor, spawn, time, workdir, os
@@ -238,7 +239,7 @@ def make_environ_file(host):
 
 def render_installer_script_and_scp_files(host):
     """identify files to send and scp using our ssh with a pipe"""
-    files = []   # will copy
+    files = []  # will copy
     pips = json.loads(read_file(f'{workdir}/priv_pips/pips.json', '{}')).values()
     first_pip = [i for i in pips][0].rsplit('-', 1)[0] if pips else ''
     dw = f'{workdir}/{host.ip}'

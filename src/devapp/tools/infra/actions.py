@@ -202,7 +202,6 @@ class Actions:
         return r
 
     def load_balancer_list(A, name='*'):
-
         headers = [
             'name',
             'id',
@@ -295,7 +294,6 @@ class Actions:
             os.unlink(fs.fn_drops_cache())
 
         def headers(all):
-
             return [
                 ['name', {'style': 'green'}],
                 ['ip', {'min_width': 15}],
@@ -321,7 +319,7 @@ class Actions:
         cmd, a = '', list(sys.argv)
         if '--' in a:
             p = a.index('--')
-            cmd = ' '.join([f'{i}' for i in a[p + 1:]])
+            cmd = ' '.join([f'{i}' for i in a[p + 1 :]])
             a = a[:p]
         # convenience: he ssh <name> or he ssh <nr in list>
         if not name:
@@ -455,7 +453,7 @@ class Actions:
         Deletes all matching droplets. --name must be given, "*" accepted.'
         Example: Delete all created within the last hour: "dd --since 1h -n '*'"
         """
-        A.droplet_list_no_cache(name)   # update
+        A.droplet_list_no_cache(name)  # update
         rm('droplet', name)()
 
     def sizes_list(A, name='*'):

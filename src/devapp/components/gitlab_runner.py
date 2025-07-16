@@ -47,6 +47,8 @@ class Log:
 
 log = Log()
 [setattr(log, l, partial(log.msg, level=l)) for l in ['debug', 'info', 'warn', 'error']]
+
+
 # replace this with a check for a spec:
 def fs_stack():
     s = env.get('dflt_fs_stack')

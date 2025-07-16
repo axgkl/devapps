@@ -7,7 +7,7 @@ from .common import transient_data_key
 
 
 def positional_args_into_msg(logger, level, ev_dict):
-    '.. but only if wanted...'
+    ".. but only if wanted..."
     pa = ev_dict.get('positional_args', None)
     if not pa:
         return ev_dict
@@ -27,7 +27,6 @@ def positional_args_into_msg(logger, level, ev_dict):
 
 
 def censor_values(L, l, ev_dict, cfg):
-
     keys = cfg.get('keys')
     if not keys:
         return ev_dict

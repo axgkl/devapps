@@ -33,7 +33,7 @@ from collections import OrderedDict
 
 
 def sys_path_insert(fn):
-    """ helper, often required in SPECs, which does import us only"""
+    """helper, often required in SPECs, which does import us only"""
     sys.path.insert(0, os.path.abspath(os.path.dirname(fn)))
 
 
@@ -224,7 +224,7 @@ class MT(object, metaclass=MixinTypeMetaClass):
 
 
 def build_type_hirarchy(root):
-    """ e.g. Project"""
+    """e.g. Project"""
     while 1:
         if R.hirarchy[0] != root:
             R.hirarchy.pop(0)
@@ -444,7 +444,7 @@ def has_parent(c):
 
 
 def descr(c):
-    'up the mro to find any descr or __doc__'
+    "up the mro to find any descr or __doc__"
     d = []
     for b in mro(c):
         if b in R.hirarchy:  # this is a type not a class
@@ -467,7 +467,7 @@ def has_typ(c):
 
 
 def add_to(*dests, **kw):
-    'convenience wrapper for add_cls - from spec'
+    "convenience wrapper for add_cls - from spec"
     dests = _list(dests)
     for parent in dests:
         for k, childs in list(kw.items()):
@@ -478,7 +478,7 @@ def add_to(*dests, **kw):
 
 
 def add_cls(parent, child):
-    """ called from the spec """
+    """called from the spec"""
     check_allow_add(parent, child)
     out('    adding %s to %s' % (child, parent))
     # R.cls_counter += 1
@@ -494,15 +494,14 @@ def add_cls(parent, child):
 
 
 def set_bases_as_attrs(name, b0, orig_bases, attrs):
-    """ type hirarchy is built at this point
+    """type hirarchy is built at this point
     Our job now is to pop those bases (and add them as subclasses which
     registered already).
     If registered as mixin then we create new R.mixins or resolve - see below
     """
 
     def add_local(b0, name, sub, parent_attrs, lms=None):
-        """
-        """
+        """ """
         msg = 'Error trying to add %s(%s) to %s: ' % (sub, name, b0)
         try:
             check_allow_add(b0, sub)
@@ -521,9 +520,7 @@ def set_bases_as_attrs(name, b0, orig_bases, attrs):
         out('    adding {0} to {1}'.format(sub.__name__, name))
         # parent_attrs[bn] = t = type(bn, (sub,), {'_parent': name})
         # won't work with R.mixins, is basically creating a class also for python=0:
-        parent_attrs[bn] = t = type.__new__(
-            TypeMetaClass, bn, (sub,), {'_parent': name}
-        )
+        parent_attrs[bn] = t = type.__new__(TypeMetaClass, bn, (sub,), {'_parent': name})
         parent_attrs.setdefault('_from_mro', []).append(t)
         out('parent_attrs', len(parent_attrs), list(parent_attrs.keys()))
         return t
@@ -567,9 +564,7 @@ def set_bases_as_attrs(name, b0, orig_bases, attrs):
                 # create new
                 mxins.append(lambda ncls: new_mixin(ncls, b0, b))
         elif b in R.hirarchy:
-            out(
-                'you should instantiate your inner classes from R.hirarchy type classes'
-            )
+            out('you should instantiate your inner classes from R.hirarchy type classes')
             import pdb
 
             pdb.set_trace()
@@ -600,7 +595,7 @@ def _list(s):
 
 # ------------------------------------------------------------ Tools
 def lazy(d, key, func_if_missing, args):
-    """ a lazy setdefault effectively. Often useful"""
+    """a lazy setdefault effectively. Often useful"""
     if key in d:
         return d[key]
     d[key] = func_if_missing(*args)
@@ -626,7 +621,7 @@ struct_types = (float, int, bool, pystring, dict, list, tuple)
 
 
 def struct_props(c):
-    'still serializable but with dicts and lists'
+    "still serializable but with dicts and lists"
     res = [(k, v) for k, v in props(c) if isinstance(v, struct_types)]
     return res
 
@@ -653,7 +648,7 @@ def walk_tree(cur, pre=None, post=None, match=None, res=None, cfg=None, level=0)
 
 
 def setup(root):
-    """ configure all prebound classes """
+    """configure all prebound classes"""
     cfg = {'hashes': [], 'root': root}
     out('walking tree', root.__name__)
     root._level = root._hir = 0
@@ -700,7 +695,6 @@ def scale(c, into, n):
 
 
 def unordered_childs(parent, match, level=None):
-
     # if parent.name == 'NB':
     #    import pdb; pdb.set_trace()
     c = getattr(parent, '_childs', None)
@@ -779,22 +773,22 @@ def get_spec_root(spec):
 if __name__ == '__main__':
 
     class Project(T):
-        ''
+        ""
 
     class Cluster(T):
-        ''
+        ""
 
     build_type_hirarchy(root=Project)
 
     class cluster(Group):
         class A(Cluster):
-            'A cluster'
+            "A cluster"
 
         class B(Cluster):
-            'B cluster'
+            "B cluster"
 
     class MyP(Project, cluster['A'], cluster.B):
-        'Pro'
+        "Pro"
 
     setup(MyP)
     print(('have ', dir(MyP)))

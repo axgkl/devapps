@@ -24,7 +24,7 @@ d_fs = dict(
 
 
 def already_overlayed(frm, to):
-    """ Not so easy since dirs can be shadowed, the only secure way is mounts"""
+    """Not so easy since dirs can be shadowed, the only secure way is mounts"""
     overs = [l for l in read_file('/proc/mounts').splitlines()]
     # TODO!!
     return False
@@ -168,9 +168,7 @@ class FS:
                 return
             os.unlink(to)
         if exists(to):
-            raise Exception(
-                'Symlink Target %s exists and is no symlink: %s' % (frm, to)
-            )
+            raise Exception('Symlink Target %s exists and is no symlink: %s' % (frm, to))
         FS.mkdir(dirname(to))
         return FS.sp_call('ln', '-s', frm, to)
 

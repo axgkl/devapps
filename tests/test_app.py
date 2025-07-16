@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """# Tests for the app module"""
+
 is_auto_doc_file = True
 import pytest
 import os, json, sys
@@ -29,8 +30,7 @@ def test_run_app_show_flags(we_are_in_app_process=False):
 
         @cfl.document(trace=(app_module, devapp.tools), dest=fn_md)
         def test_start_app():
-            """A test function which starts an app
-            """
+            """A test function which starts an app"""
 
             # the "classic" abseil way to define a flag:
             from absl import flags

@@ -6,6 +6,7 @@ Note: This was written while I did not yet realize the 16 color term indirection
 I.e. global cross app shell themes.
 Meanwhile I don't think, hardcoded colorthemes per app should even exist.
 """
+
 from __future__ import absolute_import, division, print_function
 
 import os
@@ -25,6 +26,7 @@ else:
 
     def char(nr):
         return unichr(nr).encode('utf-8')
+
 
 envget = os.environ.get
 

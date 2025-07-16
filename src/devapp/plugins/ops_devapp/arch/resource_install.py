@@ -5,7 +5,7 @@ Installing Local Resources (e.g. Databases and Tools)
 Does install into directories without affecting the host setup
 
 Uses
-- Miniconda 
+- Miniconda
 - Container image pulling
 
 Maintains a .resources file within the project root for looking up install state from elsewhere
@@ -14,7 +14,6 @@ API:
     - python: E.g. pytest can run: get_redis_exe = lambda: project.get_present_resource_location('redis-server')
     - shell:  Use jq
 """
-
 
 import os
 from functools import partial

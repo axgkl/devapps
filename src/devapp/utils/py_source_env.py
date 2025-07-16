@@ -3,7 +3,6 @@ Dependency free sourcer of shell style environ files into a
 python process
 """
 
-
 import json
 import os
 import subprocess as sp
@@ -20,7 +19,7 @@ def die(msg, **kw):
 
 
 def source(*f, set_sys_path_from_py_path=None, ign_missing=False, insert_env_vars=()):
-    """ sourcing shell config file
+    """sourcing shell config file
     we source all in one process, in order to allow referencing of vars within
 
     Referenced environ vars from outside are not resolved, unless state by insert_env_vars!

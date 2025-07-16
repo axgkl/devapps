@@ -4,8 +4,9 @@ Inspects an api class recursively
 Generates:
 
 - documentation
--  
+-
 """
+
 import inspect
 from devapp.tools import deindent
 

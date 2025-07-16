@@ -75,26 +75,26 @@ def struct_code_block(d, title=None):
     r = '\n```yaml\n%s\n```\n\n' % yaml.dump(d, default_flow_style=False)
     if not title:
         return r
-    s = '''
+    s = """
 <details>
  <summary>%s</summary>
 %s
 </details>
-    '''
+    """
     return s % (title, r)
 
 
 if __name__ == '__main__':
     for md in (
         '#foo\nbody',
-        '''
+        """
 ---
 foo: bar
 bar: baz
 ---
 
 body
-    ''',
+    """,
         'foo',
     ):
         m = {'dict': {'a': 'b'}}

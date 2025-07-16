@@ -14,6 +14,7 @@ There is AXOrderedTree class which uses a OrderedDict for internal storage
 ===> order of the kyes.
 This class has a python implementation ONLY, no great speed
 """
+
 import copyreg as copy_reg
 from collections.abc import Iterator
 import warnings
@@ -110,9 +111,7 @@ def _build_base(_base_name, _base_parent_type):
             _base_parent_type.__setitem__(self, parts[-1], value)
         elif isinstance(value, dict):
             # step down value, because it can look like this {'a.b.d' : 1}
-            _base_parent_type.__setitem__(
-                self, parts[-1], self.__class__(value)
-            )
+            _base_parent_type.__setitem__(self, parts[-1], self.__class__(value))
         else:
             _base_parent_type.__setitem__(self, parts[-1], value)
 

@@ -4,7 +4,6 @@ Starts a command within a pty from a controlling process, which reads "keystroke
 and forwards into the child.
 """
 
-
 import os, sys, tempfile, termios, fcntl, pty, select, signal, struct, time, threading
 from tty import setraw
 
@@ -25,7 +24,7 @@ class fifo_reader(threading.Thread):
     def run(self):
         while 1:
             fd = os.open(self.fn_fifo, os.O_RDONLY)
-            s = os.read(fd, 1024)   # blocks, waiting
+            s = os.read(fd, 1024)  # blocks, waiting
             into_pty(s) if s else None
 
     @classmethod
@@ -63,7 +62,7 @@ def start_select_loop_over_input_fds():
             if data:
                 os.write(fd_tty_stdout, data)
             else:
-                return   # EOF, stop program
+                return  # EOF, stop program
 
         if fd_tty_stdin in polled_fds:
             # piped into this parent process:
@@ -80,13 +79,13 @@ def term_size_into_pty(signal=0, _=0):
     The forked pty has no idea about size changes, otherwise
     """
     if signal:
-        assert signal == 28   # WINCH, we are signal handler
+        assert signal == 28  # WINCH, we are signal handler
     if fd_pty is None:
         return
     try:
         cols, rows = os.get_terminal_size()
     except Exception as _:
-        f = os.popen('stty size').read().strip()   # works in tee
+        f = os.popen('stty size').read().strip()  # works in tee
         rows, cols = [int(i) for i in f.split()] if f else [25, 80]
     # https://stackoverflow.com/a/6420070/4583360 - and yes, the child gets sigwinch :-)
     size = struct.pack('HHHH', rows, cols, 0, 0)
@@ -112,7 +111,7 @@ def run(args):
     try:
         cooked_attrs_before = termios.tcgetattr(fd_tty_stdin)
         setraw(fd_tty_stdin)
-        was_cooked = True   # 'canonical mode'
+        was_cooked = True  # 'canonical mode'
     except termios.error:
         # e.g. when in a pipe we are already raw:
         was_cooked = False
@@ -123,7 +122,7 @@ def run(args):
     finally:
         os.unlink(fn_fifo) if os.path.exists(fn_fifo) else 0
         if was_cooked:
-            time.sleep(0.05)   # receive all into the term, before we switch back
+            time.sleep(0.05)  # receive all into the term, before we switch back
             termios.tcsetattr(fd_tty_stdin, termios.TCSAFLUSH, cooked_attrs_before)
 
     os.waitpid(pid, 0)

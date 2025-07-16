@@ -2,6 +2,7 @@
 """
 TODO combine nearly equal oauth/token flow with gitlab
 """
+
 import json
 import os
 import sys
@@ -121,7 +122,11 @@ class CloudFoundry:
             ul + '/oauth/token',
             # that is an accepted client id, did cost me 2 hours to find:
             auth=basic('cf', ''),
-            data={'grant_type': 'password', 'username': user, 'password': password,},
+            data={
+                'grant_type': 'password',
+                'username': user,
+                'password': password,
+            },
         )
         res['url'] = h
         res['login_url'] = h = '/oauth/token'

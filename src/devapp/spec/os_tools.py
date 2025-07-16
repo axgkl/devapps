@@ -2,7 +2,6 @@
 Tools which are importable before app runs
 """
 
-
 import os
 import platform
 import sys

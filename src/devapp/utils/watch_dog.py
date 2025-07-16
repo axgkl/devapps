@@ -8,6 +8,7 @@ ground process - this one.
 Usage:
     See devapp.app.py, search dirwatch
 """
+
 signal_handled = 1  # here app will continue
 import os
 import sys

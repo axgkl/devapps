@@ -12,7 +12,6 @@ using tar -> copy over
 using union2 -> mount overlay(2)
 """
 
-
 import json
 import os
 import socket

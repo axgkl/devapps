@@ -23,7 +23,7 @@ class const:
     # evt types:
     signal = 'signal'
     app_start = 'app_start'
-    first_items = 'first_items'   # different stream then stream updates
+    first_items = 'first_items'  # different stream then stream updates
     item_col_getter_values = '.getter_results'
     fzf_keyb_interrupt = 'fzf ctrl-c pressed'
 
@@ -82,5 +82,5 @@ class FifoMsg:
     app: App = None
     raw_msg: str = ''
     item_nr: int = 0
-    cmd: str = ''   # preview or execute
+    cmd: str = ''  # preview or execute
     res: str = ''

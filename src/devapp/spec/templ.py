@@ -2,6 +2,7 @@
 Templating
 
 """
+
 import json
 import os
 import re
@@ -29,7 +30,7 @@ class SmartAdapt:
         self.log = app.log.bind(name=name, fid=fidstr(r))
 
     def __getitem__(self, k):
-        'try proxy to class first'
+        "try proxy to class first"
         k, postproc = (k + '|>').split('|>')[:2]
         v = self.getitem(k)
         return postprocs[postproc](v)
@@ -191,7 +192,7 @@ class API:
     # links = Links
     @staticmethod
     def lazy(*a, **kw):
-        'provide a cache for user funcs, e.g. the ssh key read'
+        "provide a cache for user funcs, e.g. the ssh key read"
         # not overwrite our own stuff:
         # TODO: take from old axc2:
         return c_lazy('user_api_' + a[0], *a[1:], **kw)
@@ -226,7 +227,7 @@ class API:
 
 
 def align_by_eq(lines):
-    """make a nice aligned unit file """
+    """make a nice aligned unit file"""
     max_len, out, kvs = 0, [], []
 
     def add_kvs(out, kvs, m=0):

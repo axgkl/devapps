@@ -54,7 +54,7 @@ def find_py_paths(comp_checkout_dir_check_dir):
         # if this build toolchain would be written in go, they would hate python
         # for this. We have python, so ...piece of cak(e or a) to get the comp stuff:
         j = os.popen(
-            '''cd "%s" && python -c 'if 1:
+            """cd "%s" && python -c 'if 1:
         import setuptools
         import json
         def fake_setup(**kw):
@@ -62,7 +62,7 @@ def find_py_paths(comp_checkout_dir_check_dir):
             print(json.dumps(l, default=str))
         setuptools.setup = fake_setup
         import setup'
-        '''
+        """
             % d
         ).read()
         os.makedirs(dirname(fnc)) if not exists(dirname(fnc)) else 0

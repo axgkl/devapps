@@ -18,11 +18,11 @@ class Api:
 
     @property
     def resources(_):
-        breakpoint()   # FIXME BREAKPOINT
+        breakpoint()  # FIXME BREAKPOINT
         i = 23
 
 
-api = Api()   # want properties
+api = Api()  # want properties
 
 
 R = project.root

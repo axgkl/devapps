@@ -4,6 +4,7 @@ FZF based Directory browser.
 
 Taken when the first argument is a directory.
 """
+
 from interactive.tools import abspath, os, props, g, d, ansi_color, color
 
 from interactive.tools.times import times
@@ -68,7 +69,7 @@ def col_by_type(s, item):
 def col_since(s, item):
     u = s[-1]
     nr = times.since_unit_to_nr[u]
-    col = 255 - (nr * 3)   # mappinig units to variations of gray
+    col = 255 - (nr * 3)  # mappinig units to variations of gray
     return ansi_color(s, col)
 
 
@@ -130,7 +131,7 @@ stats = ('mode', 'ino', 'dev', 'nlink', 'uid', 'gid', 'size', 'atime', 'mtime', 
 
 class types:
     class dir:
-        _ico = '📁'   # 2 chars wide. hard. pip install wcwidth
+        _ico = '📁'  # 2 chars wide. hard. pip install wcwidth
         widechars.add(_ico)
         color = 'blue'
         # _ico = ''
@@ -207,7 +208,7 @@ class types:
         m3gp = mp4 = m4v = mkv = mov = avi = wmv = mpeg = webm = flv = True
 
 
-extensions = {}   # {'aac': 'audio',...
+extensions = {}  # {'aac': 'audio',...
 typs = [t for t in props(types) if isinstance(t[1], type)]
 [extensions.update({k[0]: t[0] for k in props(t[1])}) for t in typs]
 

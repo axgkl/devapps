@@ -64,7 +64,6 @@ except ImportError:
 
 
 class AES256Vault:
-
     """
     Vault implementation using AES-CTR with an HMAC-SHA256 authentication code.
     Keys are derived using PBKDF2
@@ -98,7 +97,6 @@ class AES256Vault:
 
     @classmethod
     def _create_key_pycrypto(cls, b_password, b_salt, key_length, iv_length):
-
         # make two keys and one iv
 
         b_derivedkey = PBKDF2_pycrypto(
@@ -130,9 +128,7 @@ class AES256Vault:
             b_derivedkey = cls._create_key_pycrypto(
                 b_password, b_salt, key_length, iv_length
             )
-            b_iv = hexlify(
-                b_derivedkey[(key_length * 2) : (key_length * 2) + iv_length]
-            )
+            b_iv = hexlify(b_derivedkey[(key_length * 2) : (key_length * 2) + iv_length])
         else:
             raise AXC2Error(NEED_CRYPTO_LIBRARY + '(Detected in initctr)')
 

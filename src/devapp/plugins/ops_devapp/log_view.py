@@ -7,6 +7,7 @@ When lines cannot be json loaded we print them on stderr
 
 Output format always set to plain
 """
+
 import json
 import re
 import sys

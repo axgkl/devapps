@@ -36,7 +36,6 @@ See: https://registry.terraform.io/modules/aigisuk/ha-k3s/digitalocean/latest
 https://docs.digitalocean.com/reference/api/api-reference/
 """
 
-
 from devapp.app import run_app, FLG, app
 from devapp.tools.infra import Actions, Flags, Provider, Prov, fmt, rm, Api
 from operator import setitem
@@ -46,7 +45,6 @@ from operator import setitem
 
 
 class Actions(Actions):
-
     # only at DO:
 
     database_list = lambda name=None: Prov().list_simple(name, Prov().database)
@@ -214,7 +212,7 @@ class DProv(Provider):
         ]
         # fmt:on
         def create_data(d):
-            breakpoint()   # FIXME BREAKPOINT
+            breakpoint()  # FIXME BREAKPOINT
             return d
 
     class ssh_keys:

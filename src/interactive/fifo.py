@@ -56,7 +56,7 @@ class Fifo:
         def q_reader(Obs, _):
             while True:
                 # we want LIFO processing:
-                raw_msg = Fifo.q.get()   # the oldest
+                raw_msg = Fifo.q.get()  # the oldest
                 if Fifo.have_no_newer(raw_msg):
                     Obs.on_next(raw_msg)
 

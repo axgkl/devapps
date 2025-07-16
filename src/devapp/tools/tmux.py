@@ -119,7 +119,6 @@ def make_grid(sn, panes):
 
 
 def make_session(cmds, sn, kill_existing):
-
     if sn == 'auto':
         sn = md5(str(cmds).encode('utf-8')).hexdigest()
     sn = 'devapp_' + sn
@@ -173,4 +172,4 @@ def run_single_win_cmds(cmds, sn, panes):
         # cmd += f'{nr}'
         T(sn, sel, '-t', nr + 1)
         S(sn, cmd)
-        time.sleep(0.05)   # TODO otherwise noshow often
+        time.sleep(0.05)  # TODO otherwise noshow often

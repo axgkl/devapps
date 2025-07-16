@@ -264,9 +264,7 @@ class FSComponents:
             for k, m in (('bare_dir', d_exe_bare),):
                 repo[k] = '/'.join((m(env), d))
             repo['branch'] = 'exe'
-            repo['fs_method'] = repo.get(
-                'fs_method', FSComponents.Defaults.exe_fs_method
-            )
+            repo['fs_method'] = repo.get('fs_method', FSComponents.Defaults.exe_fs_method)
             return repo
 
         @classmethod
@@ -335,8 +333,7 @@ def _guess_component_type(repo_as_from_spec):
 
 
 def _flow_by_type(comp_type):
-    """flows are so similar, we offer this for oci and git
-    """
+    """flows are so similar, we offer this for oci and git"""
     cls = getattr(FSComponents, comp_type)
     ifs = getattr(cls, 'into_fs', pass_)
     into_fs = [ifs] if callable(ifs) else ifs
@@ -345,7 +342,11 @@ def _flow_by_type(comp_type):
         getattr(cls, 'prepare', pass_),
         _complete_repo_infos,
         _add_fs_presence_infos,
-        do_if(cls.get_bare, threaded(10), if_=lambda comp: not comp.get('bare_have'),),
+        do_if(
+            cls.get_bare,
+            threaded(10),
+            if_=lambda comp: not comp.get('bare_have'),
+        ),
         # do_if(*into_fs, if_=lambda comp: not comp.get('checkout_have')),
         do_if(*into_fs, if_=checkout_missing),
         _find_auto_env_paths,

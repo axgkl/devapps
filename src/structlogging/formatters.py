@@ -32,8 +32,7 @@ class ConsoleFormatter(ProcessorFormatter):
     def __init__(
         self, colors='auto', theme=None, val_formatters=None, fmt_vals=None, **kw
     ):
-        """we use the built in colorama based colorizer only when colors=True
-        """
+        """we use the built in colorama based colorizer only when colors=True"""
         if colors == 'auto':
             colors = True if have_stdout else False
 
@@ -51,14 +50,13 @@ class ConsoleFormatter(ProcessorFormatter):
                 theme=theme,
                 val_formatters=val_formatters,
                 fmt_vals=fmt_vals,
-                **kw
+                **kw,
             )
 
         ProcessorFormatter.__init__(
             self,
-            processor=r
+            processor=r,
             # , foreign_pre_chain = pre_chain
-            ,
             keep_exc_info=True,
             keep_stack_info=False,  # py3 only
         )
