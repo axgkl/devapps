@@ -727,8 +727,6 @@ def run_this(cmd):
         DIE.append(True)
 
 
-
-
 # def dropname_by_id(id, fail=False):
 #     d = [i for i in DROPS.values() if i['id'] == id]
 #     if not d:

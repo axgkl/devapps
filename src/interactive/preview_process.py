@@ -77,8 +77,6 @@ class fifo:
                     print(s, end='')
 
 
-
-
 # debug:
 def n(*msg, c=[-1], **kw):
     c[0] += 1

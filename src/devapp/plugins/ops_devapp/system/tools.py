@@ -152,7 +152,6 @@ def tar_any_project_files():
     FLG.transfer_project_files = abspath('./proj_files.tgz')
 
 
-
 from rich.console import Console
 from rich.table import Table
 

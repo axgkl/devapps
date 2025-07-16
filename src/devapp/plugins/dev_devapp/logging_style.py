@@ -56,8 +56,6 @@ import time
 now = time.time
 
 
-
-
 def show():
     _, F = formatter_by_style('get')
     if hasattr(F, 'style_string'):
