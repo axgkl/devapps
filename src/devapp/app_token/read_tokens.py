@@ -1,8 +1,7 @@
-import os
+import os, sys
 import uuid
 from fnmatch import fnmatch
 from functools import partial
-
 import jwt
 from absl import flags
 
@@ -66,7 +65,7 @@ def read_secret(get_app, unauth):
             # for now:
             fn = s.split('file://', 1)[1]
             if not os.path.exists(fn):
-                log.warn('token secret file not found', filename=fn)
+                print(f'token secret file not found, filename={fn}')
                 sys.exit(1)
             with open(fn) as fd:
                 secret = fd.read().strip()
