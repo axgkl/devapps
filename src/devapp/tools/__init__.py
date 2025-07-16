@@ -24,7 +24,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from fnmatch import fnmatch
 
-# from jsondiff import diff as js_diff # TODO
+from jsondiff import diff as js_diff  # TODO
 from functools import partial
 from pprint import pformat
 from threading import current_thread
@@ -1607,7 +1607,9 @@ class project:
             fn.insert(0, project.root() + '/%s.lock' % k)
             if exists(fn[0]):
                 return toml.load(fn[0])
-        die('No lock file in root', fn)
+        from devapp.app import app
+
+        app.die(f'No lock file in root {fn}')
 
 
 def parse_deps(deplist, seps='~<>!= '):
