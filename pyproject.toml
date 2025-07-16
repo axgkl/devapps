@@ -10,7 +10,7 @@ authors = [{ name = "Gunther Klessinger", email = "g_kle_ss_ing_er@gmx.de" }]
 license = { text = "BSD" }
 readme = "README.md"
 keywords = []
-requires-python = ">=3.8"
+requires-python = ">=3.8,<4.0"
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.8",
