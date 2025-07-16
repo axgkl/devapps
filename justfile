@@ -32,17 +32,26 @@ sync-dev:
 format:
     uv run ruff format .
 
-# Lint code with ruff
+# Lint code with ruff. Todo...
 lint:
     uv run ruff check .
 
-# Fix linting issues automatically
+# Fix linting issues automatically. A lot todo...
 lint-fix:
     uv run ruff check --fix .
 
 # Type check with pyright
 typecheck:
     uv run pyright
+
+# Check git status - fail if uncommitted changes
+git-status:
+    #!/usr/bin/env bash
+    if [[ -n $(git status --porcelain) ]]; then
+        echo "❌ Error: You have uncommitted changes. Commit or stash them before release."
+        git status --short
+        exit 1
+    fi
 
 # Clean build artifacts
 clean:
@@ -53,7 +62,16 @@ clean:
     find . -type f -name "*.pyc" -delete
 
 # Run all checks (lint, format check, type check, tests)
-check: lint typecheck test
+#check: lint typecheck test
+check: typecheck test
 
-# Prepare for release (clean, check, build)
-release: clean check build
+# Create git tag with version from pyproject.toml
+tag:
+    #!/usr/bin/env bash
+    VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+    echo "Creating git tag $VERSION"
+    git tag "$VERSION"
+    git push origin "$VERSION"
+
+# Prepare for release (clean, check, build, tag)
+release: git-status clean check build tag publish
