@@ -29,7 +29,7 @@ def build_chain_from_list(processors):
     ctx = {'last': 'beginning', 'nr': 0}
 
     def processor(p, ctx=ctx):
-        if not isinstance(p, (basestring, dict)):
+        if not isinstance(p, (str, dict)):
             # already done:
             return p
 

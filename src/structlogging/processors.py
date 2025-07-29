@@ -36,7 +36,7 @@ def censor_values(L, l, ev_dict, cfg):
             show_chars = cfg.get('hint_chars')
             v = cfg.get('repl_with', '*CENSORED*')
             if show_chars:
-                v += ' hint: ' + str(unicode(ev_dict[k])[:show_chars]) + '...'
+                v += ' hint: ' + str(ev_dict[k])[:show_chars] + '...'
             ev_dict[k] = v
     return ev_dict
 

@@ -4,14 +4,7 @@ import sys
 
 PY2, U8 = sys.version_info[0] < 3, 'UTF-8'
 if PY2:
-
-    def unic(s):
-        return s if isinstance(s, unicode) else unicode(s, encoding=U8)
-
-    def bytes_(s):
-        return s if isinstance(s, str) else s.encode(U8)
-
-
+    raise
 else:
 
     def unic(s):

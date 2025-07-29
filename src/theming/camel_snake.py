@@ -34,14 +34,14 @@ def convert_keys(m, to=None, recurse=1, in_place=0):
     """
     # no conversion of simple types, these are normally values and not structs
     # with keys:
-    if isinstance(m, (basestring, bool, int, float)):
+    if isinstance(m, (str, bool, int, float)):
         return m
     if not to:
         return CONVERTERS.keys()
-    if isinstance(to, basestring):
+    if isinstance(to, str):
         to = to.split(',')
     for _to in to:
-        if isinstance(_to, basestring):
+        if isinstance(_to, str):
             _to = _to.strip()
             if not _to:
                 continue
@@ -110,7 +110,7 @@ def camel_1(string):
 
 
 def camel(string, uc=False):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     string = string.replace(' ', '_')
     # underscore first to prevent 'HTTPAuthPassword -> hTTPAuthPassword:
@@ -128,26 +128,26 @@ def ordinal(nr):
 
 
 def snake(string):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     string = string.replace(' ', '_')
     return underscore(string)
 
 
 def title(string):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     return titleize(string)
 
 
 def plural(string):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     return pluralize(string)
 
 
 def ascii(string):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     return str(transliterate(unicode(string)))
 
@@ -157,13 +157,13 @@ def snake_plural(string):
 
 
 def singular(string):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     return singularize(string)
 
 
 def param_dash(string, d='-'):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     return str(parameterize(unicode(string), d))
 
@@ -177,14 +177,14 @@ def param_space(string):
 
 
 def human(string):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     # want fooBar -> Foo bar
     return humanize(snake(string))
 
 
 def dash(string):
-    if not isinstance(string, basestring):
+    if not isinstance(string, str):
         return string
     return dasherize(snake(string))
 
