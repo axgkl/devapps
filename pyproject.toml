@@ -4,20 +4,20 @@ build-backend = "hatchling.build"
 
 [project]
 name = "devapps"
-version = "2025.07.19"
+version = "2025.07.29"
 description = "Apps - End to End."
 authors = [{ name = "Gunther Klessinger", email = "g_kle_ss_ing_er@gmx.de" }]
 license = { text = "BSD" }
 readme = "README.md"
 keywords = []
-requires-python = ">=3.8,<4.0"
+requires-python = ">=3.9,<4.0"
 classifiers = [
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
 
 dependencies = [
@@ -29,10 +29,11 @@ dependencies = [
   "inflection",
   "requests",
   "pycond",
+  "axiros-utils>=3.0.2",
 ]
 
 [project.optional-dependencies]
-dev = ["docutools"]
+dev = ["docutools", "pytest", "pytest-cov", "mypy", "pyright"]
 
 [project.urls]
 Homepage = "https://axgkl.github.io/devapps"
@@ -74,6 +75,11 @@ exclude = [
   "**/node_modules/**",
   "**/__pycache__/**",
   "**/.git/**",
+  "**/ops_devapp/**",
+  "**/camel_snake/**",
+  "src/devapp/components/gitlab_runner.py",
+  "src/interactive/old_pipeline.py",
+  "src/devapp/utils/vault.py",
 ]
 
 # Make pyright completely silent
@@ -181,3 +187,14 @@ inline-quotes = "single"
 [tool.ruff.format]
 # Prefer single quotes over double quotes
 quote-style = "single"
+
+[tool.pytest.ini_options]
+# Suppress deprecation warnings from pytest itself
+filterwarnings = [
+    "ignore::DeprecationWarning:_pytest.assertion.rewrite",
+    "ignore:ast.Str is deprecated:DeprecationWarning",
+]
+# Add any test paths
+testpaths = ["tests"]
+# Configure minimum version
+minversion = "6.0"
