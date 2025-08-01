@@ -106,7 +106,7 @@ def class_doc(cls, level=1, hir=0, out=None):
                 }
             )
     # FIXME
-    add_md_list(funcs, out)
+    # add_md_list(funcs, out)
     for c in clss:
         class_doc(c, level, hir, out)
     if aliases:

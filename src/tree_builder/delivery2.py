@@ -298,7 +298,7 @@ class Swisscom(Project, Dev, A, B, Prod):
     "Enterprise Voice"
 
 
-postconfigure(Swisscom)
+# postconfigure(Swisscom)
 
 # ------------------------------------------------------------------ Properties
 Swisscom.Dev.Zuerich.L0Master.C.ip = '10.67.225.109'

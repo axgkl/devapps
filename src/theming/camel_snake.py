@@ -75,7 +75,7 @@ def _convert_keys(m, converter, recurse, in_place):
             l.extend(m)
         else:
             l = m
-        for i in xrange(len(l)):
+        for i in range(len(l)):
             k = l[i]
             if isinstance(k, dict):
                 l[i] = _convert_keys(
@@ -149,7 +149,7 @@ def plural(string):
 def ascii(string):
     if not isinstance(string, str):
         return string
-    return str(transliterate(unicode(string)))
+    return str(transliterate(str(string)))
 
 
 def snake_plural(string):
@@ -165,7 +165,7 @@ def singular(string):
 def param_dash(string, d='-'):
     if not isinstance(string, str):
         return string
-    return str(parameterize(unicode(string), d))
+    return str(parameterize(str(string), d))
 
 
 def param_under(string):

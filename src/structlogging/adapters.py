@@ -39,9 +39,11 @@ def adapt_gevent_pywsgi(server, logger):
 
 
 def absl_run(mod_name, main, write_pid=True):
+    from devapp.app import FLG, app
+
     def do_write_pid():
         try:
-            fn = FLAGS.pidfile
+            fn = FLG.pidfile
         except Exception:
             # only when he gave the flag
             return

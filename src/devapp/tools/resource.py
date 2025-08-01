@@ -246,24 +246,23 @@ def gf(rsc, key, default=''):
 # ------------------------------------ Setting Directories project dir and conda_prefix
 
 
-# def matching_resource(match, exact=False):
-#     if not S.rscs_defined:
-#         find_resource_defs()
-#     if exact:
-#         rsc = [r for r in S.rscs_defined.listed() if match == r.name]
-#     else:
-#         app.info('trying fuzzy match', match=match)
-#         rsc = [r for r in S.rscs_defined.listed() if match in str(to_dict(r)).lower()]
-#         app.debug('matches', rsc=rsc)
-#         if len(rsc) > 1:
-#             prov = to_list(g(rsc, 'provides', ''))
-#             rsc = [r for r in rsc if match in r.name.lower() or match in str(prov)]
-#             if len(rsc) > 1:
-#                 rsc = [r for r in rsc if match == r.name or match in prov]
-#     if not rsc or len(rsc) > 1:
-#         app.die('No unique match', match=match, defined=S.rscs_defined, found=len(rsc))
-
-#     return rsc[0]
+def matching_resource(match, exact=False):
+    if not S.rscs_defined:
+        find_resource_defs()
+    if exact:
+        rsc = [r for r in S.rscs_defined.listed() if match == r.name]
+    else:
+        app.info('trying fuzzy match', match=match)
+        rsc = [r for r in S.rscs_defined.listed() if match in str(to_dict(r)).lower()]
+        app.debug('matches', rsc=rsc)
+        if len(rsc) > 1:
+            prov = to_list(g(rsc, 'provides', ''))
+            rsc = [r for r in rsc if match in r.name.lower() or match in str(prov)]
+            if len(rsc) > 1:
+                rsc = [r for r in rsc if match == r.name or match in prov]
+    if not rsc or len(rsc) > 1:
+        app.die('No unique match', match=match, defined=S.rscs_defined, found=len(rsc))
+    return rsc[0]
 
 
 def is_fs(rsc):

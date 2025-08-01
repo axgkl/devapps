@@ -1,4 +1,6 @@
 """
+2025: An old relict of systemd-nspawn times.
+
 
 sys.argv:
     build/bin/<run_script> --log_fmt=10 foo bar -baz
@@ -516,8 +518,8 @@ def devapps_run():
     """
     import_and_expose_da_level_modules()
 
-    flag.string('da_dir', '$DA_DIR', 'Solution directory', short_name='d')
-    flag.string('da_name', '$DA_NAME', 'Solution name', short_name='n')
+    flags.string('da_dir', '$DA_DIR', 'Solution directory', short_name='d')
+    flags.string('da_name', '$DA_NAME', 'Solution name', short_name='n')
     args = sys.argv
     parse_flags_funcname_and_args(args, for_devapps=True)
     if 'DA_DIR' not in env:

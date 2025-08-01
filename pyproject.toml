@@ -32,8 +32,15 @@ dependencies = [
   "axiros-utils>=3.0.2",
 ]
 
-[project.optional-dependencies]
-dev = ["docutools", "pytest", "pytest-cov", "mypy", "pyright"]
+[dependency-groups]
+dev = [
+  "markdown-include>=0.8.1",
+  "pytest",
+  "pytest-cov",
+  "mypy",
+  "pyright",
+  "docutools",
+]
 
 [project.urls]
 Homepage = "https://axgkl.github.io/devapps"
@@ -191,10 +198,13 @@ quote-style = "single"
 [tool.pytest.ini_options]
 # Suppress deprecation warnings from pytest itself
 filterwarnings = [
-    "ignore::DeprecationWarning:_pytest.assertion.rewrite",
-    "ignore:ast.Str is deprecated:DeprecationWarning",
+  "ignore::DeprecationWarning:_pytest.assertion.rewrite",
+  "ignore:ast.Str is deprecated:DeprecationWarning",
 ]
 # Add any test paths
 testpaths = ["tests"]
 # Configure minimum version
 minversion = "6.0"
+
+[tool.uv.sources]
+docutools = { path = "../../Axiros/docutools/dist/docutools-2025.8.1.tar.gz" }

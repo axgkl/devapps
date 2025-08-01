@@ -38,7 +38,7 @@ def read_uni_chars_off_str(s, chars, buffer=None):
 def read_uni_chars(fd, chars, buffer=None):
     """
     read as many bytes from an fd as required to get <chars> characters back -
-    as str in 2, as unicode in3
+    as str in 2, as str in3
     """
     if not PY2:
         # fd must be a textio wrapper, why would you open an fd with 'rb' in
@@ -52,9 +52,9 @@ def read_uni_chars(fd, chars, buffer=None):
     # could not get this to work with BytesIO/TextIO because its late but
     # there Must be a way -> remove this crap when fit:
     buffer = buffer or chars
-    s = unicode('')
+    s = str('')
 
-    s, last_chunk_bytes = unicode(''), ''
+    s, last_chunk_bytes = str(''), ''
 
     while True:
         chunk = fd.read(buffer)
@@ -96,7 +96,7 @@ def split_off_incompl(chunk, pre=None):
 # ---------------------------------------------------------- oldish stuff below
 # remove when surely uneeded
 class UCs:
-    """unicode characteres. type new ones in vi (insert mode) like:
+    """str characteres. type new ones in vi (insert mode) like:
     strg-v u 2500
     """
 

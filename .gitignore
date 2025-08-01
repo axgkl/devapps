@@ -35,3 +35,4 @@ src/devapp/tools/git.py
 src/structlogging/r.py
 dump.rdb
 .binenv.lock
+.aider*

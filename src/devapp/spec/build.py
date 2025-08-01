@@ -811,5 +811,6 @@ def build(dir=None, from_dir=None, cls_match=None):
 #    flags_validator=set_cli_flags,
 # )
 #
-if __name__ == '__main__':
-    main()
+
+# if __name__ == '__main__':
+#     main()

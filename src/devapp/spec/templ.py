@@ -7,7 +7,7 @@ import json
 import os
 import re
 import sys
-
+import operator
 from devapp import tools
 from devapp.app import app
 from tree_builder import full_id
@@ -19,6 +19,8 @@ nil = '\x01'
 fidstr = lambda r: r['___']  # stored here to show up top
 
 postprocs = {'': lambda v: v, 'json.dumps': json.dumps}
+
+Vault = {}
 
 
 class SmartAdapt:
@@ -191,13 +193,13 @@ class API:
         kw['why'] = kw.get('why', 'build')
         return jwt.encode(kw, s, algorithm='HS256').decode('utf-8')
 
-    # links = Links
-    @staticmethod
-    def lazy(*a, **kw):
-        "provide a cache for user funcs, e.g. the ssh key read"
-        # not overwrite our own stuff:
-        # TODO: take from old axc2:
-        return c_lazy('user_api_' + a[0], *a[1:], **kw)
+    # # links = Links
+    # @staticmethod
+    # def lazy(*a, **kw):
+    #     "provide a cache for user funcs, e.g. the ssh key read"
+    #     # not overwrite our own stuff:
+    #     # TODO: take from old axc2:
+    #     return c_lazy('user_api_' + a[0], *a[1:], **kw)
 
     @classmethod
     def _into(cls, g):

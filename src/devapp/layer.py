@@ -43,13 +43,13 @@ def show():
 
 
 def write_state(state):
-    start_pid = have['start_pid']
+    start_pid = state['start_pid']
     fn = app.workdir + 'state.%s' % start_pid
     if exists(fn):
         app.log.dbg('State already written', fn=fn)
     else:
         with open(app.workdir + 'state.%s' % start_pid, 'w') as fd:
-            fd.write(dumps(have))
+            fd.write(dumps(state))
         app.log.dbg('State written', **state)
 
 
@@ -58,8 +58,20 @@ def create():
     have = show()
     if have:
         write_state(have)
-    breakpoint()
     fail = os.system('unshare -m ')
+    # TODO: Now continue...
+
+
+def remove():
+    """Remove Layers"""
+    # TODO: Implement layer removal logic
+    have = show()
+    if not have:
+        app.log.info('No layers to remove')
+        return
+    # Add implementation here
+    app.log.info('Layer removal not yet implemented')
+    return have
 
 
 def main():

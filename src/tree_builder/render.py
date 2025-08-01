@@ -275,9 +275,9 @@ def print_out(
         pre, post = sk(pre), sk(post)
 
     if pre or post:
-        if outfile != file:
-            # no seps in the target if target not the file
-            into = ('', '')
+        # if outfile != file:
+        #     # no seps in the target if target not the file
+        #     into = ('', '')
         out = '\n'.join((pre, into[0], out, into[1], post)).strip()
 
     for k, v in replace:

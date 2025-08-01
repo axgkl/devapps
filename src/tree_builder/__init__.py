@@ -767,7 +767,9 @@ def get_spec_root(spec):
         root = getattr(getattr(spec, k), '_root', None)
         if root:
             return root
-    die('Could not determine spec root', spec)
+    from devapp.app import app
+
+    app.die('Could not determine spec root', spec)
 
 
 if __name__ == '__main__':
