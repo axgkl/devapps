@@ -10,8 +10,8 @@
 [gh-ci_img]: https://github.com/AXGKl/devapps/actions/workflows/ci.yml/badge.svg
 [pkg]: https://pypi.com/
 [pkg_img]: https://axgkl.github.io/devapps/img/badge_pypi.svg
-[code_style]: https://pypi.org/project/axblack/
-[code_style_img]: https://axgkl.github.io/devapps/img/badge_axblack.svg
+[code_style]: https://github.com/astral-sh/ruff
+[code_style_img]: https://axgkl.github.io/devapps/img/badge_ruff.svg
 <!-- badges -->
 
 

@@ -8,12 +8,12 @@ Here is how you create or extend tools with plugins, callable like `<toolname> <
 
 ## Defining a **New** Tool
 
-In your `pyproject.toml` add the name of the tool within the `scripts` section like so:
+Using uv, in your `pyproject.toml` add the name of the tool within the `scripts` section like so:
 
 ```python lp hide_cmd=True mode=python
 from devapp.tools import read_file, write_file
 
-fn, sect = 'pyproject.toml', '[tool.poetry.scripts]'
+fn, sect = 'pyproject.toml', '[project.scripts]'
 app = '\nmyapp = "devapp.tools.plugin:main"'
 s = read_file(fn)
 if not app in s:
@@ -25,7 +25,7 @@ print(sect + app)
 This makes the tool available, with no plugins yet:
 
 ```bash lp fmt=xt_flat
-[{"cmd": "poetry install", "timeout": 10}, "myapp -h || true"]
+uv run myapp -h || true
 ```
 
 We are ready to create plugins:

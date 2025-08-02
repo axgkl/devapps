@@ -1,4 +1,5 @@
-from devapp.tools import offset_port, exists, project
+from devapp.tools import offset_port, exists, project, write_file
+import platform
 import os
 from devapp.app import app
 # from devapp.operations import binenv, asdf
@@ -25,8 +26,16 @@ def redis_server(**kw):
     return m
 
 
+def fake_rotatelogs_presence(pth):
+    """Up to now we did not find a proper replacement for the linuy only http tools of kalefranz"""
+    os.makedirs(pth, exist_ok=True)
+    write_file(pth + '/rotatelogs', '', chmod=0o755)
+
+
 def verify_tools(path, rsc, **kw):
     for p in rsc.provides:
+        if p == 'rotatelogs' and platform.system() != 'Linux':
+            fake_rotatelogs_presence(path)
         d = path + '/' + p
         if not exists(d):
             app.error('Not found', cmd=d)

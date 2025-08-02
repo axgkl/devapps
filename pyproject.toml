@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "devapps"
-version = "2025.07.29"
+version = "2025.08.02"
 description = "Apps - End to End."
 authors = [{ name = "Gunther Klessinger", email = "g_kle_ss_ing_er@gmx.de" }]
 license = { text = "BSD" }
@@ -39,7 +39,7 @@ dev = [
   "pytest-cov",
   "mypy",
   "pyright",
-  "docutools",
+  "docutools>=2025.08.02",
 ]
 
 [project.urls]
@@ -154,9 +154,6 @@ strictParameterNoneValue = false
 enableTypeIgnoreComments = true
 useLibraryCodeForTypes = false
 
-[tool.blue]
-line-length = 90
-exclude = "tests/fixtures"
 
 [tool.isort]
 line_length = 90
@@ -196,15 +193,13 @@ inline-quotes = "single"
 quote-style = "single"
 
 [tool.pytest.ini_options]
-# Suppress deprecation warnings from pytest itself
-filterwarnings = [
-  "ignore::DeprecationWarning:_pytest.assertion.rewrite",
-  "ignore:ast.Str is deprecated:DeprecationWarning",
-]
 # Add any test paths
 testpaths = ["tests"]
 # Configure minimum version
 minversion = "6.0"
 
-[tool.uv.sources]
-docutools = { path = "../../Axiros/docutools/dist/docutools-2025.8.1.tar.gz" }
+# [tool.uv.sources]
+# docutools = { path = "/Users/gk/repos/gh/Axiros/docutools", editable = true }
+# [tool.uv.sources]
+# docutools = { path = "../../Axiros/docutools/dist/docutools-2025.8.1.tar.gz" }
+

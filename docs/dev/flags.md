@@ -258,8 +258,11 @@ Test it:
 ```bash lp fmt=xt_flat xxx
 /tmp/action_flagtest.py -h
 /tmp/action_flagtest.py # lp: asserts="running False"
+/tmp/action_flagtest.py -f # lp: asserts="running True"
+/tmp/action_flagtest.py -iv || true # lp: asserts="Unknown command line flag 'iv'"
 /tmp/action_flagtest.py install -iv # lp: asserts="installing False True"
-/tmp/action_flagtest.py -f install --install_verbose # lp: asserts="installing True True"
+/tmp/action_flagtest.py install -f -iv # lp: asserts="installing True True"
+/tmp/action_flagtest.py install --install_verbose # lp: asserts="installing False True"
 /tmp/action_flagtest.py run --install_verbose=True || true # lp: asserts="Unknown command line flag 'install_verbose'"
 ```
 

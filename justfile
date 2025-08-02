@@ -1,48 +1,58 @@
-# justfile for devapps project
-
-# Default recipe to list available commands
+# Default recipe to display help
 default:
     @just --list
 
-# Run ops command with arguments
-ops *args:
-    uv run ops {{args}}
-
-# Run tests with pytest
-test *args:
-    uv run pytest tests {{args}}
-
-# Build the package
-build:
-    uv build
-
-# Publish to PyPI using pass for token
-publish:
-    uv publish --token "$(pass pypitoken)"
+# Initialize development environment using brew. Tested on OSX
+init:
+    @echo "Setting up uv and installing dependencies..."
+    uv sync
+    @echo "Development environment ready!"
 
 # Install/sync dependencies
-sync:
+install:
     uv sync
 
-# Install with dev dependencies
-sync-dev:
-    uv sync --extra dev
+# Run all tests
+test *ARGS:
+    uv run pytest {{ARGS}} tests -c config/pytest.ini
+
+# Run tests with coverage
+test-cov:
+    uv run coverage run --rcfile=config/coverage.pytest.ini -m pytest tests -c config/pytest.ini
+    uv run coverage combine
+    uv run coverage report --precision=2
 
 # Format code with ruff
 format:
-    uv run ruff format .
+    uv run ruff format src tests
+    uv run ruff check --fix src tests
 
-# Lint code with ruff. Todo...
-lint:
-    uv run ruff check .
-
-# Fix linting issues automatically. A lot todo...
-lint-fix:
-    uv run ruff check --fix .
-
-# Type check with pyright
+# Run type checking
 typecheck:
-    uv run pyright
+    uv run mypy src
+
+# Lint code
+lint:
+    uv run ruff check src tests
+
+# Run all quality checks (format, lint, typecheck)
+check: format lint typecheck
+
+# Build documentation
+docs:
+    rm -f docs/autodocs
+    uv run coverage run --rcfile=config/coverage.lp.ini $(uv run which mkdocs) build
+
+# Serve documentation locally
+docs-serve PORT="2222":
+    @echo "Serving docs on http://127.0.0.1:{{PORT}}"
+    @pkill -f "mkdocs serve.*{{PORT}}" || true
+    uv run mkdocs serve -a "127.0.0.1:{{PORT}}"
+
+# Check documentation links
+docs-checklinks:
+    uv run linkchecker --help | cat >/dev/null || (echo "Install linkchecker: pip install git+https://github.com/linkchecker/linkchecker.git" && exit 1)
+    uv run linkchecker site --ignore-url '(.*).json'
 
 # Check git status - fail if uncommitted changes
 git-check-status:
@@ -53,25 +63,50 @@ git-check-status:
         exit 1
     fi
 
-# Clean build artifacts
+# Clean build artifacts and caches
 clean:
-    rm -rf dist/
-    rm -rf build/
-    rm -rf *.egg-info/
-    find . -type d -name __pycache__ -delete
-    find . -type f -name "*.pyc" -delete
+    rm -f .coverage*
+    rm -rf .mypy_cache .pytest_cache build dist pip-wheel-metadata site public __pycache__
+    find . -name "*.pyc" -delete
+    find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+    just clean-lp
 
-# Run all checks (lint, format check, type check, tests)
-#check: lint typecheck test
-check: typecheck test
+# Clean LP (Literal Programming) caches
+clean-lp:
+    @echo "Cleaning LP caches..."
+    find . -name "*.lp.py" -delete
 
-# Create git tag with version from pyproject.toml
-tag:
+# Build the package
+build:
+    uv build
+
+# Run tests and lp doc tests:
+doctest:
+    just test
+    just docs
+
+# Calcs a version, adds it to pyproject, git tags
+new-version VERSION="":
     #!/usr/bin/env bash
-    VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
-    echo "Creating git tag $VERSION"
+    set -xeuo pipefail
+    VERSION="{{VERSION}}"
+    if [ -z "$VERSION" ]; then VERSION=$(date "+%Y.%m.%d"); fi
+    echo "Releasing version $VERSION"
+    sed -i '' "s/^version = .*/version = \"$VERSION\"/" pyproject.toml
+    git commit -am "chore: Prepare release $VERSION" || true
+    git tag -d "$VERSION" 2>/dev/null || true
     git tag "$VERSION"
-    git push origin "$VERSION"
 
-# Release (clean, check, build, tag, publish)
-release: git-check-status clean check build tag publish
+# Pushes the tag, publishes to pypi
+publish:
+    git pull
+    git push --tags
+    just clean
+    just build
+    uv publish --token "$(pass pypitoken)"
+
+# Development shortcuts
+alias t := test
+alias d := docs  
+alias ds := docs-serve
+alias clc := clean-lp

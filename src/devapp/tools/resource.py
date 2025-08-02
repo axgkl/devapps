@@ -8,6 +8,7 @@ import os
 import sys
 import json
 import time
+import shutil
 from functools import partial
 import importlib
 from devapp.app import app, do, run_app, system
@@ -40,6 +41,7 @@ class S:
     constants = {}
     constants_z = {}  # priority of overwriting constants
     rsc_dirs = {}
+    mm_binary = None
 
 
 # mamba support hack
@@ -143,7 +145,9 @@ def set_conda_prefix():
     elif cli in ('local', 'l'):
         cli = project.root() + '/conda'
     elif cli in ('default', 'd'):
-        cli = os.environ['HOME'] + '/miniconda3'
+        # cli = os.environ['HOME'] + '/miniconda3'
+        cli = os.environ['HOME'] + '/micromamba'
+        S.mm_binary = shutil.which('micromamba')
     cli = os.path.abspath(cli)
     S.conda_prefix = cli
 
@@ -652,14 +656,19 @@ class Install:
 
             # return False if not dp else all([exists(dp + '/' + p) for p in rsc.provides])
             if not exists(D):
-                app.warn('Conda base not fully installed')
+                app.warn('Micromamba not fully installed')
                 do(Install.Conda.base, location=D)
 
             if str(rsc.path).startswith(D):
                 return app.debug('already installed - skipping', rsc=rsc)
 
             env = g(rsc, 'conda_env', rsc.name)
-            ctx = dict(D=D, name=env, yes=interactive())
+            ctx = dict(mm_binary=S.mm_binary, D=D, name=env, yes=interactive())
+            for fn in 'micromamba', 'mamba':
+                fn = f'{D}/etc/profile.d/{fn}.sh'
+                if os.path.exists(fn):
+                    ctx['shfile'] = fn
+
             mamba = os.environ.get('MAMBA_EXE')
             # if os.system('type micromamba') == 0 or 1:
             if S.is_mamba and mamba and MRP:
@@ -683,8 +692,15 @@ class Install:
                     '%(conda)s activate "%(name)s"',
                 ]
             else:
+                assert ctx.get('shfile'), 'micromamba not fully installed'
+
+                if not S.mm_binary:
+                    app.die('Need a working micromamba install')
+                ctx['conda'] = 'micromamba'
                 cmd = [
-                    'test -e "%(D)s/etc/profile.d/conda.sh" && . "%(D)s/etc/profile.d/conda.sh" || true',
+                    'export MAMBA_EXE=%(mm_binary)s',
+                    'export MAMBA_ROOT_PREFIX=%(D)s',
+                    '. %(shfile)s',
                     '%(conda)s create %(yes)s -n "%(name)s"',
                     '%(conda)s activate "%(name)s"',
                 ]
@@ -719,20 +735,22 @@ class Install:
             return do(system, cmd)
 
         def base(location):
-            app.warn('conda dir not found', dir=location)
             if not FLG.force:
-                q = 'Confirm: Install miniconda at %s? [y/N]'
+                q = 'Confirm: Install micromamba at %s? [y/N]'
                 if not input(q % location).lower() == 'y':
                     app.die('unconfirmed')
-            fn = os.environ['HOME'] + '/install_miniconda.sh'
-            url = Install.conda_installer_url
-            if not exists(fn):
-                Install.Tools.download(url, fn)
-            if not exists(fn):
-                app.die('download failed', fn=fn)
-            os.system('chmod +x "%s"' % fn)
-            os.makedirs(os.path.dirname(location), exist_ok=True)
-            do(system, '%s -b -p "%s"' % (fn, location))
+            raise NotImplemented(
+                'https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html#homebrew'
+            )
+            # fn = os.environ['HOME'] + '/install_miniconda.sh'
+            # url = Install.conda_installer_url
+            # if not exists(fn):
+            #     Install.Tools.download(url, fn)
+            # if not exists(fn):
+            #     app.die('download failed', fn=fn)
+            # os.system('chmod +x "%s"' % fn)
+            # os.makedirs(os.path.dirname(location), exist_ok=True)
+            # do(system, '%s -b -p "%s"' % (fn, location))
 
     def post(rsc):
         pf = gf(rsc, 'post_inst')

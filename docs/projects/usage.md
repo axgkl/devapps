@@ -7,14 +7,7 @@ maintain projects and resources.
 
 ## Project
 
-To use the tool, first activate your environment via `poetry shell` in case of a development installation (virtual
-environ activation in case of a pip(x) based install).
-
-Verification:
-
-```bash lp fmt=xt_flat new_session=project asserts=devapps_py3 eval=always
-poetry debug info
-```
+To use the tool, first activate your environment via `poetry shell` or `. .venv/bin/activte' in case of a development installation (virtual environ activation in case of a uv / pip(x) based install).
 
 Let's now create a (new) directory for the project:
 
@@ -95,13 +88,13 @@ The `--init_create_unit_files=<name of daemon resource>` will create a unit file
 
 !!! example "Creating a resource incl. unit file"
 
-    ```bash lp session=project
+    ```bash xlp session=project
     ops project --init_at=. --init_create_unit_files=redis-server --force
     ```
 
     You control the service using `systemctl --user`:
 
-    ```bash lp session=project
+    ```bash xlp session=project
     [
     {'cmd': 'systemctl --user --no-pager start  redis-server-myproject'},
     {'cmd': 'systemctl --user --no-pager status redis-server-myproject', 'assert': '(running)'},
