@@ -55,6 +55,8 @@ jobs:
 
       - name: Setup environment
         uses: ./.github/actions/setup
+        with:
+          python-version: 3.12
 
       - name: Build documentation
         run: |
