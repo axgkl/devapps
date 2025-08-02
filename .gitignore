@@ -37,3 +37,4 @@ src/structlogging/r.py
 dump.rdb
 .binenv.lock
 .aider*
+docs/dev/logging.md.lp.py
