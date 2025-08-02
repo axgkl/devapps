@@ -39,7 +39,7 @@ dev = [
   "pytest-cov",
   "mypy",
   "pyright",
-  "docutools>=2025.08.02",
+  "docutools>=2025.08.03",
 ]
 
 [project.urls]
@@ -202,4 +202,3 @@ minversion = "6.0"
 # docutools = { path = "/Users/gk/repos/gh/Axiros/docutools", editable = true }
 # [tool.uv.sources]
 # docutools = { path = "../../Axiros/docutools/dist/docutools-2025.8.1.tar.gz" }
-
