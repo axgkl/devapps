@@ -33,7 +33,6 @@ runs:
       uses: mamba-org/setup-micromamba@v1
       with:
         micromamba-version: "latest"
-        environment-file: environment.yml
         init-shell: bash
         cache-environment: true
 
