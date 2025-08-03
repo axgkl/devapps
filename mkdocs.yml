@@ -11,11 +11,6 @@ copyright: |
 nav:
   - Overview: index.md
   - Quickstart: quickstart.md
-  - Installation:
-      - Python: install/python.md
-      - DevApps Packages: install/prod_inst.md
-      - Installing A Development Version: install/dev_inst.md
-      - "Setting up CI/CD": install/cicd.md
   - Features:
       - Projects:
           - About: projects/index.md

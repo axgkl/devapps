@@ -1,6 +1,10 @@
 # Quickstart
 
-## Advanced Logging
+## Advanced Logging Features
+
+We added a few processors and console rendering features to the awesome [structlog](https://github.com/hynek/structlog).
+
+Example usage:
 
 ```python lp mode=make_file fn=/tmp/myapp.py fmt=mk_console
 from threading import Thread
@@ -27,7 +31,7 @@ python /tmp/myapp.py
 
 ## Flags
 
-We can handover classes, defining [absl](https://abseil.io/docs/python/quickstart) flags in init_app also:
+Via nested classes, devapps allows to define [absl](https://abseil.io/docs/python/quickstart) flags:
 
 
 ```python lp mode=make_file fn=/tmp/mymain.py fmt=mk_console
@@ -38,6 +42,8 @@ class Flags:
   autoshort = '' # prefix for short flag keys, built with collision avoidance 
   class greeting:
     d = 'Hi'
+  # more.., incl. action flags and complex types
+
 define_flags(Flags)
 
 main = lambda: app.debug(f'{FLG.greeting} {FLG.greeted}', greeted=FLG.greeted)
@@ -53,8 +59,7 @@ main = lambda: app.debug(f'{FLG.greeting} {FLG.greeted}', greeted=FLG.greeted)
 - Logs
 - Uses Flags
 """
-from devapp.app import init_app, FLG
-from devapp.tools import define_flags
+from devapp.app import init_app
 import sys
 sys.path.append('.')
 from mymain import main # flags found anywhere imported
@@ -63,17 +68,17 @@ class AppFlags:
   autoshort = ''
   class greeted:
     '''Who is greeted'''
-    s = 'G' # explicit short
+    s = 'G' # explicit short. See help output below
     d = 'World'
-define_flags(AppFlags)
 
 
 if __name__ == '__main__':
-    init_app().info('Starting main')
+    init_app(flags=AppFlags).info('Starting main')
     main()
 ```
 
 ```bash lp fmt=xt_flat session=quickstart
+python /tmp/myapp.py -h
 python /tmp/myapp.py -hf log_
 python /tmp/myapp.py -hf greet
 python /tmp/myapp.py -G=Joe -ll 10 -latn
