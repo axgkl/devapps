@@ -271,7 +271,7 @@ wheels = [
 
 [[package]]
 name = "devapps"
-version = "2025.8.3"
+version = "2025.8.4"
 source = { editable = "." }
 dependencies = [
     { name = "absl-py" },
