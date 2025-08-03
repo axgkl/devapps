@@ -1127,53 +1127,49 @@
 
 <h1 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">¤</a></h1>
 <h2 id="advanced-logging">Advanced Logging<a class="headerlink" href="#advanced-logging" title="Permanent link">¤</a></h2>
-<!-- id: 786f84d2b3af701d884c8870471e1bd0 -->
+<!-- id: 590593197faaaa8da3a4601054da0b5e -->
 <div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">myapp</span><span class="o">.</span><span class="n">py</span>
-<span class="c1">#!/usr/bin/env python</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd"># Simple Test App</span>
-<span class="sd">- Spawns a thread</span>
-<span class="sd">- Logs</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thread</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">devapp.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_app</span>
 
+<span class="c1"># log time deltas in millis, highlight &#39;main&#39; strings, add unique symbol for threads</span>
 <span class="n">app</span> <span class="o">=</span> <span class="n">init_app</span><span class="p">(</span><span class="n">log_time_fmt</span><span class="o">=</span><span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="n">log_dev_match</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="n">log_add_thread_name</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;In main&#39;</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bar&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
+<span class="c1"># by default kw &#39;json&#39; and &#39;payload&#39; will be colorized using pygments&#39; json lexer:</span>
+<span class="n">main</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">app</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;In main&#39;</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bar&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">app</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting main&#39;</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">main</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </code></pre></div>
-<!-- id: 786f84d2b3af701d884c8870471e1bd0 -->
+<!-- id: 590593197faaaa8da3a4601054da0b5e -->
 
 <!-- id: ade653c9242109680b7e77fa88517a01 -->
 <p><xterm /></p>
 <pre><code>$ python /tmp/myapp.py
-[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m24 [[38;5;4minfo     ] [0mStarting [1m[38;5;124m[48;5;255mmain[0m                  [[38;5;5mmyapp[39m]
-[1;2m[38;5;201m[48;5;222m§[0m [2m[38;5;5m24 [[38;5;4minfo     ] [0mIn [1m[38;5;124m[48;5;255mmain[0m                        [[38;5;5mmyapp[39m] [1m[38;5;1mfoo=[2m[38;5;5mbar [38;5;1mjson=[0m{[94m"bar"[39m:[90m [39m{[94m"foo"[39m:[90m [94mtrue[39m}}
+[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m23 [[38;5;4minfo     ] [0mStarting [1m[38;5;124m[48;5;255mmain[0m                  [[38;5;5mmyapp[39m]
+[1;2m[38;5;201m[48;5;8m3[0m [2m[38;5;5m24 [[38;5;4minfo     ] [0mIn [1m[38;5;124m[48;5;255mmain[0m                        [[38;5;5mmyapp[39m] [1m[38;5;1mfoo=[2m[38;5;5mbar [38;5;1mjson=[0m{[94m"bar"[39m:[90m [39m{[94m"foo"[39m:[90m [94mtrue[39m}}
 </code></pre>
 <!-- id: ade653c9242109680b7e77fa88517a01 -->
 
 <h2 id="flags">Flags<a class="headerlink" href="#flags" title="Permanent link">¤</a></h2>
-<!-- id: d6246bda4b801c284553438e61f723df -->
+<p>We can handover classes, defining <a href="https://abseil.io/docs/python/quickstart">absl</a> flags in init_app also:</p>
+<!-- id: e7c4045113c43adfe5ee3ccd7bef689f -->
 <div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">mymain</span><span class="o">.</span><span class="n">py</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">devapp.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">FLG</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">devapp.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">define_flags</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Flags</span><span class="p">:</span>
-  <span class="n">autoshort</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+  <span class="n">autoshort</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="c1"># prefix for short flag keys, built with collision avoidance </span>
   <span class="k">class</span><span class="w"> </span><span class="nc">greeting</span><span class="p">:</span>
     <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;Hi&#39;</span>
 <span class="n">define_flags</span><span class="p">(</span><span class="n">Flags</span><span class="p">)</span>
 
 <span class="n">main</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">app</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">FLG</span><span class="o">.</span><span class="n">greeting</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">FLG</span><span class="o">.</span><span class="n">greeted</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">greeted</span><span class="o">=</span><span class="n">FLG</span><span class="o">.</span><span class="n">greeted</span><span class="p">)</span>
 </code></pre></div>
-<!-- id: d6246bda4b801c284553438e61f723df -->
+<!-- id: e7c4045113c43adfe5ee3ccd7bef689f -->
 
-<!-- id: 0586bf90a5eb931ab7ceda2b9491dd10 -->
+<!-- id: 4e0bf42489ce5c651d345303396f53a9 -->
 <div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">myapp</span><span class="o">.</span><span class="n">py</span>
 <span class="c1">#!/usr/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -1186,13 +1182,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">devapp.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">define_flags</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mymain</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">mymain</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span> <span class="c1"># flags found anywhere imported</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">AppFlags</span><span class="p">:</span>
   <span class="n">autoshort</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
   <span class="k">class</span><span class="w"> </span><span class="nc">greeted</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Who is greeted&#39;&#39;&#39;</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span> <span class="c1"># explicit short</span>
     <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;World&#39;</span>
 <span class="n">define_flags</span><span class="p">(</span><span class="n">AppFlags</span><span class="p">)</span>
 
@@ -1201,11 +1197,11 @@
     <span class="n">init_app</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting main&#39;</span><span class="p">)</span>
     <span class="n">main</span><span class="p">()</span>
 </code></pre></div>
-<!-- id: 0586bf90a5eb931ab7ceda2b9491dd10 -->
+<!-- id: 4e0bf42489ce5c651d345303396f53a9 -->
 
-<!-- id: 6ad18330a9790ac7474a258c4a9fa5a9 -->
+<!-- id: f1fb76380c24e68183b3baf8f68897aa -->
 <p><xterm /></p>
-<pre><code>$ python /tmp/myapp.py -hf log
+<pre><code>$ python /tmp/myapp.py -hf log_
 
 [1m[38;5;11mSimple Test App
 ────────────────────────────────────────────────────────────────────────────────
@@ -1214,25 +1210,10 @@
 [38;5;5m❖ [39mUses Flags
 
 
-All supported command line flags [matching [1m[32mlog[0m]:
+All supported command line flags [matching [1m[32mlog_[0m]:
 [1m[34mabsl.logging
-[0m[32m        [1m[33malsologtostderr          [0m[31mFalse
-[38;5;245malso log to stderr? 
-[32m        [1m[33mlog_dir                  [0m[31m''
+[0m[32m        [1m[33mlog_dir                  [0m[31m''
 [38;5;245mdirectory to write logfiles into 
-[32m        [1m[33mlogger_levels            [0m[31m''
-[38;5;245mSpecify log level of loggers. The format is a CSV list of `name:level`. Where `name` is the logger name used with `logging.getLogger()`, and `level` is a level name  (INFO, DEBUG, etc). e.g. `myapp.foo:INFO,other.logger:DEBUG` 
-[32m        [1m[33mlogtostderr              [0m[31mFalse
-[38;5;245mShould only log to stderr? 
-[32m        [1m[33mshowprefixforinfo        [0m[31mTrue
-[38;5;245mIf False, do not prepend prefix to info messages when it's logged to stderr, --verbosity is set to INFO level, and python logging is used. 
-[32m        [1m[33mstderrthreshold          [0m[31mfatal
-[38;5;245mlog messages at this level, or more severe, to stderr in addition to the logfile.  Possible values are 'debug', 'info', 'warning', 'error', and 'fatal'.  Obsoletes --alsologtostderr. Using --alsologtostderr cancels the effect of this flag. Please also note that this flag is subject to --verbosity and requires logfile not be stderr. 
-[32mv       [1m[33mverbosity                [0m[31m-1
-[38;5;245mLogging verbosity level. Messages logged at this level or lower will be included. Set to 1 for debug logging. If the flag was not set or supplied, the value will be changed from the default of -1 (warning) to 0 (info) after flags are parsed. 
-[1m[34mdevapp.tools
-[0m[32mdasdi   [1m[33msensitive_data_identifiers [0m[31mpass.*|.*secret.*
-[38;5;245mRegexp which helps identify keys carrying sensitive information (for filtering out of logs). Case insensitive matching. 
 [1m[34mstructlogging.sl
 [0m[32mlatn    [1m[33mlog_add_thread_name      [0m[31mFalse
 [38;5;245mAdd name of thread 
@@ -1288,10 +1269,10 @@ All supported command line flags [matching [1m[32mgreet[0m]:
 
 [39m
 $ python /tmp/myapp.py -G=Joe -ll 10 -latn
-[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m08-03 16:02:06 [[38;5;4minfo     ] [0mStarting main                  [[38;5;5mmyapp[39m]
-[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m08-03 16:02:06 [debug    ] [0mHi Joe                         [[38;5;5mmyapp[39m] [1m[38;5;1mgreeted=[2m[38;5;5mJoe
+[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m08-03 16:58:25 [[38;5;4minfo     ] [0mStarting main                  [[38;5;5mmyapp[39m]
+[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m08-03 16:58:25 [debug    ] [0mHi Joe                         [[38;5;5mmyapp[39m] [1m[38;5;1mgreeted=[2m[38;5;5mJoe
 </code></pre>
-<!-- id: 6ad18330a9790ac7474a258c4a9fa5a9 -->
+<!-- id: f1fb76380c24e68183b3baf8f68897aa -->
 
 <script>typeof start_lc === "undefined" ? 0 : start_lc() </script>
 
