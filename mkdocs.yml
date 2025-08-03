@@ -10,6 +10,7 @@ copyright: |
 #
 nav:
   - Overview: index.md
+  - Quickstart: quickstart.md
   - Installation:
       - Python: install/python.md
       - DevApps Packages: install/prod_inst.md

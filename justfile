@@ -47,7 +47,7 @@ docs:
 docs-serve PORT="2222":
     @echo "Serving docs on http://127.0.0.1:{{PORT}}"
     @pkill -f "mkdocs serve.*{{PORT}}" || true
-    uv run mkdocs serve -a "127.0.0.1:{{PORT}}"
+    lp_eval=on_page_change uv run mkdocs serve -a "127.0.0.1:{{PORT}}"
 
 # Check documentation links
 docs-checklinks:

@@ -12,7 +12,7 @@ from devapp import gevent_patched  # noqa
 from devapp import load, tools
 from devapp.lib import sh
 from structlogging import sl
-from theming.absl_color_help import call_doc, exit_at_help_flag
+from theming.absl_color_help import call_doc, env_hlp_exit_flg, exit_at_help_flag
 from theming.colorhilite import coljhighlight
 
 FLG = flags_.FLAGS
@@ -213,6 +213,61 @@ def init_app_parse_flags(*args):
 
 
 running = [0]
+
+
+from typing import Literal, Union
+
+LogLevel = Union[
+    Literal[
+        'fatal',
+        'critical',
+        'error',
+        'exception',
+        'err',
+        'warn',
+        'warning',
+        'info',
+        'debug',
+    ],
+    Literal[70, 60, 50, 40, 20, 10],
+]
+
+
+def init_app(**kw):
+    """
+    Lightweight Alternative to full run_app.
+    Getting log and (optional) flag features configured with a non blocking function call
+
+    log_level: LogLevel = '20',
+    log_time_fmt: Literal['ISO', 'dt', '%m-%d %H:%M:%S'] = '%m-%d %H:%M:%S',
+    log_to_stdout=False,
+    log_fmt: Union[ Literal['off', 'auto', 'plain', 'plain_no_colors', 'json'], Literal[0, 1, 2, 3, 4] ] = 'auto',
+    log_add_thread_name=False,
+    log_add_thread_name=False,
+    log_thread_local_names=False,
+    log_dev_match='',
+    log_dev_dimm_no_match=False,
+    log_dev_coljson_style='dark',
+    log_dev_coljson_no_truecolor=False,
+    log_dev_fmt_coljson=['json', 'payload'],
+    """
+    lkw = [k for k in kw if k[:4] == 'log_']
+    # new dflts. still ovrwrtble by cli
+    [setattr(flags_.FLAGS, k, kw.pop(k)) for k in lkw]
+    if 'argv' not in kw:
+        # w/o setting flags we just have 2: sl.flags and tools.appflags:
+        if len(tools.have_flg_cls) > 2 or 'flags' in kw:
+            # define_flags was or will be called
+            kw['argv'] = sys.argv  # flag feature in use
+        else:
+            # when he does not use flags, sys.argv should not collide
+            kw['argv'] = [sys.argv[0]]
+    try:
+        run_app(lambda: None, **kw)
+    except SystemExit:
+        if env_hlp_exit_flg in os.environ:
+            raise
+    return app
 
 
 def run_app(

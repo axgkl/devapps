@@ -271,7 +271,7 @@ wheels = [
 
 [[package]]
 name = "devapps"
-version = "2025.7.29"
+version = "2025.8.3"
 source = { editable = "." }
 dependencies = [
     { name = "absl-py" },
@@ -310,7 +310,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "docutools", specifier = ">=2025.8.2" },
+    { name = "docutools", specifier = ">=2025.8.3" },
     { name = "markdown-include", specifier = ">=0.8.1" },
     { name = "mypy" },
     { name = "pyright" },
@@ -343,7 +343,7 @@ wheels = [
 
 [[package]]
 name = "docutools"
-version = "2025.8.2"
+version = "2025.8.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anybadge" },
@@ -368,9 +368,9 @@ dependencies = [
     { name = "pytest-xdist" },
     { name = "toml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3c/03/80f1f263c8d9e8e0ea3afb2dda397f31477b9acb7e682e574cb7ef923322/docutools-2025.8.2.tar.gz", hash = "sha256:a10505706e3815d0d5e321b6a1738ece32415ce1471a9f86e53b560b17d179ac", size = 677865, upload-time = "2025-08-02T17:28:33.006Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/33/38/d077495845e8b7f579955c7b2ba0d9237fc3db99de53521078662ddc4eb9/docutools-2025.8.3.tar.gz", hash = "sha256:90e94516af9ae2a07f9053c869c78484d7aa12133a65eca2b165b17617b56563", size = 677876, upload-time = "2025-08-02T19:34:31.564Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/21/11/2c478f69c3092a8bae9e9444f62dceedc6db8128015113c8068213e16c9d/docutools-2025.8.2-py3-none-any.whl", hash = "sha256:5f6fef555fb03debee45377486bf43106008ace075083f3db8db14754c7ced81", size = 1298251, upload-time = "2025-08-02T17:28:30.309Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/0e/31bd0082126cee295cebb994034771e9781d4a5333a3eaae2945ab92f579/docutools-2025.8.3-py3-none-any.whl", hash = "sha256:ae5f7dedf8c2619503b308d7033f7809db15bbca7af6d5c34c0cda2a000feb52", size = 1298254, upload-time = "2025-08-02T19:34:29.493Z" },
 ]
 
 [[package]]

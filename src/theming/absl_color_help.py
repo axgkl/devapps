@@ -389,14 +389,12 @@ def color_usage(*a, main_module, full=None, **kw):
             define_flags(af['flg_cls'], sub=af['key'], parent_autoshort=af['autoshort'])
             afs.append(af)
 
-    so = sys.stdout
-    s = io.StringIO()
-    sys.stdout = s
-    flags.FLAGS.write_help_in_xml_format(sys.stdout)
-    sys.stdout = so
-    u = s.getvalue()
-    s.close()
+    with io.StringIO() as s:
+        flags.FLAGS.write_help_in_xml_format(s)
+        u = s.getvalue()
+
     j = parse_xml_help(u, match=match, cli_actions=afs)
+    program = j['program']
     all_flgs = j['flags']
     if hof != 'terminal':
         r = []
@@ -419,11 +417,11 @@ def color_usage(*a, main_module, full=None, **kw):
 
     w = term_widths(match)
 
-    def do(fn_mod, w=w, flgs=None):
+    def do(fn_mod, w=w, flgs=None, program=program):
         # module headline:
         flgs = all_flgs[fn_mod] if flgs is None else flgs
         if len(all_flgs) > 1:
-            add(ansi_col('1;34') + fn_mod)
+            add(ansi_col('1;34') + fn_mod.replace('__main__', program))
         add(to_terminal(flgs, w, match=match))
 
     # main_help = all_flgs.pop(main_module.__name__, [])
@@ -452,9 +450,13 @@ hlp_flags = {'-h': False, '--help': False, '-hf': True, '--helpfull': True}
 
 
 def find_module(main):
-    f, kw1 = func_from_partial(main)
-    if f:
+    f, _ = func_from_partial(main)
+    if f and f.__module__ != 'devapp.app':
         return sys.modules.get(f.__module__)
+    return sys.modules.get('__main__')
+
+
+env_hlp_exit_flg = '_exit_help_'
 
 
 def exit_at_help_flag(main, argv):
@@ -480,4 +482,5 @@ def exit_at_help_flag(main, argv):
 
     h = color_usage(main_module=mod, full=full)
     print(''.join(h))
+    os.environ[env_hlp_exit_flg] = 'true'
     sys.exit(0)
