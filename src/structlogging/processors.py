@@ -91,9 +91,9 @@ def TimeStamper(**kw):
 def add_thread_name(L, l, ev_dict):
     t = current_thread()
     try:
-        tn = int(t.getName().rsplit('-', 1)[1])
+        tn = int(t.name.rsplit('-', 1)[1])
     except Exception:
-        if t.getName() == 'MainThread':
+        if t.name == 'MainThread':
             tn = 0
         else:
             tn = t.ident  # int guaranteed
