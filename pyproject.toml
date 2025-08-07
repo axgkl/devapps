@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "devapps"
-version = "2025.08.04"
+version = "2025.08.07"
 description = "Apps - End to End."
 authors = [{ name = "Gunther Klessinger", email = "g_kle_ss_ing_er@gmx.de" }]
 license = { text = "BSD" }
@@ -29,7 +29,6 @@ dependencies = [
   "inflection",
   "requests",
   "pycond",
-  "axiros-utils>=3.0.2",
 ]
 
 [dependency-groups]
@@ -202,3 +201,4 @@ minversion = "6.0"
 # docutools = { path = "/Users/gk/repos/gh/Axiros/docutools", editable = true }
 # [tool.uv.sources]
 # docutools = { path = "../../Axiros/docutools/dist/docutools-2025.8.1.tar.gz" }
+
