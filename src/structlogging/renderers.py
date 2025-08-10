@@ -214,7 +214,7 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
                     s1 = _[0] + ']\x1b[2;38;5;235m' + _[1]
 
         if not self.colorful or tn is None:
-            return stack + s1
+            return stack + s1 + '\x1b[0m'
 
         # Thread: a unique looking cell in the terminal matrix:
         symb = Cell.unique(tn)
@@ -229,4 +229,4 @@ class ThemeableConsoleRenderer(structlog.dev.ConsoleRenderer):
             else:
                 s1 = by + s1
         s = '\x1b[2m' + symb + ' ' + s2
-        return stack + s
+        return stack + s + '\x1b[0m'
