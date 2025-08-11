@@ -45,7 +45,8 @@ def formatter_by_style(pygm_style, _cache=[0]):  # noqa: B006
     else:
         from pygments.formatters.terminal256 import Terminal256Formatter as F
     # their bg coloring for unparsable json is super annoying (payload="asdf...)
-    F = F(style=pygm_style)
+    
+    F = F(style=pygm_style, nobold=True)
     # F.style_string['Token.Error'] = F.style_string['Token.Generic.Error']
     _cache[0] = pygm_style, F
     return pygm_style, F
