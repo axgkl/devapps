@@ -1017,8 +1017,8 @@ maintain projects and resources.</p>
 <p><xterm /></p>
 <pre><code>$ mkdir $HOME/myproject &amp;&amp; cd $HOME/myproject &amp;&amp; ls -lta
 total 8
-drwxr-xr-x  2 runner docker 4096 Aug  7 17:20 .
-drwxr-x--- 14 runner docker 4096 Aug  7 17:20 ..
+drwxr-xr-x  2 runner docker 4096 Aug 11 17:21 .
+drwxr-x--- 14 runner docker 4096 Aug 11 17:21 ..
 </code></pre>
 <!-- id: 4c652d1e83f1fac38bf25e54f869857b -->
 
@@ -1037,9 +1037,9 @@ drwxr-x--- 14 runner docker 4096 Aug  7 17:20 ..
 <div class="tabbed-block">
 <p><xterm /></p>
 <pre><code>$ ops project list
-[2m[38;5;5m08-07 17:20:24 [[38;5;4minfo     ] [0mDirectories                    [[38;5;5mlist[39m] [1m[38;5;1mconda_prefix=[2m[38;5;5m/home/runner/micromamba [38;5;1mfs_dir=[38;5;5m/home/runner/micromamba/fs(default)
-08-07 17:20:24 [[38;5;124merror    ] [0mNot found                      [[38;5;5mlist[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools/bin/git
-08-07 17:20:24 [[38;5;124merror    ] [0mNot found                      [[38;5;5mlist[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools_kf/bin/rotatelogs
+[2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mDirectories                    [[38;5;5mlist[39m] [1m[38;5;1mconda_prefix=[2m[38;5;5m/home/runner/micromamba [38;5;1mfs_dir=[38;5;5m/home/runner/micromamba/fs(default)
+[0;2m[38;5;5m08-11 17:21:06 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mlist[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools/bin/git
+[0;2m[38;5;5m08-11 17:21:06 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mlist[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools_kf/bin/rotatelogs
 
 [0m[31m╭───────────────────── [1mTraceback [2m(most recent call last)[0m[31m ──────────────────────╮
 │[39m [2m/home/runner/work/devapps/devapps/src/devapp/tools/[0;1m__init__.py[0m:1449 in root  [31m│
@@ -1094,7 +1094,7 @@ drwxr-x--- 14 runner docker 4096 Aug  7 17:20 ..
 ╰──────────────────────────────────────────────────────────────────────────────╯
 [1m[91mDieNow: [39m([0m[32m'could not determine project root dir'[39m, [1m{})
 
-[0;2m[38;5;5m08-07 17:20:24 [[1m[38;5;124merror    ] [0mcould not determine project root dir [[38;5;5mlist[39m]
+[0;2m[38;5;5m08-11 17:21:06 [[1m[38;5;124merror    ] [0mcould not determine project root dir [[38;5;5mlist[39m]
 </code></pre>
 </div>
 </div>
@@ -1128,22 +1128,22 @@ packages and use standard config options (see previous chapter why).</p>
 <div class="tabbed-block">
 <p><xterm /></p>
 <pre><code>$ ops project --init_at . --port_offset 2000 --force
-[2m[38;5;5m08-07 17:20:24 [[38;5;4minfo     ] [0mchdir                          [[38;5;5mproject[39m] [1m[38;5;1margs=[2m[38;5;5m/home/runner/myproject [38;5;1mstore_log=[38;5;5mNone
-08-07 17:20:24 [[38;5;4minfo     ] [0mDirectories                    [[38;5;5mproject[39m] [1m[38;5;1mconda_prefix=[2m[38;5;5m/home/runner/micromamba [38;5;1mfs_dir=[38;5;5m/home/runner/micromamba/fs(default)
-08-07 17:20:24 [[38;5;124merror    ] [0mNot found                      [[38;5;5mproject[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools/bin/git
-08-07 17:20:24 [[38;5;124merror    ] [0mNot found                      [[38;5;5mproject[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools_kf/bin/rotatelogs
-08-07 17:20:24 [[38;5;124mwarning  ] [0mInstalling resources           [[38;5;5mproject[39m] [1m[38;5;1mresources=[2m[38;5;5m[{'bin_name': 'lc_tools', 'conda_chan': 'conda-forge', 'conda_pkg': 'git fzf jq ripgrep fd-find httpie htop tmux', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools', 'path': False, 'provides': ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'], 'run': 'lc_tools', 'verify_present': 'verify_tools'}, {'bin_name': 'lc_tools_kf', 'conda_chan': 'kalefranz', 'conda_pkg': 'httpd', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools_kf', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools_kf', 'path': False, 'provides': ['rotatelogs'], 'verify_present': 'verify_tools'}, {'bin_name': 'redis_server', 'cmd': 'redis-server', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/redis_server', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'redis_server', 'path': False, 'pkg': 'redis-server', 'port': 6379, 'provides': ['redis-server', 'redis-cli'], 'run': 'redis_server', 'systemd': 'redis-server'}, {'bin_name': 'slc', 'cmd': 'slc', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'environ': ['lc_hubs'], 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/slc', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'slc', 'path': False, 'pkg': False}]
-08-07 17:20:24 [[38;5;4minfo     ] [0mcreate_project_dirs            [[38;5;5mproject[39m] [1m[38;5;1mstore_log=[2m[38;5;5mNone
-08-07 17:20:24 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/bin
-08-07 17:20:24 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/data
-08-07 17:20:24 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/log
-08-07 17:20:24 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/work
-08-07 17:20:24 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/conf
-08-07 17:20:24 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/tmp
-08-07 17:20:24 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/build
-08-07 17:20:24 [[38;5;4minfo     ] [0mchdir                          [[38;5;5mproject[39m] [1m[38;5;1margs=[2m[38;5;5m/home/runner/myproject [38;5;1mstore_log=[38;5;5mNone
-08-07 17:20:24 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      lc_tools ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'] [38;5;1mstore_log=[38;5;5mNone
--ne 
+[2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mchdir                          [[38;5;5mproject[39m] [1m[38;5;1margs=[2m[38;5;5m/home/runner/myproject [38;5;1mstore_log=[38;5;5mNone
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mDirectories                    [[38;5;5mproject[39m] [1m[38;5;1mconda_prefix=[2m[38;5;5m/home/runner/micromamba [38;5;1mfs_dir=[38;5;5m/home/runner/micromamba/fs(default)
+[0;2m[38;5;5m08-11 17:21:06 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mproject[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools/bin/git
+[0;2m[38;5;5m08-11 17:21:06 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mproject[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools_kf/bin/rotatelogs
+[0;2m[38;5;5m08-11 17:21:06 [[1m[38;5;124mwarning  ] [0mInstalling resources           [[38;5;5mproject[39m] [1m[38;5;1mresources=[2m[38;5;5m[{'bin_name': 'lc_tools', 'conda_chan': 'conda-forge', 'conda_pkg': 'git fzf jq ripgrep fd-find httpie htop tmux', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools', 'path': False, 'provides': ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'], 'run': 'lc_tools', 'verify_present': 'verify_tools'}, {'bin_name': 'lc_tools_kf', 'conda_chan': 'kalefranz', 'conda_pkg': 'httpd', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools_kf', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools_kf', 'path': False, 'provides': ['rotatelogs'], 'verify_present': 'verify_tools'}, {'bin_name': 'redis_server', 'cmd': 'redis-server', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/redis_server', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'redis_server', 'path': False, 'pkg': 'redis-server', 'port': 6379, 'provides': ['redis-server', 'redis-cli'], 'run': 'redis_server', 'systemd': 'redis-server'}, {'bin_name': 'slc', 'cmd': 'slc', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'environ': ['lc_hubs'], 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/slc', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'slc', 'path': False, 'pkg': False}]
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mcreate_project_dirs            [[38;5;5mproject[39m] [1m[38;5;1mstore_log=[2m[38;5;5mNone
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/bin
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/data
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/log
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/work
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/conf
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/tmp
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/build
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mchdir                          [[38;5;5mproject[39m] [1m[38;5;1margs=[2m[38;5;5m/home/runner/myproject [38;5;1mstore_log=[38;5;5mNone
+[0;2m[38;5;5m08-11 17:21:06 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      lc_tools ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'] [38;5;1mstore_log=[38;5;5mNone
+[0m-ne 
 [38;5;240mEmpty environment created at prefix: /home/runner/micromamba/envs/lc_tools
 
 Transaction
@@ -1166,7 +1166,7 @@ Transaction
   Install:
 ─────────────────────────────────────────────────────────────────────────────────
 
-  [32m+ _libgcc_mutex     [0m           0.1  conda_forge         conda-forge       3kB
+  [32m+ _libgcc_mutex     [39m           0.1  conda_forge         conda-forge       3kB
   [32m+ _openmp_mutex     [39m           4.5  2_gnu               conda-forge      24kB
   [32m+ brotli-python     [39m         1.1.0  py313h46c70d0_3     conda-forge     350kB
   [32m+ bzip2             [39m         1.0.8  h4bc722e_7          conda-forge     253kB
@@ -1174,7 +1174,7 @@ Transaction
   [32m+ ca-certificates   [39m      2025.8.3  hbd8a1cb_0          conda-forge     154kB
   [32m+ certifi           [39m      2025.8.3  pyhd8ed1ab_0        conda-forge     159kB
   [32m+ cffi              [39m        1.17.1  py313hfab6e84_0     conda-forge     296kB
-  [32m+ charset-normalizer[39m         3.4.2  pyhd8ed1ab_0        conda-forge      50kB
+  [32m+ charset-normalizer[39m         3.4.3  pyhd8ed1ab_0        conda-forge      51kB
   [32m+ defusedxml        [39m         0.7.1  pyhd8ed1ab_0        conda-forge      24kB
   [32m+ fd-find           [39m        10.2.0  h8fae777_1          conda-forge       1MB
   [32m+ fzf               [39m        0.65.1  hf1419bc_0          conda-forge       3MB
@@ -1186,7 +1186,7 @@ Transaction
   [32m+ hyperframe        [39m         6.1.0  pyhd8ed1ab_0        conda-forge      17kB
   [32m+ idna              [39m          3.10  pyhd8ed1ab_1        conda-forge      50kB
   [32m+ jq                [39m         1.8.1  h73b1eb8_0          conda-forge     313kB
-  [32m+ keyutils          [39m         1.6.1  h166bdaf_0          conda-forge     118kB
+  [32m+ keyutils          [39m         1.6.3  hb9d3cd8_0          conda-forge     134kB
   [32m+ krb5              [39m        1.21.3  h659f571_0          conda-forge       1MB
   [32m+ ld_impl_linux-64  [39m          2.44  h1423503_1          conda-forge     676kB
   [32m+ libcurl           [39m        8.14.1  h332b0f4_0          conda-forge     450kB
@@ -1198,7 +1198,7 @@ Transaction
   [32m+ libgcc            [39m        15.1.0  h767d61c_4          conda-forge     824kB
   [32m+ libgcc-ng         [39m        15.1.0  h69a702a_4          conda-forge      29kB
   [32m+ libgomp           [39m        15.1.0  h767d61c_4          conda-forge     447kB
-  [32m+ libiconv          [39m          1.18  h4ce23a2_1          conda-forge     713kB
+  [32m+ libiconv          [39m          1.18  h3b78370_2          conda-forge     790kB
   [32m+ liblzma           [39m         5.8.1  hb9d3cd8_2          conda-forge     113kB
   [32m+ libmpdec          [39m         4.0.0  hb9d3cd8_0          conda-forge      91kB
   [32m+ libnghttp2        [39m        1.64.0  h161d5f1_0          conda-forge     648kB
@@ -1254,7 +1254,8 @@ Linking _libgcc_mutex-0.1-conda_forge
 Linking _openmp_mutex-4.5-2_gnu
 Linking libgcc-15.1.0-h767d61c_4
 Linking libmpdec-4.0.0-hb9d3cd8_0
-Linking libiconv-1.18-h4ce23a2_1
+Linking libiconv-1.18-h3b78370_2
+Linking keyutils-1.6.3-hb9d3cd8_0
 Linking c-ares-1.34.5-hb9d3cd8_0
 Linking libzlib-1.3.1-hb9d3cd8_2
 Linking liblzma-5.8.1-hb9d3cd8_2
@@ -1277,7 +1278,6 @@ Linking libxcrypt-4.4.36-hd590300_1
 Linking libev-4.33-hd590300_2
 Linking bzip2-1.0.8-h4bc722e_7
 Linking libuuid-2.38.1-h0b41bf4_0
-Linking keyutils-1.6.1-h166bdaf_0
 Linking jq-1.8.1-h73b1eb8_0
 Linking htop-3.4.1-haa1a288_0
 Linking perl-5.32.1-7_hd590300_perl5
@@ -1305,7 +1305,7 @@ Linking certifi-2025.8.3-pyhd8ed1ab_0
 Linking typing_extensions-4.14.1-pyhe01879c_0
 Linking defusedxml-0.7.1-pyhd8ed1ab_0
 Linking pygments-2.19.2-pyhd8ed1ab_0
-Linking charset-normalizer-3.4.2-pyhd8ed1ab_0
+Linking charset-normalizer-3.4.3-pyhd8ed1ab_0
 Linking setuptools-80.9.0-pyhff2d567_0
 Linking h2-4.2.0-pyhd8ed1ab_0
 Linking markdown-it-py-3.0.0-pyhd8ed1ab_1
@@ -1322,8 +1322,8 @@ Linking httpie-3.2.4-pyh55f8243_1
 Transaction finished
 
 -ne 
-[2m[38;5;5m08-07 17:20:40 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      lc_tools_kf ['rotatelogs'] [38;5;1mstore_log=[38;5;5mNone
--ne 
+[2m[38;5;5m08-11 17:21:22 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      lc_tools_kf ['rotatelogs'] [38;5;1mstore_log=[38;5;5mNone
+[0m-ne 
 [38;5;240mEmpty environment created at prefix: /home/runner/micromamba/envs/lc_tools_kf
 conda-forge/linux-64                                        Using cache
 conda-forge/noarch                                          Using cache
@@ -1341,7 +1341,7 @@ Transaction
   Install:
 ────────────────────────────────────────────────────────────────────
 
-  [32m+ _libgcc_mutex  [0m       0.1  conda_forge  conda-forge[32m     Cached
+  [32m+ _libgcc_mutex  [39m       0.1  conda_forge  conda-forge[32m     Cached
 [39m  [32m+ _openmp_mutex  [39m       4.5  2_gnu        conda-forge[32m     Cached
 [39m  [32m+ ca-certificates[39m  2025.8.3  hbd8a1cb_0   conda-forge[32m     Cached
 [39m  [32m+ httpd          [39m    2.4.12  6            kalefranz          8MB
@@ -1381,8 +1381,8 @@ Linking httpd-2.4.12-6
 Transaction finished
 
 -ne 
-[2m[38;5;5m08-07 17:20:44 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5ms     redis-server ['redis-server', 'redis-cli'] [38;5;1mstore_log=[38;5;5mNone
--ne 
+[2m[38;5;5m08-11 17:21:27 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5ms     redis-server ['redis-server', 'redis-cli'] [38;5;1mstore_log=[38;5;5mNone
+[0m-ne 
 [38;5;240mEmpty environment created at prefix: /home/runner/micromamba/envs/redis_server
 conda-forge/linux-64                                        Using cache
 conda-forge/noarch                                          Using cache
@@ -1400,7 +1400,7 @@ Transaction
   Install:
 ────────────────────────────────────────────────────────────────────
 
-  [32m+ _libgcc_mutex  [0m       0.1  conda_forge  conda-forge[32m     Cached
+  [32m+ _libgcc_mutex  [39m       0.1  conda_forge  conda-forge[32m     Cached
 [39m  [32m+ _openmp_mutex  [39m       4.5  2_gnu        conda-forge[32m     Cached
 [39m  [32m+ ca-certificates[39m  2025.8.3  hbd8a1cb_0   conda-forge[32m     Cached
 [39m  [32m+ libgcc         [39m    15.1.0  h767d61c_4   conda-forge[32m     Cached
@@ -1430,12 +1430,12 @@ Linking redis-server-7.4.0-h3400bea_0
 Transaction finished
 
 -ne 
-[2m[38;5;5m08-07 17:20:47 [[38;5;4minfo     ] [0mInstall.no_pkg                 [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      slc  [38;5;1mstore_log=[38;5;5mNone
-08-07 17:20:47 [[38;5;4minfo     ] [0mNo package resource - no install [[38;5;5mproject[39m]
-[2m[38;5;5m08-07 17:20:47 [[38;5;4minfo     ] [0mgit_init                       [[38;5;5mproject[39m] [1m[38;5;1mstore_log=[2m[38;5;5mNone
--ne 
+[2m[38;5;5m08-11 17:21:30 [[38;5;4minfo     ] [0mInstall.no_pkg                 [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      slc  [38;5;1mstore_log=[38;5;5mNone
+[0;2m[38;5;5m08-11 17:21:30 [[38;5;4minfo     ] [0mNo package resource - no install [[38;5;5mproject[39m]
+[2m[38;5;5m08-11 17:21:30 [[38;5;4minfo     ] [0mgit_init                       [[38;5;5mproject[39m] [1m[38;5;1mstore_log=[2m[38;5;5mNone
+[0m-ne 
 [33mhint: Using 'master' as the name for the initial branch. This default branch name
-[0m[33mhint: is subject to change. To configure the initial branch name to use in all
+hint: is subject to change. To configure the initial branch name to use in all
 hint: of your new repositories, which will suppress this warning, call:
 hint:
 hint: [39m  [33mgit config --global init.defaultBranch &lt;name&gt;
@@ -1603,18 +1603,18 @@ Try <code>ops p -hf log_level</code>, <code>ops p -hf port</code> (...)</p>
 <p>In the example above, a <code>--port_offset=2000</code> flag was given, determining the start parameters written into the redis wrapper:</p>
 <p><!-- id: dfb9ed5f3d9468406462d07976eab52c -->
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>bin/redis-server
-<span class="m">4477</span>:C<span class="w"> </span><span class="m">07</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:20:51.552<span class="w"> </span><span class="c1"># WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add &#39;vm.overcommit_memory = 1&#39; to /etc/sysctl.conf and then reboot or run the command &#39;sysctl vm.overcommit_memory=1&#39; for this to take effect.</span>
-<span class="m">4477</span>:C<span class="w"> </span><span class="m">07</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:20:51.552<span class="w"> </span>*<span class="w"> </span>oO0OoO0OoO0Oo<span class="w"> </span>Redis<span class="w"> </span>is<span class="w"> </span>starting<span class="w"> </span>oO0OoO0OoO0Oo
-<span class="m">4477</span>:C<span class="w"> </span><span class="m">07</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:20:51.552<span class="w"> </span>*<span class="w"> </span>Redis<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">7</span>.4.0,<span class="w"> </span><span class="nv">bits</span><span class="o">=</span><span class="m">64</span>,<span class="w"> </span><span class="nv">commit</span><span class="o">=</span>abcd3ea3,<span class="w"> </span><span class="nv">modified</span><span class="o">=</span><span class="m">0</span>,<span class="w"> </span><span class="nv">pid</span><span class="o">=</span><span class="m">4477</span>,<span class="w"> </span>just<span class="w"> </span>started
-<span class="m">4477</span>:C<span class="w"> </span><span class="m">07</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:20:51.552<span class="w"> </span>*<span class="w"> </span>Configuration<span class="w"> </span>loaded
-<span class="m">4477</span>:M<span class="w"> </span><span class="m">07</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:20:51.553<span class="w"> </span>*<span class="w"> </span>monotonic<span class="w"> </span>clock:<span class="w"> </span>POSIX<span class="w"> </span>clock_gettime
+<span class="m">4483</span>:C<span class="w"> </span><span class="m">11</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:21:33.690<span class="w"> </span><span class="c1"># WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add &#39;vm.overcommit_memory = 1&#39; to /etc/sysctl.conf and then reboot or run the command &#39;sysctl vm.overcommit_memory=1&#39; for this to take effect.</span>
+<span class="m">4483</span>:C<span class="w"> </span><span class="m">11</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:21:33.690<span class="w"> </span>*<span class="w"> </span>oO0OoO0OoO0Oo<span class="w"> </span>Redis<span class="w"> </span>is<span class="w"> </span>starting<span class="w"> </span>oO0OoO0OoO0Oo
+<span class="m">4483</span>:C<span class="w"> </span><span class="m">11</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:21:33.690<span class="w"> </span>*<span class="w"> </span>Redis<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">7</span>.4.0,<span class="w"> </span><span class="nv">bits</span><span class="o">=</span><span class="m">64</span>,<span class="w"> </span><span class="nv">commit</span><span class="o">=</span>abcd3ea3,<span class="w"> </span><span class="nv">modified</span><span class="o">=</span><span class="m">0</span>,<span class="w"> </span><span class="nv">pid</span><span class="o">=</span><span class="m">4483</span>,<span class="w"> </span>just<span class="w"> </span>started
+<span class="m">4483</span>:C<span class="w"> </span><span class="m">11</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:21:33.690<span class="w"> </span>*<span class="w"> </span>Configuration<span class="w"> </span>loaded
+<span class="m">4483</span>:M<span class="w"> </span><span class="m">11</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:21:33.690<span class="w"> </span>*<span class="w"> </span>monotonic<span class="w"> </span>clock:<span class="w"> </span>POSIX<span class="w"> </span>clock_gettime
 <span class="w">                </span>_._<span class="w">                                                  </span>
 <span class="w">           </span>_.-<span class="sb">``</span>__<span class="w"> </span><span class="s1">&#39;&#39;</span>-._<span class="w">                                             </span>
 <span class="w">      </span>_.-<span class="sb">``</span><span class="w">    </span><span class="sb">`</span>.<span class="w">  </span><span class="sb">`</span>_.<span class="w">  </span><span class="s1">&#39;&#39;</span>-._<span class="w">           </span>Redis<span class="w"> </span>Community<span class="w"> </span>Edition<span class="w">      </span>
 <span class="w">  </span>.-<span class="sb">``</span><span class="w"> </span>.-<span class="sb">```</span>.<span class="w">  </span><span class="sb">```</span><span class="se">\/</span><span class="w">    </span>_.,_<span class="w"> </span><span class="s1">&#39;&#39;</span>-._<span class="w">     </span><span class="m">7</span>.4.0<span class="w"> </span><span class="o">(</span>abcd3ea3/0<span class="o">)</span><span class="w"> </span><span class="m">64</span><span class="w"> </span>bit
 <span class="w"> </span><span class="o">(</span><span class="w">    </span><span class="s1">&#39;      ,       .-`  | `,    )     Running in standalone mode</span>
 <span class="s1"> |`-._`-...-` __...-.``-._|&#39;</span><span class="sb">`</span><span class="w"> </span>_.-<span class="s1">&#39;|     Port: 8379</span>
-<span class="s1"> |    `-._   `._    /     _.-&#39;</span><span class="w">    </span><span class="p">|</span><span class="w">     </span>PID:<span class="w"> </span><span class="m">4477</span>
+<span class="s1"> |    `-._   `._    /     _.-&#39;</span><span class="w">    </span><span class="p">|</span><span class="w">     </span>PID:<span class="w"> </span><span class="m">4483</span>
 <span class="w">  </span><span class="sb">`</span>-._<span class="w">    </span><span class="sb">`</span>-._<span class="w">  </span><span class="sb">`</span>-./<span class="w">  </span>_.-<span class="s1">&#39;    _.-&#39;</span><span class="w">                                   </span>
 <span class="w"> </span><span class="p">|</span><span class="sb">`</span>-._<span class="sb">`</span>-._<span class="w">    </span><span class="sb">`</span>-.__.-<span class="s1">&#39;    _.-&#39;</span>_.-<span class="s1">&#39;|                                  </span>
 <span class="s1"> |    `-._`-._        _.-&#39;</span>_.-<span class="s1">&#39;    |           https://redis.io       </span>
@@ -1626,8 +1626,8 @@ Try <code>ops p -hf log_level</code>, <code>ops p -hf port</code> (...)</p>
 <span class="w">          </span><span class="sb">`</span>-._<span class="w">        </span>_.-<span class="s1">&#39;                                           </span>
 <span class="s1">              `-.__.-&#39;</span><span class="w">                                               </span>
 
-<span class="m">4477</span>:M<span class="w"> </span><span class="m">07</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:20:51.554<span class="w"> </span>*<span class="w"> </span>Server<span class="w"> </span>initialized
-<span class="m">4477</span>:M<span class="w"> </span><span class="m">07</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:20:51.554<span class="w"> </span>*<span class="w"> </span>Ready<span class="w"> </span>to<span class="w"> </span>accept<span class="w"> </span>connections<span class="w"> </span>tcp
+<span class="m">4483</span>:M<span class="w"> </span><span class="m">11</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:21:33.691<span class="w"> </span>*<span class="w"> </span>Server<span class="w"> </span>initialized
+<span class="m">4483</span>:M<span class="w"> </span><span class="m">11</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">17</span>:21:33.691<span class="w"> </span>*<span class="w"> </span>Ready<span class="w"> </span>to<span class="w"> </span>accept<span class="w"> </span>connections<span class="w"> </span>tcp
 </code></pre></div>
 <!-- id: dfb9ed5f3d9468406462d07976eab52c --></p>
 </details>
@@ -1840,21 +1840,21 @@ ops project --init_at=. --init_create_unit_files=redis-server --force
     
       <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
       
-        <script src="../../lcd/lp/javascript/tables.js"></script>
-      
-        <script src="../../lcd/lp/javascript/xterm-addon-fit.min.js"></script>
-      
-        <script src="../../lcd/lp/javascript/xterm-addon-search.min.js"></script>
-      
-        <script src="../../lcd/lp/javascript/tablesort.min.js"></script>
-      
         <script src="../../lcd/lp/javascript/lc.js"></script>
       
         <script src="../../lcd/lp/javascript/xterm.4.9.0.min.js"></script>
       
-        <script src="../../lcd/lp/javascript/fa_all.js"></script>
+        <script src="../../lcd/lp/javascript/xterm-addon-search.min.js"></script>
       
         <script src="../../lcd/lp/javascript/Rx.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/tables.js"></script>
+      
+        <script src="../../lcd/lp/javascript/tablesort.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/fa_all.js"></script>
+      
+        <script src="../../lcd/lp/javascript/xterm-addon-fit.min.js"></script>
       
     
   </body>
