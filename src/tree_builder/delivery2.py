@@ -52,7 +52,7 @@ class Service(T):
     criticality = 1
 
 
-# Swisscom.MBC.SB.Dev.Zuerich.ACS1.Nginx
+# TELEAG.MBC.SB.Dev.Zuerich.ACS1.Nginx
 
 
 # mixin types. not needed. yet.
@@ -294,23 +294,23 @@ class Prod(Cluster):
     "Production"
 
 
-class Swisscom(Project, Dev, A, B, Prod):
+class TELEAG(Project, Dev, A, B, Prod):
     "Enterprise Voice"
 
 
-# postconfigure(Swisscom)
+# postconfigure(TELEAG)
 
 # ------------------------------------------------------------------ Properties
-Swisscom.Dev.Zuerich.L0Master.C.ip = '10.67.225.109'
-Swisscom.Dev.Zuerich.NB.M.ip = '10.67.225.103'
-Swisscom.Dev.Zuerich.NB.S.ip = '10.67.225.105'
-Swisscom.Dev.Zuerich.NB.E.ip = '10.67.225.107'
-Swisscom.Dev.Zuerich.SB.ACS.ip = '195.186.149.150'
-Swisscom.Dev.Olten.L0Master.C.ip = '10.67.224.108'
-Swisscom.Dev.Olten.NB.M.ip = '10.67.224.102'
-Swisscom.Dev.Olten.NB.S.ip = '10.67.224.104'
-Swisscom.Dev.Olten.NB.E.ip = '10.67.224.106'
-Swisscom.Dev.Olten.SB.ACS.ip = '195.186.149.152'
+TELEAG.Dev.Zuerich.L0Master.C.ip = '10.67.225.109'
+TELEAG.Dev.Zuerich.NB.M.ip = '10.67.225.103'
+TELEAG.Dev.Zuerich.NB.S.ip = '10.67.225.105'
+TELEAG.Dev.Zuerich.NB.E.ip = '10.67.225.107'
+TELEAG.Dev.Zuerich.SB.ACS.ip = '195.186.149.150'
+TELEAG.Dev.Olten.L0Master.C.ip = '10.67.224.108'
+TELEAG.Dev.Olten.NB.M.ip = '10.67.224.102'
+TELEAG.Dev.Olten.NB.S.ip = '10.67.224.104'
+TELEAG.Dev.Olten.NB.E.ip = '10.67.224.106'
+TELEAG.Dev.Olten.SB.ACS.ip = '195.186.149.152'
 
 
 if __name__ == '__main__':
@@ -319,13 +319,13 @@ if __name__ == '__main__':
     sys.argv.append('')
     from .render import to_html
 
-    # print to_html(Swisscom.A.Zuerich.SB.ACS, file=sys.argv[1], into='<!--cl-->')
-    # print to_html(Swisscom.Dev, file=sys.argv[1], into='<!--cl-->',
+    # print to_html(TELEAG.A.Zuerich.SB.ACS, file=sys.argv[1], into='<!--cl-->')
+    # print to_html(TELEAG.Dev, file=sys.argv[1], into='<!--cl-->',
     #        props_ign=('cls', 'descr', 'name', 'type', 'criticality'),
     #        stop_recursion='Role', no_props=1)
     print(
         to_html(
-            Swisscom.Dev,
+            TELEAG.Dev,
             file=sys.argv[1],
             into='<!--cl-->',
             props_ign=('cls', 'descr', 'name', 'type', 'criticality'),
