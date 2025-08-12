@@ -270,11 +270,11 @@ class Zuerich(Datacenter, L0Master, NB, SB):
     "Primary"
 
 
-class Olten(Datacenter, L0Master, NB, SB):
+class Munich(Datacenter, L0Master, NB, SB):
     "HotStandby"
 
 
-class Cluster(Cluster, Zuerich, Olten):
+class Cluster(Cluster, Zuerich, Munich):
     "Cluster"
 
 
@@ -301,16 +301,16 @@ class TeleAG(Project, Dev, A, B, Prod):
 # postconfigure(TeleAG)
 
 # ------------------------------------------------------------------ Properties
-TeleAG.Dev.Zuerich.L0Master.C.ip = '10.67.225.109'
-TeleAG.Dev.Zuerich.NB.M.ip = '10.67.225.103'
-TeleAG.Dev.Zuerich.NB.S.ip = '10.67.225.105'
-TeleAG.Dev.Zuerich.NB.E.ip = '10.67.225.107'
-TeleAG.Dev.Zuerich.SB.ACS.ip = '195.186.149.150'
-TeleAG.Dev.Olten.L0Master.C.ip = '10.67.224.108'
-TeleAG.Dev.Olten.NB.M.ip = '10.67.224.102'
-TeleAG.Dev.Olten.NB.S.ip = '10.67.224.104'
-TeleAG.Dev.Olten.NB.E.ip = '10.67.224.106'
-TeleAG.Dev.Olten.SB.ACS.ip = '195.186.149.152'
+TeleAG.Dev.Zuerich.L0Master.C.ip = '1.22.225.109'
+TeleAG.Dev.Zuerich.NB.M.ip = '1.22.225.103'
+TeleAG.Dev.Zuerich.NB.S.ip = '1.22.225.105'
+TeleAG.Dev.Zuerich.NB.E.ip = '1.22.225.107'
+TeleAG.Dev.Zuerich.SB.ACS.ip = '111.226.149.150'
+TeleAG.Dev.Munich.L0Master.C.ip = '1.22.224.108'
+TeleAG.Dev.Munich.NB.M.ip = '1.22.224.102'
+TeleAG.Dev.Munich.NB.S.ip = '1.22.224.104'
+TeleAG.Dev.Munich.NB.E.ip = '1.22.224.106'
+TeleAG.Dev.Munich.SB.ACS.ip = '111.226.149.152'
 
 
 if __name__ == '__main__':
