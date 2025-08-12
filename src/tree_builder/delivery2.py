@@ -52,7 +52,7 @@ class Service(T):
     criticality = 1
 
 
-# TELEAG.MBC.SB.Dev.Zuerich.ACS1.Nginx
+# TeleAG.MBC.SB.Dev.Zuerich.ACS1.Nginx
 
 
 # mixin types. not needed. yet.
@@ -294,23 +294,23 @@ class Prod(Cluster):
     "Production"
 
 
-class TELEAG(Project, Dev, A, B, Prod):
+class TeleAG(Project, Dev, A, B, Prod):
     "Enterprise Voice"
 
 
-# postconfigure(TELEAG)
+# postconfigure(TeleAG)
 
 # ------------------------------------------------------------------ Properties
-TELEAG.Dev.Zuerich.L0Master.C.ip = '10.67.225.109'
-TELEAG.Dev.Zuerich.NB.M.ip = '10.67.225.103'
-TELEAG.Dev.Zuerich.NB.S.ip = '10.67.225.105'
-TELEAG.Dev.Zuerich.NB.E.ip = '10.67.225.107'
-TELEAG.Dev.Zuerich.SB.ACS.ip = '195.186.149.150'
-TELEAG.Dev.Olten.L0Master.C.ip = '10.67.224.108'
-TELEAG.Dev.Olten.NB.M.ip = '10.67.224.102'
-TELEAG.Dev.Olten.NB.S.ip = '10.67.224.104'
-TELEAG.Dev.Olten.NB.E.ip = '10.67.224.106'
-TELEAG.Dev.Olten.SB.ACS.ip = '195.186.149.152'
+TeleAG.Dev.Zuerich.L0Master.C.ip = '10.67.225.109'
+TeleAG.Dev.Zuerich.NB.M.ip = '10.67.225.103'
+TeleAG.Dev.Zuerich.NB.S.ip = '10.67.225.105'
+TeleAG.Dev.Zuerich.NB.E.ip = '10.67.225.107'
+TeleAG.Dev.Zuerich.SB.ACS.ip = '195.186.149.150'
+TeleAG.Dev.Olten.L0Master.C.ip = '10.67.224.108'
+TeleAG.Dev.Olten.NB.M.ip = '10.67.224.102'
+TeleAG.Dev.Olten.NB.S.ip = '10.67.224.104'
+TeleAG.Dev.Olten.NB.E.ip = '10.67.224.106'
+TeleAG.Dev.Olten.SB.ACS.ip = '195.186.149.152'
 
 
 if __name__ == '__main__':
@@ -319,13 +319,13 @@ if __name__ == '__main__':
     sys.argv.append('')
     from .render import to_html
 
-    # print to_html(TELEAG.A.Zuerich.SB.ACS, file=sys.argv[1], into='<!--cl-->')
-    # print to_html(TELEAG.Dev, file=sys.argv[1], into='<!--cl-->',
+    # print to_html(TeleAG.A.Zuerich.SB.ACS, file=sys.argv[1], into='<!--cl-->')
+    # print to_html(TeleAG.Dev, file=sys.argv[1], into='<!--cl-->',
     #        props_ign=('cls', 'descr', 'name', 'type', 'criticality'),
     #        stop_recursion='Role', no_props=1)
     print(
         to_html(
-            TELEAG.Dev,
+            TeleAG.Dev,
             file=sys.argv[1],
             into='<!--cl-->',
             props_ign=('cls', 'descr', 'name', 'type', 'criticality'),
