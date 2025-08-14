@@ -1317,7 +1317,7 @@ $ /tmp/flagtest.py -mo baz || true
 FATAL Flags parsing error: flag --my_opt=baz: value should be one of &lt;foo|bar&gt;
 Pass --helpshort or --helpfull to see help on flags.
 $ /tmp/flagtest.py -ms a -mb -mf 42.1 -mi 42 -mms a -mms b -mo bar -mom b -mom c -x a,b -ms b -lf plain
-[2;38;5;5m08-11 17:20:50 [[38;5;4minfo     ] [0mFlag values (CLI over defaults): [[38;5;5mflagtest[0m] [1;38;5;1mjson=[2;38;5;5m[0m[[90m[39;49;00m
+[2;38;5;5m08-14 12:12:15 [[38;5;4minfo     ] [0mFlag values (CLI over defaults): [[38;5;5mflagtest[0m] [1;38;5;1mjson=[2;38;5;5m[0m[[90m[39;49;00m
 [90m  [39;49;00m[[90m[39;49;00m
 [90m    [39;49;00m[33m"my_list"[39;49;00m,[90m[39;49;00m
 [90m    [39;49;00m[[90m[39;49;00m
@@ -1332,7 +1332,7 @@ $ /tmp/flagtest.py -ms a -mb -mf 42.1 -mi 42 -mms a -mms b -mo bar -mom b -mom c
 [90m  [39;49;00m[[90m[39;49;00m
 [90m    [39;49;00m[33m"my_condition"[39;49;00m,[90m[39;49;00m
 [90m    [39;49;00m[[90m[39;49;00m
-[90m      [39;49;00m[33m"&lt;function build_pycond_flag_expr.&lt;locals&gt;.&lt;lambda&gt; at 0x7ff5514d0ca0&gt;"[39;49;00m,[90m[39;49;00m
+[90m      [39;49;00m[33m"&lt;function build_pycond_flag_expr.&lt;locals&gt;.&lt;lambda&gt; at 0x7f14cddd4dc0&gt;"[39;49;00m,[90m[39;49;00m
 [90m      [39;49;00m[33m"fn not contains frozen and fn not contains /rx/"[39;49;00m[90m[39;49;00m
 [90m    [39;49;00m][90m[39;49;00m
 [90m  [39;49;00m],[90m[39;49;00m
@@ -1411,15 +1411,15 @@ $ ops project -ia /tmp --environ_flags
 │[39m [34m│[39m [3m[33mflags_validator[0m[31m =[39m [3m[35mNone[0m                                                   [34m│[39m [31m│
 │[39m [34m│[39m          [3m[33mkw_log[0m[31m =[39m [1m{}[0m                                                     [34m│[39m [31m│
 │[39m [34m│[39m             [3m[33mlog[0m[31m =[39m [1m&lt;[35mAXLogger[39m([0m[33mcontext[39m=[1m{}[0m, [33mprocessors[39m=[1m[[0m&lt;function            [34m│[39m [31m│
-│[39m [34m│[39m                   filter_by_level at [1m[36m0x7fa78ebd41f0[0m&gt;,                    [34m│[39m [31m│
+│[39m [34m│[39m                   filter_by_level at [1m[36m0x7fb0880a8310[0m&gt;,                    [34m│[39m [31m│
 │[39m [34m│[39m                   &lt;structlog.processors.TimeStamper object at            [34m│[39m [31m│
-│[39m [34m│[39m                   [1m[36m0x7fa78ec28c40[0m&gt;, &lt;function add_log_level at            [34m│[39m [31m│
-│[39m [34m│[39m                   [1m[36m0x7fa78f3f8430[0m&gt;, &lt;function censor_passwords at         [34m│[39m [31m│
-│[39m [34m│[39m                   [1m[36m0x7fa78ebd4280[0m&gt;, &lt;function add_logger_name at          [34m│[39m [31m│
-│[39m [34m│[39m                   [1m[36m0x7fa78ebd4310[0m&gt;, &lt;function                             [34m│[39m [31m│
-│[39m [34m│[39m                   stack_info.&lt;locals&gt;._stack_info at [1m[36m0x7fa78ec243a0[0m&gt;,    [34m│[39m [31m│
+│[39m [34m│[39m                   [1m[36m0x7fb088104b40[0m&gt;, &lt;function add_log_level at            [34m│[39m [31m│
+│[39m [34m│[39m                   [1m[36m0x7fb0888cc430[0m&gt;, &lt;function censor_passwords at         [34m│[39m [31m│
+│[39m [34m│[39m                   [1m[36m0x7fb0880a83a0[0m&gt;, &lt;function add_logger_name at          [34m│[39m [31m│
+│[39m [34m│[39m                   [1m[36m0x7fb0880a8430[0m&gt;, &lt;function                             [34m│[39m [31m│
+│[39m [34m│[39m                   stack_info.&lt;locals&gt;._stack_info at [1m[36m0x7fb0881004c0[0m&gt;,    [34m│[39m [31m│
 │[39m [34m│[39m                   &lt;structlogging.renderers.ThemeableConsoleRenderer      [34m│[39m [31m│
-│[39m [34m│[39m                   object at [1m[36m0x7fa78ebff970[0m&gt;[1m])&gt;[0m                           [34m│[39m [31m│
+│[39m [34m│[39m                   object at [1m[36m0x7fb0880d3a60[0m&gt;[1m])&gt;[0m                           [34m│[39m [31m│
 │[39m [34m│[39m            [3m[33mname[0m[31m =[39m [32m'project'[39m                                              [34m│[39m [31m│
 │[39m [34m│[39m            [3m[33mpost[0m[31m =[39m [3m[35mNone[0m                                                   [34m│[39m [31m│
 │[39m [34m│[39m             [3m[33mres[0m[31m =[39m [3m[35mNone[0m                                                   [34m│[39m [31m│
@@ -1461,7 +1461,7 @@ $ ops project -ia /tmp --environ_flags
 ╰──────────────────────────────────────────────────────────────────────────────╯
 [1m[91mDieNow: [39m([0m[32m'Not exists'[39m, [1m{[0m[32m'dir'[39m: [32m'/home/runner/foo'[1m[39m})
 
-[0;2m[38;5;5m08-11 17:20:56 [[1m[38;5;124merror    ] [0mNot exists                     [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/foo
+[0;2m[38;5;5m08-14 12:12:21 [[1m[38;5;124merror    ] [0mNot exists                     [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/foo
 [0m$
 </code></pre>
 <!-- id: 1f8bd792643e46ad0dd3248c251fc2e6 -->
