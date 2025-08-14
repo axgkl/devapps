@@ -1,8 +1,7 @@
 import time
 from threading import current_thread
-
+from asyncio import current_task
 import structlog
-
 from .common import transient_data_key
 
 
@@ -88,15 +87,33 @@ def TimeStamper(**kw):
     return structlog.processors.TimeStamper(timefmt, utc=utc)
 
 
-def add_thread_name(L, l, ev_dict):
+def coro_nr():
+    t = current_task()
+    if t:
+        return t.get_coro().__hash__()
+    return 0  # callback
+
+
+def thread_nr():
     t = current_thread()
     try:
-        tn = int(t.name.rsplit('-', 1)[1])
+        return int(t.get_name().rsplit('-', 1)[1])
     except Exception:
-        if t.name == 'MainThread':
-            tn = 0
+        if t.get_name() == 'MainThread':
+            return 0
         else:
-            tn = t.ident  # int guaranteed
+            return t.ident
+
+
+def add_thread_name(L, l, ev_dict, _c=[False]):
+    m = _c[0]
+    if not m:
+        try:
+            _c[0] = m = coro_nr
+        except:
+            _c[0] = m = thread_nr
+
+    tn = m()
     tn = tn % 100000
     ev_dict['thread'] = tn
     # ev_dict['thread'] = 0
