@@ -119,7 +119,7 @@ def set_direct_log_methods(app):
     app.log_level = app.log._logger.level
 
 
-def named_logger(name=None, level=None, capp=None, ctx=None) -> App:
+def named_logger(name=None, level=None,  capp=None, ctx=None) -> App:
     """buildable before flags are parsed, will be configured only after"""
     capp = App() if capp is None else capp
     if not hasattr(app, 'log'):  # called before flags -> delay
@@ -260,7 +260,7 @@ def init_app(**kw):
     [setattr(flags_.FLAGS, k, kw.pop(k)) for k in lkw]
     if 'argv' not in kw:
         # w/o setting flags we just have 2: sl.flags and tools.appflags:
-        if len(tools.have_flg_cls) > 2 or 'flags' in kw:
+        if len(tools.have_flg_cls) > 2 or kw.get('flags'):
             # define_flags was or will be called
             kw['argv'] = sys.argv  # flag feature in use
         else:
