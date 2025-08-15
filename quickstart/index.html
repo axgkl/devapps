@@ -989,22 +989,8 @@
 <!-- id: ade653c9242109680b7e77fa88517a01 -->
 <p><xterm /></p>
 <pre><code>$ python /tmp/myapp.py
-Traceback (most recent call last):
-  File "/tmp/myapp.py", line 11, in &lt;module&gt;
-    app.info('Starting main')
-  File "/home/runner/work/devapps/devapps/src/structlogging/sl.py", line 220, in meth
-    return self.log(ev, kw, _meth_)
-  File "/home/runner/work/devapps/devapps/src/structlogging/sl.py", line 184, in log
-    args, kw = self._process_event(_meth_od, event, kw)
-  File "/home/runner/work/devapps/devapps/.venv/lib/python3.10/site-packages/structlog/_base.py", line 173, in _process_event
-    event_dict = proc(self._logger, method_name, event_dict)
-  File "/home/runner/work/devapps/devapps/src/structlogging/processors.py", line 116, in add_thread_name
-    tn = m()
-  File "/home/runner/work/devapps/devapps/src/structlogging/processors.py", line 91, in coro_nr
-    t = current_task()
-  File "/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/asyncio/tasks.py", line 38, in current_task
-    loop = events.get_running_loop()
-RuntimeError: no running event loop
+[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m22 [[38;5;4minfo     ] [0mStarting [1m[38;5;124m[48;5;255mmain[0m                  [[38;5;5mmyapp[39m]
+[1;2m[38;5;201m[48;5;31m╵[0m [2m[38;5;5m22 [[38;5;4minfo     ] [0mIn [1m[38;5;124m[48;5;255mmain[0m                        [[38;5;5mmyapp[39m] [1m[38;5;1mfoo=[2m[38;5;5mbar [38;5;1mjson=[0m{[94m"bar"[39m:[90m [39m{[94m"foo"[39m:[90m [94mtrue[39m}}
 </code></pre>
 <!-- id: ade653c9242109680b7e77fa88517a01 -->
 
@@ -1138,22 +1124,9 @@ All supported command line flags [matching [1m[32mgreet[0m]:
 
 [39m
 $ python /tmp/myapp.py -G=Joe -ll 10 -latn
-Traceback (most recent call last):
-  File "/tmp/myapp.py", line 22, in &lt;module&gt;
-    init_app(flags=AppFlags).info('Starting main')
-  File "/home/runner/work/devapps/devapps/src/structlogging/sl.py", line 220, in meth
-    return self.log(ev, kw, _meth_)
-  File "/home/runner/work/devapps/devapps/src/structlogging/sl.py", line 184, in log
-    args, kw = self._process_event(_meth_od, event, kw)
-  File "/home/runner/work/devapps/devapps/.venv/lib/python3.10/site-packages/structlog/_base.py", line 173, in _process_event
-    event_dict = proc(self._logger, method_name, event_dict)
-  File "/home/runner/work/devapps/devapps/src/structlogging/processors.py", line 116, in add_thread_name
-    tn = m()
-  File "/home/runner/work/devapps/devapps/src/structlogging/processors.py", line 91, in coro_nr
-    t = current_task()
-  File "/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/asyncio/tasks.py", line 38, in current_task
-    loop = events.get_running_loop()
-RuntimeError: no running event loop
+[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m08-15 09:13:56 [[38;5;4minfo     ] [0mStarting main                  [[38;5;5mmyapp[39m]
+[1;2m[38;5;201m[48;5;0m0[0m [2m[38;5;5m08-15 09:13:56 [debug    ] [0mHi Joe                         [[38;5;5mmyapp[39m] [1m[38;5;1mgreeted=[2m[38;5;5mJoe
+[0m
 </code></pre>
 <!-- id: 8c6063e5397411d3ece057b25d16be98 -->
 
