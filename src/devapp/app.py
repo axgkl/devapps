@@ -108,6 +108,7 @@ App.dbg = App.debug
 
 # this is only for being able to print it:
 app = App()
+named_loggers = []
 
 
 def set_direct_log_methods(app):
@@ -118,13 +119,15 @@ def set_direct_log_methods(app):
     app.log_level = app.log._logger.level
 
 
-# # allowing from devapp import FLG, flag;  flag.def_str(..)
-# class flag:
-#     to_flags = tools.define_flags
-
-
-# r = lambda k: k.replace('DEFINE_', '')
-# [setattr(flag, r(k), getattr(flags, k)) for k in dir(flags) if 'DEFINE_' in k]
+def named_logger(name=None, level=None,  capp=None, ctx=None):
+    """buildable before flags are parsed, will be configured only after"""
+    capp = App() if capp is None else capp
+    if not hasattr(app, 'log'):  # called before flags -> delay
+        named_loggers.append([name, level, capp, ctx])
+        return capp
+    log = sl.get_logger(name, level, **ctx)
+    capp.log = log
+    set_direct_log_methods(capp)
 
 
 # --------------------------------------------------------------- Wrapping Apps
@@ -156,6 +159,7 @@ def command_name():
 def set_app(name, log):
     app.log = log
     set_direct_log_methods(app)  # app.info, app.debug, ...
+    [named_logger(*c) for c in named_loggers]
     app.notify = partial(notify, app)
     app.sh = sh
     # app.var_dir ...:
@@ -733,7 +737,3 @@ def system(cmd, no_fail=False):
 # allows raise app.die(msg, **kw) with correct error logging:
 # we want to raise for --pdb_post_mortem
 # app_die = lambda app: type('Die', (Die,), {'log': app.log})
-
-i = 1
-
-i = 1
