@@ -119,7 +119,7 @@ def set_direct_log_methods(app):
     app.log_level = app.log._logger.level
 
 
-def named_logger(name=None, level=None,  capp=None, ctx=None):
+def named_logger(name=None, level=None, capp=None, ctx=None) -> App:
     """buildable before flags are parsed, will be configured only after"""
     capp = App() if capp is None else capp
     if not hasattr(app, 'log'):  # called before flags -> delay
