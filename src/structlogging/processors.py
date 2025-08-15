@@ -96,10 +96,11 @@ def coro_nr():
 
 def thread_nr():
     t = current_thread()
+    tn = t.getName()
     try:
-        return int(t.get_name().rsplit('-', 1)[1])
+        return int(tn.rsplit('-', 1)[1])
     except Exception:
-        if t.get_name() == 'MainThread':
+        if tn == 'MainThread':
             return 0
         else:
             return t.ident
@@ -109,6 +110,7 @@ def add_thread_name(L, l, ev_dict, _c=[False]):
     m = _c[0]
     if not m:
         try:
+            current_task()
             _c[0] = m = coro_nr
         except:
             _c[0] = m = thread_nr
@@ -116,5 +118,4 @@ def add_thread_name(L, l, ev_dict, _c=[False]):
     tn = m()
     tn = tn % 100000
     ev_dict['thread'] = tn
-    # ev_dict['thread'] = 0
     return ev_dict
