@@ -732,6 +732,22 @@ def system(cmd, no_fail=False):
     else:
         return 0
 
+uv = [False]
+
+def loopuv(main):
+    """convenience function for real workers"""
+    import asyncio
+
+    try:
+        import uvloop
+
+        uvloop.install()
+        uv[0] = True
+
+    except ImportError:
+        pass
+
+    asyncio.run(main())
 
 # is set into app as .die:
 # allows raise app.die(msg, **kw) with correct error logging:
