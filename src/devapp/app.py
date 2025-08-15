@@ -125,7 +125,7 @@ def named_logger(name=None, level=None,  capp=None, ctx=None):
     if not hasattr(app, 'log'):  # called before flags -> delay
         named_loggers.append([name, level, capp, ctx])
         return capp
-    log = sl.get_logger(name, level, **ctx)
+    log = sl.get_logger(name, level, **(ctx or {}))
     capp.log = log
     set_direct_log_methods(capp)
 
