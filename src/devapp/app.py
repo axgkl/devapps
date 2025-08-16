@@ -734,21 +734,39 @@ def system(cmd, no_fail=False):
 
 uv = [False]
 
-def loopuv(main, init=False):
+def aioloop(main,*main_args, init=True, uv=True):
     """convenience function for real workers"""
     import asyncio
+    os.environ['gevent_no_patch'] = 'true'
+    if uv:
+        try:
+            import uvloop
 
-    try:
-        import uvloop
+            uvloop.install()
+            uv[0] = True
 
-        uvloop.install()
-        uv[0] = True
+        except ImportError:
+            pass
+    if main_args:
+        main = partial(main, *main_args)
+    appmain = main
 
-    except ImportError:
-        pass
+    if init:
+        init_app()
+        async def appmain(main=main):
+            try:
+                await main()
+                await asyncio.Event().wait()
+            except asyncio.exceptions.CancelledError:
+                print('\nShutting down...')
+            except Exception as e:
+                app.error(f'{app.name} failed', error=str(e))
+                import traceback
 
-    init_app() if init else 0
-    asyncio.run(main())
+                traceback.print_exc()
+
+
+    asyncio.run(appmain())
 
 # is set into app as .die:
 # allows raise app.die(msg, **kw) with correct error logging:
