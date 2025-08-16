@@ -734,7 +734,7 @@ def system(cmd, no_fail=False):
 
 uv = [False]
 
-def loopuv(main):
+def loopuv(main, init=False):
     """convenience function for real workers"""
     import asyncio
 
@@ -747,6 +747,7 @@ def loopuv(main):
     except ImportError:
         pass
 
+    init_app() if init else 0
     asyncio.run(main())
 
 # is set into app as .die:
