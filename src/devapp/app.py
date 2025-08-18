@@ -512,8 +512,15 @@ def reload_handler(signum, frame):
 
 
 # action = ['']
-
-
+def setup_auto_restart(dw="fd '.py' src"):
+    '''Start the app in a while loop'''
+    current_pid = os.getpid()
+    cmd = dw; cmd += f""" | entr -p -z -n -r sh -c 'kill -TERM {current_pid}' """
+    dn = subprocess.DEVNULL
+    proc = subprocess.Popen( cmd, shell=True, stdout=dn, stderr=dn)
+    app.info('🔍 Starting watcher', cmd=cmd, pid=proc.pid)
+    
+   
 def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     tools.set_flag_vals_from_env()  # 0.0001sec
 
@@ -538,26 +545,22 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     sl.setup_logging(**kw_log)
     log = sl.get_logger(app.selected_action or name)
     set_app(name, log)
-    watcher_pid = None
     if FLG.dirwatch:
-        # TODO: simply do it with entr:
-        # cat conf/reload _py3.8
-        # !/usr/bin/env bash
+        setup_auto_restart()
 
-        # ps wwwax |grep python |grep app | grep client | xargs kill
-
-        # test if tools present:
-        d, match, rec, sig, freq = (FLG.dirwatch + ':::::').split(':')[:5]
-        if not sig:
-            sig = str(reload_signal)
-        d = os.path.abspath(d)
-        if not os.path.isdir(d):
-            app.die('No directory:', d=d, nfo='Use <dir>:<match>[:r[:sig[:freq]]]')
-        w = os.path.dirname(os.path.abspath(__file__)) + '/utils/watch_dog.py'
-        cmd = [w, ':'.join([d, str(os.getpid()), match, rec, sig, freq])]
-        # print('pid', os.getpid())
-        app.info('watcher', cmd=' '.join(cmd))
-        watcher_pid = subprocess.Popen(cmd).pid
+        # # ps wwwax |grep python |grep app | grep client | xargs kill
+        # # test if tools present:
+        # d, match, rec, sig, freq = (FLG.dirwatch + ':::::').split(':')[:5]
+        # if not sig:
+        #     sig = str(reload_signal)
+        # d = os.path.abspath(d)
+        # if not os.path.isdir(d):
+        #     app.die('No directory:', d=d, nfo='Use <dir>:<match>[:r[:sig[:freq]]]')
+        # w = os.path.dirname(os.path.abspath(__file__)) + '/utils/watch_dog.py'
+        # cmd = [w, ':'.join([d, str(os.getpid()), match, rec, sig, freq])]
+        # # print('pid', os.getpid())
+        # app.info('watcher', cmd=' '.join(cmd))
+        # watcher_pid = subprocess.Popen(cmd).pid
 
     res = post = None
     while True:
@@ -567,14 +570,14 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
             # so that everybody knows what is running. informational
             app._app_func = main
             # main = lambda: run_app(Action, flags=Flags, wrapper=cleanup)
-            if FLG.dirwatch:
-                signal.signal(reload_signal, reload_handler)
+            # if FLG.dirwatch:
+            #     signal.signal(reload_signal, reload_handler)
             res = wrapper(main) if wrapper else main()
-            if FLG.dirwatch:
-                app.info('Keep running, dirwatch is set')
-                while 1:
-                    # wait for receiving watchdog signal
-                    time.sleep(10)
+            # if FLG.dirwatch:
+            #     app.info('Keep running, dirwatch is set')
+            #     while 1:
+            #         # wait for receiving watchdog signal
+            #         time.sleep(10)
         except DieNow as ex:
             app.error(ex.msg, exc=ex, **ex.kw)
             raise
@@ -583,8 +586,8 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
         except SystemExit as ex:
             return ex.args[0]
         except KeyboardInterrupt:
-            if watcher_pid:
-                os.kill(watcher_pid, 9)
+            # if watcher_pid:
+            #     os.kill(watcher_pid, 9)
             print('Keyboard Interrupt - Bye.')
             sys.exit(1)
         except Exception as ex:
@@ -732,7 +735,7 @@ def system(cmd, no_fail=False):
     else:
         return 0
 
-uv = [False]
+_uv = [False]
 
 def aioloop(main,*main_args, init=True, uv=True):
     """convenience function for real workers"""
@@ -743,7 +746,7 @@ def aioloop(main,*main_args, init=True, uv=True):
             import uvloop
 
             uvloop.install()
-            uv[0] = True
+            _uv[0] = True
 
         except ImportError:
             pass

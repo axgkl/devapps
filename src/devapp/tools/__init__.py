@@ -1734,29 +1734,18 @@ def cache(dt):
 class appflags:
     default = False
     autoshort = 'da'
-    uc_dirwatch_flow = [
-        'Running build app, monitoring flow.json, triggering plots on change',
-        'build --plot_before --dirwatch .:flow',
-    ]
 
     class dirwatch:
-        """Spawning helper process, sending reload, monitoring changes in given directory.
-        The app itself keeps full access at stdin, out, err, unlike using tools e.g. `entr`.
+        """Provide a file listing command and we will launch entr in the background killing the main apps pid
 
-        You may deliver a match spec, colon seperated.
+        You have to start the app within a loop. 
+        This way the app itself keeps full access at stdin, out, err.
 
-        Format: <dir>[:match[:r[:sig[:freq]]]].
-        - match: w/o * will be enclosed in *, left and right.
-        - r: recursive scan
-        - sig: 1(default) is reload, 15 is kill app
-        - freq: min frequency, default  1 (sec)
-
-        Examples:
-        myapp -dw .:.py # reloads app on every python file change
-        while true; do myapp -dw .:.py:1:15:2; done # kills app every 2 secs, scans recursively
+        Example:
+        while True; do uv run waio.py -dw 'fd ".py" src'; sleep 0.1; done
         """
 
-        n = 'Restart or reload application on file changes'
+        n = 'Kill application on file changes'
         d = ''
         s = 'dw'
 
