@@ -119,7 +119,7 @@ def set_direct_log_methods(app):
     app.log_level = app.log._logger.level
 
 
-def named_logger(name=None, level=None,  capp=None, ctx=None) -> App:
+def named_logger(name=None, level=None, capp=None, ctx=None) -> App:
     """buildable before flags are parsed, will be configured only after"""
     capp = App() if capp is None else capp
     if not hasattr(app, 'log'):  # called before flags -> delay
@@ -513,14 +513,15 @@ def reload_handler(signum, frame):
 
 # action = ['']
 def setup_auto_restart(dw="fd '.py' src"):
-    '''Start the app in a while loop'''
+    """Start the app in a while loop"""
     current_pid = os.getpid()
-    cmd = dw; cmd += f""" | entr -p -z -n -r sh -c 'kill -TERM {current_pid}' """
+    cmd = dw
+    cmd += f""" | entr -p -z -n -r sh -c 'kill -TERM {current_pid}' """
     dn = subprocess.DEVNULL
-    proc = subprocess.Popen( cmd, shell=True, stdout=dn, stderr=dn)
+    proc = subprocess.Popen(cmd, shell=True, stdout=dn, stderr=dn)
     app.info('🔍 Starting watcher', cmd=cmd, pid=proc.pid)
-    
-   
+
+
 def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     tools.set_flag_vals_from_env()  # 0.0001sec
 
@@ -546,7 +547,7 @@ def run_phase_2(args, name, main, kw_log, flags_validator, wrapper):
     log = sl.get_logger(app.selected_action or name)
     set_app(name, log)
     if FLG.dirwatch:
-        setup_auto_restart()
+        setup_auto_restart(FLG.dirwatch)
 
         # # ps wwwax |grep python |grep app | grep client | xargs kill
         # # test if tools present:
@@ -735,11 +736,14 @@ def system(cmd, no_fail=False):
     else:
         return 0
 
+
 _uv = [False]
 
-def aioloop(main,*main_args, init=True, uv=True):
+
+def aioloop(main, *main_args, init=True, uv=True):
     """convenience function for real workers"""
     import asyncio
+
     os.environ['gevent_no_patch'] = 'true'
     if uv:
         try:
@@ -756,6 +760,7 @@ def aioloop(main,*main_args, init=True, uv=True):
 
     if init:
         init_app()
+
         async def appmain(main=main):
             try:
                 await main()
@@ -768,8 +773,8 @@ def aioloop(main,*main_args, init=True, uv=True):
 
                 traceback.print_exc()
 
-
     asyncio.run(appmain())
+
 
 # is set into app as .die:
 # allows raise app.die(msg, **kw) with correct error logging:
