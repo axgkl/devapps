@@ -764,7 +764,6 @@ def aioloop(main, *main_args, init=True, uv=True):
         async def appmain(main=main):
             try:
                 await main()
-                await asyncio.Event().wait()
             except asyncio.exceptions.CancelledError:
                 print('\nShutting down...')
             except Exception as e:
