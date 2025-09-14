@@ -1191,8 +1191,16 @@ def set_flag(k, v):
     setattr(FLG, k, t(v))
 
 
+def call_flag_finalizers():
+    F = flag_val_finalizers
+    [setattr(FLG, k, f(getattr(FLG, k))) for k, f in F.items()]
+
+
 def set_flag_vals_from_env():
-    """allows so ref $foo as default var a flag"""
+    """
+    1. Allows so ref $foo as default var a flag
+    2. Also calls the finalizers
+    """
     # hmm. pytest -> nrtesting -> run_app in greenlet. How to pass flags, e.g. to drawflow
     ef = FLG.environ_flags
     if not ef:
@@ -1208,6 +1216,7 @@ def set_flag_vals_from_env():
         v = getattr(FLG, f)
         if isinstance(v, str) and v.startswith('$'):
             setattr(FLG, f, os.environ.get(v[1:], v))
+    call_flag_finalizers()
 
 
 def shorten(key, prefix, maxlen, all_shorts=None, take=1):
@@ -1314,6 +1323,9 @@ def make_flag(c, module, autoshort, default, sub=False, **kw):
         flags.register_validator(key, val, message=m)
     else:
         try:
+            fin = g(c, 'f', None)
+            if fin:
+                flag_val_finalizers[key] = fin
             define_flag(key, d, txt, **mkw)
         except Exception:
             print('conflicting:', c, module, kw)
@@ -1344,6 +1356,9 @@ def rm_absl_flags():
             'v',
         ]
     )
+
+
+flag_val_finalizers = {}
 
 
 def define_flags(Class, sub=False, parent_autoshort=False):
@@ -1738,7 +1753,7 @@ class appflags:
     class dirwatch:
         """Provide a file listing command and we will launch entr in the background killing the main apps pid
 
-        You have to start the app within a loop. 
+        You have to start the app within a loop.
         This way the app itself keeps full access at stdin, out, err.
 
         Example:
