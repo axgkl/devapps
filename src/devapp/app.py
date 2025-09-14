@@ -740,7 +740,7 @@ def system(cmd, no_fail=False):
 _uv = [False]
 
 
-def aioloop(main, *main_args, init=True, uv=True):
+def aioloop(main, *main_args, init=True, uv=True, keep_running=False):
     """convenience function for real workers"""
     import asyncio
 
@@ -762,17 +762,14 @@ def aioloop(main, *main_args, init=True, uv=True):
         init_app()
 
         async def appmain(main=main):
-            try:
-                await main()
-            except asyncio.exceptions.CancelledError:
-                print('\nShutting down...')
-            except Exception as e:
-                app.error(f'{app.name} failed', error=str(e))
-                import traceback
+            await main()
+            if keep_running:
+                await asyncio.Event().wait()
 
-                traceback.print_exc()
-
-    asyncio.run(appmain())
+    try:
+        asyncio.run(appmain())
+    except KeyboardInterrupt:
+        app.fatal('KeyboardInterrupt')
 
 
 # is set into app as .die:
