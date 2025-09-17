@@ -128,6 +128,7 @@ def named_logger(name=None, level=None, capp=None, ctx=None) -> App:
     log = sl.get_logger(name, level, **(ctx or {}))
     capp.log = log
     set_direct_log_methods(capp)
+    return capp
 
 
 # --------------------------------------------------------------- Wrapping Apps
