@@ -16,7 +16,7 @@ import time
 from structlog import PrintLogger
 
 from devapp.app import FLG, app, run_app
-from devapp.tools import exists
+from devapp.tools import color, exists
 
 # skip_flag_defines.append('structlogging.sl')  # noqa: e402
 from structlogging import sl
@@ -35,26 +35,50 @@ class Flags:
         n = 'Input is from systemd journalctl in default format'
         d = False
 
+    class from_compose:
+        n = 'Input is from compose output' 
+        d = False
+
+    class add_proc:
+        n = 'Set to a positive width and we will output it on the right of each line'
+        d = 0
+
     class to_json:
         n = 'just print json loadable lines to stdout, rest to stderr. No ansi. Basically a filter, making jq work, when bogus lines are in.'
         d = False
 
 
-def colorize(s, rend, p=PrintLogger(file=sys.stdout), levels=levels, pid=None):  # noqa: B008
+def colorize(s, rend, p=PrintLogger(file=sys.stdout), levels=levels, proc=''):  # noqa: B008
+    out = sys.stdout
+    ap = FLG.add_proc
     try:
         s = json.loads(s)
-        if pid is not None:
-            s['_pid'] = pid
+        if not ap and proc:
+            s['proc'] = proc
         l = s['level']
         if levels[l] < app.log_level:
             return
         s = rend(p, s['level'], s)
-        sys.stdout.write(s + '\n')
-    except Exception:
-        print(s, file=sys.stderr)
-
+    except:
+        if ap:
+            out = sys.stderr # allows to filter out
+    if ap:
+        s = f'{proc.ljust(ap)} | {s}'
+    out.write(s + '\n')
+    # except Exception:
+    #     sys.stdout.write(s + '\n')
+    #     #print(s, file=sys.stderr)
+    #
+    #     #sys.stdout.write(f'{l[0]} | ')
 
 sqr = '['
+
+def compose_colorize(s, rend, clr=colorize):
+    l = s.split(' | ')
+    if len(l) == 1:
+        l = ['', s]
+    colorize(l[1], rend, proc=l[0].strip() )
+
 
 
 def journalctl_colorize(s, rend, clr=colorize):
@@ -63,8 +87,8 @@ def journalctl_colorize(s, rend, clr=colorize):
         s = l[1]
         pid = l[0].split(sqr, 1)[1][:-1]
     except Exception:
-        pid = 0
-    clr(s, rend, pid=pid)
+        pid ='' 
+    clr(s, rend, proc=pid)
 
 
 def run():
@@ -77,14 +101,17 @@ def run():
         fd = open(fn)
     rend = sl.setup_logging(get_renderer=True)
     clr = colorize
-    if FLG.from_journal:
-        clr = journalctl_colorize
+    if FLG.from_journal: clr = journalctl_colorize
+    if FLG.from_compose: clr = compose_colorize
     try:
         while True:
-            s = fd.readline()
+            s = fd.readline().strip()
             if s:
                 clr(s, rend=rend)
                 continue
+            if not fn == sys.stdin:
+                sys.stdout.flush()
+                return
             time.sleep(0.1)
     except KeyboardInterrupt:
         sys.exit(1)
