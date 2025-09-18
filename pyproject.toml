@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "devapps"
-version = "2025.09.17"
+version = "2025.09.18"
 description = "Apps - End to End."
 authors = [{ name = "Gunther Klessinger", email = "g_kle_ss_ing_er@gmx.de" }]
 license = { text = "BSD" }
