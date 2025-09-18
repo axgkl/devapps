@@ -78,13 +78,23 @@ def add_dt(_, __, ev):
     ev['timestamp'] = now() - t0
     return ev
 
+def add_dtl(_, __, ev, last=[t0]):
+    n = now()
+    ev['timestamp'] = n - last[0]
+    last[0] = n 
+    return ev
 
 def TimeStamper(**kw):
     timefmt = kw.get('fmt', 'ISO')
     if timefmt == 'dt':
         return add_dt
+    if timefmt == 'dtl':
+        return add_dtl
     utc = kw.get('utc', True)
     return structlog.processors.TimeStamper(timefmt, utc=utc)
+
+
+
 
 
 def coro_nr():

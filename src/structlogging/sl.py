@@ -52,7 +52,7 @@ class flags(stacktrace.flags):
         d = '20'
 
     class log_time_fmt:
-        n = 'Log time format. Shortcuts: "ISO", "dt"'
+        n = 'Log time format. Shortcuts: "ISO", "dt" (since start), "dtl" (since last)'
         d = '%m-%d %H:%M:%S'
 
     class log_to_stdout:
