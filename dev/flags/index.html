@@ -1218,7 +1218,7 @@ Maximum Frames Shown in Terminal Stack Traces
 [0;32mltln    [1;33mlog_thread_local_names   [0;31mFalse[0;38;5;245m
 Prefer thread local logger_name, when set 
 [0;32mltf     [1;33mlog_time_fmt             [0;31m%m-%d %H:%M:%S[0;38;5;245m
-Log time format. Shortcuts: "ISO", "dt" 
+Log time format. Shortcuts: "ISO", "dt" (since start), "dtl" (since last) 
 [0;32mlts     [1;33mlog_to_stdout            [0;31mFalse[0;38;5;245m
 Default: stderr 
 [1;34mops_devapp.project
@@ -1317,7 +1317,7 @@ $ /tmp/flagtest.py -mo baz || true
 FATAL Flags parsing error: flag --my_opt=baz: value should be one of &lt;foo|bar&gt;
 Pass --helpshort or --helpfull to see help on flags.
 $ /tmp/flagtest.py -ms a -mb -mf 42.1 -mi 42 -mms a -mms b -mo bar -mom b -mom c -x a,b -ms b -lf plain
-[2;38;5;5m09-14 11:30:02 [[38;5;4minfo     ] [0mFlag values (CLI over defaults): [[38;5;5mflagtest[0m] [1;38;5;1mjson=[2;38;5;5m[0m[[90m[39;49;00m
+[2;38;5;5m09-18 08:49:25 [[38;5;4minfo     ] [0mFlag values (CLI over defaults): [[38;5;5mflagtest[0m] [1;38;5;1mjson=[2;38;5;5m[0m[[90m[39;49;00m
 [90m  [39;49;00m[[90m[39;49;00m
 [90m    [39;49;00m[33m"my_list"[39;49;00m,[90m[39;49;00m
 [90m    [39;49;00m[[90m[39;49;00m
@@ -1332,7 +1332,7 @@ $ /tmp/flagtest.py -ms a -mb -mf 42.1 -mi 42 -mms a -mms b -mo bar -mom b -mom c
 [90m  [39;49;00m[[90m[39;49;00m
 [90m    [39;49;00m[33m"my_condition"[39;49;00m,[90m[39;49;00m
 [90m    [39;49;00m[[90m[39;49;00m
-[90m      [39;49;00m[33m"&lt;function build_pycond_flag_expr.&lt;locals&gt;.&lt;lambda&gt; at 0x7fb2f0252ca0&gt;"[39;49;00m,[90m[39;49;00m
+[90m      [39;49;00m[33m"&lt;function build_pycond_flag_expr.&lt;locals&gt;.&lt;lambda&gt; at 0x7f33006f0d30&gt;"[39;49;00m,[90m[39;49;00m
 [90m      [39;49;00m[33m"fn not contains frozen and fn not contains /rx/"[39;49;00m[90m[39;49;00m
 [90m    [39;49;00m][90m[39;49;00m
 [90m  [39;49;00m],[90m[39;49;00m
@@ -1392,15 +1392,15 @@ $
 $ ops project -ia /tmp --environ_flags
 
 [31m╭───────────────────── [1mTraceback [2m(most recent call last)[0m[31m ──────────────────────╮
-│[39m [2m/home/runner/work/devapps/devapps/src/devapp/[0;1mapp.py[0m:576 in run_phase_2       [31m│
+│[39m [2m/home/runner/work/devapps/devapps/src/devapp/[0;1mapp.py[0m:577 in run_phase_2       [31m│
 │[39m                                                                              [31m│
-│[39m   [2m573 │   │   │   # main = lambda: run_app(Action, flags=Flags, wrapper=clea[0m [31m│
-│[39m   [2m574 │   │   │   # if FLG.dirwatch:[0m                                         [31m│
-│[39m   [2m575 │   │   │   #     signal.signal(reload_signal, reload_handler)[0m         [31m│
-│[39m [31m❱ [39m576 [2m│   │   │   [0mres = wrapper(main) [94mif[39m wrapper [94melse[39m main()                 [31m│
-│[39m   [2m577 │   │   │   # if FLG.dirwatch:[0m                                         [31m│
-│[39m   [2m578 │   │   │   #     app.info('Keep running, dirwatch is set')[0m            [31m│
-│[39m   [2m579 │   │   │   #     while 1:[0m                                             [31m│
+│[39m   [2m574 │   │   │   # main = lambda: run_app(Action, flags=Flags, wrapper=clea[0m [31m│
+│[39m   [2m575 │   │   │   # if FLG.dirwatch:[0m                                         [31m│
+│[39m   [2m576 │   │   │   #     signal.signal(reload_signal, reload_handler)[0m         [31m│
+│[39m [31m❱ [39m577 [2m│   │   │   [0mres = wrapper(main) [94mif[39m wrapper [94melse[39m main()                 [31m│
+│[39m   [2m578 │   │   │   # if FLG.dirwatch:[0m                                         [31m│
+│[39m   [2m579 │   │   │   #     app.info('Keep running, dirwatch is set')[0m            [31m│
+│[39m   [2m580 │   │   │   #     while 1:[0m                                             [31m│
 │[39m                                                                              [31m│
 │[39m [34m╭───────────────────────────────── locals ─────────────────────────────────╮[39m [31m│
 │[39m [34m│[39m            [3m[33margs[0m[31m =[39m [1m[[0m                                                      [34m│[39m [31m│
@@ -1411,15 +1411,15 @@ $ ops project -ia /tmp --environ_flags
 │[39m [34m│[39m [3m[33mflags_validator[0m[31m =[39m [3m[35mNone[0m                                                   [34m│[39m [31m│
 │[39m [34m│[39m          [3m[33mkw_log[0m[31m =[39m [1m{}[0m                                                     [34m│[39m [31m│
 │[39m [34m│[39m             [3m[33mlog[0m[31m =[39m [1m&lt;[35mAXLogger[39m([0m[33mcontext[39m=[1m{}[0m, [33mprocessors[39m=[1m[[0m&lt;function            [34m│[39m [31m│
-│[39m [34m│[39m                   filter_by_level at [1m[36m0x7f10b69b0550[0m&gt;,                    [34m│[39m [31m│
+│[39m [34m│[39m                   filter_by_level at [1m[36m0x7fb1a95975e0[0m&gt;,                    [34m│[39m [31m│
 │[39m [34m│[39m                   &lt;structlog.processors.TimeStamper object at            [34m│[39m [31m│
-│[39m [34m│[39m                   [1m[36m0x7f10b692e800[0m&gt;, &lt;function add_log_level at            [34m│[39m [31m│
-│[39m [34m│[39m                   [1m[36m0x7f10b705e9d0[0m&gt;, &lt;function censor_passwords at         [34m│[39m [31m│
-│[39m [34m│[39m                   [1m[36m0x7f10b69b05e0[0m&gt;, &lt;function add_logger_name at          [34m│[39m [31m│
-│[39m [34m│[39m                   [1m[36m0x7f10b69b0670[0m&gt;, &lt;function                             [34m│[39m [31m│
-│[39m [34m│[39m                   stack_info.&lt;locals&gt;._stack_info at [1m[36m0x7f10b692c670[0m&gt;,    [34m│[39m [31m│
+│[39m [34m│[39m                   [1m[36m0x7fb1a9516900[0m&gt;, &lt;function add_log_level at            [34m│[39m [31m│
+│[39m [34m│[39m                   [1m[36m0x7fb1a9c469d0[0m&gt;, &lt;function censor_passwords at         [34m│[39m [31m│
+│[39m [34m│[39m                   [1m[36m0x7fb1a9597670[0m&gt;, &lt;function add_logger_name at          [34m│[39m [31m│
+│[39m [34m│[39m                   [1m[36m0x7fb1a9597700[0m&gt;, &lt;function                             [34m│[39m [31m│
+│[39m [34m│[39m                   stack_info.&lt;locals&gt;._stack_info at [1m[36m0x7fb1a9514700[0m&gt;,    [34m│[39m [31m│
 │[39m [34m│[39m                   &lt;structlogging.renderers.ThemeableConsoleRenderer      [34m│[39m [31m│
-│[39m [34m│[39m                   object at [1m[36m0x7f10b692d310[0m&gt;[1m])&gt;[0m                           [34m│[39m [31m│
+│[39m [34m│[39m                   object at [1m[36m0x7fb1a9515340[0m&gt;[1m])&gt;[0m                           [34m│[39m [31m│
 │[39m [34m│[39m            [3m[33mname[0m[31m =[39m [32m'project'[39m                                              [34m│[39m [31m│
 │[39m [34m│[39m            [3m[33mpost[0m[31m =[39m [3m[35mNone[0m                                                   [34m│[39m [31m│
 │[39m [34m│[39m             [3m[33mres[0m[31m =[39m [3m[35mNone[0m                                                   [34m│[39m [31m│
@@ -1442,15 +1442,15 @@ $ ops project -ia /tmp --environ_flags
 │[39m [34m│[39m [3m[33mm[0m[31m =[39m [32m''[39m                 [34m│[39m                                                   [31m│
 │[39m [34m╰────────────────────────╯[39m                                                   [31m│
 │[39m                                                                              [31m│
-│[39m [2m/home/runner/work/devapps/devapps/src/devapp/[0;1mapp.py[0m:175 in die               [31m│
+│[39m [2m/home/runner/work/devapps/devapps/src/devapp/[0;1mapp.py[0m:176 in die               [31m│
 │[39m                                                                              [31m│
-│[39m   [2m172 │   │   [0m[94mif[39m silent:                                                     [31m│
-│[39m   [2m173 │   │   │   [0mapp.fatal(msg, **kw)                                       [31m│
-│[39m   [2m174 │   │   │   [0msys.exit([94m1[39m)                                                [31m│
-│[39m [31m❱ [39m175 [2m│   │   [0m[94mraise[39m DieNow(msg, kw)                                          [31m│
-│[39m   [2m176 │   [0m                                                                   [31m│
-│[39m   [2m177 │   [0mapp.die = die                                                      [31m│
-│[39m   [2m178 │   [0mapp.name = name                                                    [31m│
+│[39m   [2m173 │   │   [0m[94mif[39m silent:                                                     [31m│
+│[39m   [2m174 │   │   │   [0mapp.fatal(msg, **kw)                                       [31m│
+│[39m   [2m175 │   │   │   [0msys.exit([94m1[39m)                                                [31m│
+│[39m [31m❱ [39m176 [2m│   │   [0m[94mraise[39m DieNow(msg, kw)                                          [31m│
+│[39m   [2m177 │   [0m                                                                   [31m│
+│[39m   [2m178 │   [0mapp.die = die                                                      [31m│
+│[39m   [2m179 │   [0mapp.name = name                                                    [31m│
 │[39m                                                                              [31m│
 │[39m [34m╭─────────────── locals ───────────────╮[39m                                     [31m│
 │[39m [34m│[39m     [3m[33mkw[0m[31m =[39m [1m{[0m[32m'dir'[39m: [32m'/home/runner/foo'[1m[39m}[0m [34m│[39m                                     [31m│
@@ -1460,7 +1460,7 @@ $ ops project -ia /tmp --environ_flags
 ╰──────────────────────────────────────────────────────────────────────────────╯
 [1m[91mDieNow: [39m([0m[32m'Not exists'[39m, [1m{[0m[32m'dir'[39m: [32m'/home/runner/foo'[1m[39m})
 
-[0;2m[38;5;5m09-14 11:30:08 [[1m[38;5;124merror    ] [0mNot exists                     [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/foo
+[0;2m[38;5;5m09-18 08:49:30 [[1m[38;5;124merror    ] [0mNot exists                     [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/foo
 [0m$
 </code></pre>
 <!-- id: 1f8bd792643e46ad0dd3248c251fc2e6 -->
