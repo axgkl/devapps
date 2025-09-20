@@ -763,9 +763,16 @@ def aioloop(main, *main_args, init=True, uv=True, keep_running=False):
         init_app()
 
         async def appmain(main=main):
-            await main()
-            if keep_running:
-                await asyncio.Event().wait()
+            try:
+                await main()
+                if keep_running:
+                    await asyncio.Event().wait()
+            finally:
+                for f in ataioexit:
+                    try:
+                        await f()
+                    except Exception as ex:
+                        print(f'ataioexit err [{f}]: {ex}', file=sys.stderr)
 
     try:
         asyncio.run(appmain())
@@ -773,6 +780,7 @@ def aioloop(main, *main_args, init=True, uv=True, keep_running=False):
         app.fatal('KeyboardInterrupt')
 
 
+ataioexit = []
 # is set into app as .die:
 # allows raise app.die(msg, **kw) with correct error logging:
 # we want to raise for --pdb_post_mortem
