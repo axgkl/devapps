@@ -78,11 +78,13 @@ def add_dt(_, __, ev):
     ev['timestamp'] = now() - t0
     return ev
 
+
 def add_dtl(_, __, ev, last=[t0]):
     n = now()
     ev['timestamp'] = n - last[0]
-    last[0] = n 
+    last[0] = n
     return ev
+
 
 def TimeStamper(**kw):
     timefmt = kw.get('fmt', 'ISO')
@@ -94,9 +96,6 @@ def TimeStamper(**kw):
     return structlog.processors.TimeStamper(timefmt, utc=utc)
 
 
-
-
-
 def coro_nr():
     t = current_task()
     if t:
@@ -106,7 +105,7 @@ def coro_nr():
 
 def thread_nr():
     t = current_thread()
-    tn = t.getName()
+    tn = t.name
     try:
         return int(tn.rsplit('-', 1)[1])
     except Exception:
