@@ -515,7 +515,7 @@ def confirm(msg, dflt='n'):
     if r.lower() != 'y':
         from devapp.app import app
 
-        app.die('Unconfirmed')
+        app.die('Unconfirmed', silent=True)
 
 
 def now():
