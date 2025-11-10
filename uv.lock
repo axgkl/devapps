@@ -259,7 +259,7 @@ wheels = [
 
 [[package]]
 name = "devapps"
-version = "2025.8.19"
+version = "2025.9.20"
 source = { editable = "." }
 dependencies = [
     { name = "absl-py" },
@@ -290,7 +290,7 @@ requires-dist = [
     { name = "pycond" },
     { name = "requests" },
     { name = "rich" },
-    { name = "structlog", specifier = ">=24.1.0" },
+    { name = "structlog", specifier = "==25.4.0" },
     { name = "toml" },
 ]
 

@@ -25,7 +25,7 @@ dependencies = [
   "absl-py",
   "jsondiff",
   "rich",
-  "structlog>=24.1.0",
+  "structlog==25.4.0", #TODO: .5 breaks in self._styles in console renderer
   "inflection",
   "requests",
   "pycond",
@@ -201,4 +201,3 @@ minversion = "6.0"
 # docutools = { path = "/Users/gk/repos/gh/Axiros/docutools", editable = true }
 # [tool.uv.sources]
 # docutools = { path = "../../Axiros/docutools/dist/docutools-2025.8.1.tar.gz" }
-
