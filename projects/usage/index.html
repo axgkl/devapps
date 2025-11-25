@@ -1017,8 +1017,8 @@ maintain projects and resources.</p>
 <p><xterm /></p>
 <pre><code>$ mkdir $HOME/myproject &amp;&amp; cd $HOME/myproject &amp;&amp; ls -lta
 total 8
-drwxr-x--- 14 runner runner 4096 Sep 20 14:57 ..
-drwxr-xr-x  2 runner runner 4096 Sep 20 14:57 .
+drwxr-xr-x  2 runner runner 4096 Nov 25 10:49 .
+drwxr-x--- 14 runner runner 4096 Nov 25 10:49 ..
 </code></pre>
 <!-- id: 4c652d1e83f1fac38bf25e54f869857b -->
 
@@ -1037,9 +1037,9 @@ drwxr-xr-x  2 runner runner 4096 Sep 20 14:57 .
 <div class="tabbed-block">
 <p><xterm /></p>
 <pre><code>$ ops project list
-[2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mDirectories                    [[38;5;5mlist[39m] [1m[38;5;1mconda_prefix=[2m[38;5;5m/home/runner/micromamba [38;5;1mfs_dir=[38;5;5m/home/runner/micromamba/fs(default)
-[0;2m[38;5;5m09-20 14:57:36 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mlist[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools/bin/git
-[0;2m[38;5;5m09-20 14:57:36 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mlist[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools_kf/bin/rotatelogs
+[2m[38;5;5m11-25 10:49:19 [[38;5;4minfo     ] [0mDirectories                    [[38;5;5mlist[39m] [1m[38;5;1mconda_prefix=[2m[38;5;5m/home/runner/micromamba [38;5;1mfs_dir=[38;5;5m/home/runner/micromamba/fs(default)
+[0;2m[38;5;5m11-25 10:49:19 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mlist[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools/bin/git
+[0;2m[38;5;5m11-25 10:49:19 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mlist[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools_kf/bin/rotatelogs
 
 [0m[31m╭───────────────────── [1mTraceback [2m(most recent call last)[0m[31m ──────────────────────╮
 │[39m [2m/home/runner/work/devapps/devapps/src/devapp/tools/[0;1m__init__.py[0m:1464 in root  [31m│
@@ -1047,7 +1047,7 @@ drwxr-xr-x  2 runner runner 4096 Sep 20 14:57 .
 │[39m   [2m1461 │   │   #     return r[0m                                                [31m│
 │[39m   [2m1462 │   │   [0mp = project.dir_home                                          [31m│
 │[39m   [2m1463 │   │   [0m[94mif[39m [95mnot[39m p:                                                     [31m│
-│[39m [31m❱ [39m1464 [2m│   │   │   [0mp = project.set_project_dir(no_fail=no_fail)              [31m│
+│[39m [31m❱ [39m1464 [2m│   │   │   [0mp = [1;4mproject.set_project_dir(no_fail=no_fail)[0m              [31m│
 │[39m   [2m1465 │   │   │   [0m[94mif[39m p:                                                     [31m│
 │[39m   [2m1466 │   │   │   │   [0mb = p + [33m'/bin:'[39m                                       [31m│
 │[39m   [2m1467 │   │   │   │   [0m[94mif[39m b [95mnot[39m [95min[39m envget([33m'PATH'[39m, [33m''[39m):                       [31m│
@@ -1063,7 +1063,7 @@ drwxr-xr-x  2 runner runner 4096 Sep 20 14:57 .
 │[39m   [2m1490 │   │   │   [0m[94mreturn[39m                                                    [31m│
 │[39m   [2m1491 │   │   [0m[94mfrom[90m [4m[96mdevapp.app[0m[90m [94mimport[39m app                                    [31m│
 │[39m   [2m1492 │   │   [0m                                                              [31m│
-│[39m [31m❱ [39m1493 [2m│   │   [0mapp.die([33m'could not determine project root dir'[39m)               [31m│
+│[39m [31m❱ [39m1493 [2m│   │   [0;1;4mapp.die([33m'could not determine project root dir'[39m)[0m               [31m│
 │[39m   [2m1494 │   [0m                                                                  [31m│
 │[39m   [2m1495 │   [0m[94mdef[90m [92mfn_resources[39m():                                               [31m│
 │[39m   [2m1496 │   │   [0m[94mreturn[39m project.root() + [33m'/.resources.json'[39m                    [31m│
@@ -1081,7 +1081,7 @@ drwxr-xr-x  2 runner runner 4096 Sep 20 14:57 .
 │[39m   [2m173 │   │   [0m[94mif[39m silent:                                                     [31m│
 │[39m   [2m174 │   │   │   [0mapp.fatal(msg, **kw)                                       [31m│
 │[39m   [2m175 │   │   │   [0msys.exit([94m1[39m)                                                [31m│
-│[39m [31m❱ [39m176 [2m│   │   [0m[94mraise[39m DieNow(msg, kw)                                          [31m│
+│[39m [31m❱ [39m176 [2m│   │   [0;1;4m[94mraise[39m DieNow(msg, kw)[0m                                          [31m│
 │[39m   [2m177 │   [0m                                                                   [31m│
 │[39m   [2m178 │   [0mapp.die = die                                                      [31m│
 │[39m   [2m179 │   [0mapp.name = name                                                    [31m│
@@ -1094,7 +1094,7 @@ drwxr-xr-x  2 runner runner 4096 Sep 20 14:57 .
 ╰──────────────────────────────────────────────────────────────────────────────╯
 [1m[91mDieNow: [39m([0m[32m'could not determine project root dir'[39m, [1m{})
 
-[0;2m[38;5;5m09-20 14:57:36 [[1m[38;5;124merror    ] [0mcould not determine project root dir [[38;5;5mlist[39m]
+[0;2m[38;5;5m11-25 10:49:19 [[1m[38;5;124merror    ] [0mcould not determine project root dir [[38;5;5mlist[39m]
 </code></pre>
 </div>
 </div>
@@ -1128,21 +1128,21 @@ packages and use standard config options (see previous chapter why).</p>
 <div class="tabbed-block">
 <p><xterm /></p>
 <pre><code>$ ops project --init_at . --port_offset 2000 --force
-[2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mchdir                          [[38;5;5mproject[39m] [1m[38;5;1margs=[2m[38;5;5m/home/runner/myproject [38;5;1mstore_log=[38;5;5mNone
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mDirectories                    [[38;5;5mproject[39m] [1m[38;5;1mconda_prefix=[2m[38;5;5m/home/runner/micromamba [38;5;1mfs_dir=[38;5;5m/home/runner/micromamba/fs(default)
-[0;2m[38;5;5m09-20 14:57:36 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mproject[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools/bin/git
-[0;2m[38;5;5m09-20 14:57:36 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mproject[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools_kf/bin/rotatelogs
-[0;2m[38;5;5m09-20 14:57:36 [[1m[38;5;124mwarning  ] [0mInstalling resources           [[38;5;5mproject[39m] [1m[38;5;1mresources=[2m[38;5;5m[{'bin_name': 'lc_tools', 'conda_chan': 'conda-forge', 'conda_pkg': 'git fzf jq ripgrep fd-find httpie htop tmux', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools', 'path': False, 'provides': ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'], 'run': 'lc_tools', 'verify_present': 'verify_tools'}, {'bin_name': 'lc_tools_kf', 'conda_chan': 'kalefranz', 'conda_pkg': 'httpd', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools_kf', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools_kf', 'path': False, 'provides': ['rotatelogs'], 'verify_present': 'verify_tools'}, {'bin_name': 'redis_server', 'cmd': 'redis-server', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/redis_server', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'redis_server', 'path': False, 'pkg': 'redis-server', 'port': 6379, 'provides': ['redis-server', 'redis-cli'], 'run': 'redis_server', 'systemd': 'redis-server'}, {'bin_name': 'slc', 'cmd': 'slc', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'environ': ['lc_hubs'], 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/slc', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'slc', 'path': False, 'pkg': False}]
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mcreate_project_dirs            [[38;5;5mproject[39m] [1m[38;5;1mstore_log=[2m[38;5;5mNone
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/bin
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/data
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/log
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/work
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/conf
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/tmp
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/build
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mchdir                          [[38;5;5mproject[39m] [1m[38;5;1margs=[2m[38;5;5m/home/runner/myproject [38;5;1mstore_log=[38;5;5mNone
-[0;2m[38;5;5m09-20 14:57:36 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      lc_tools ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'] [38;5;1mstore_log=[38;5;5mNone
+[2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mchdir                          [[38;5;5mproject[39m] [1m[38;5;1margs=[2m[38;5;5m/home/runner/myproject [38;5;1mstore_log=[38;5;5mNone
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mDirectories                    [[38;5;5mproject[39m] [1m[38;5;1mconda_prefix=[2m[38;5;5m/home/runner/micromamba [38;5;1mfs_dir=[38;5;5m/home/runner/micromamba/fs(default)
+[0;2m[38;5;5m11-25 10:49:20 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mproject[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools/bin/git
+[0;2m[38;5;5m11-25 10:49:20 [[1m[38;5;124merror    ] [0mNot found                      [[38;5;5mproject[39m] [1m[38;5;1mcmd=[2m[38;5;5m/home/runner/micromamba/envs/lc_tools_kf/bin/rotatelogs
+[0;2m[38;5;5m11-25 10:49:20 [[1m[38;5;124mwarning  ] [0mInstalling resources           [[38;5;5mproject[39m] [1m[38;5;1mresources=[2m[38;5;5m[{'bin_name': 'lc_tools', 'conda_chan': 'conda-forge', 'conda_pkg': 'git fzf jq ripgrep fd-find httpie htop tmux', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools', 'path': False, 'provides': ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'], 'run': 'lc_tools', 'verify_present': 'verify_tools'}, {'bin_name': 'lc_tools_kf', 'conda_chan': 'kalefranz', 'conda_pkg': 'httpd', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/lc_tools_kf', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'lc_tools_kf', 'path': False, 'provides': ['rotatelogs'], 'verify_present': 'verify_tools'}, {'bin_name': 'redis_server', 'cmd': 'redis-server', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/redis_server', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'redis_server', 'path': False, 'pkg': 'redis-server', 'port': 6379, 'provides': ['redis-server', 'redis-cli'], 'run': 'redis_server', 'systemd': 'redis-server'}, {'bin_name': 'slc', 'cmd': 'slc', 'disabled': False, 'doc': 'The base class of the class hierarchy.\n\nWhen called, it accepts no arguments and returns a new featureless\ninstance that has no instance attributes and cannot be given any.\n', 'environ': ['lc_hubs'], 'host_conf_dir': '$PROJECT_ROOT/conf/${host:-$HOSTNAME}/slc', 'installed': False, 'module': 'devapp', 'module_dir': '/home/runner/work/devapps/devapps/src/devapp', 'name': 'slc', 'path': False, 'pkg': False}]
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mcreate_project_dirs            [[38;5;5mproject[39m] [1m[38;5;1mstore_log=[2m[38;5;5mNone
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/bin
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/data
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/log
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/work
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/conf
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/tmp
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mcreating                       [[38;5;5mproject[39m] [1m[38;5;1mdir=[2m[38;5;5m/home/runner/myproject/build
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mchdir                          [[38;5;5mproject[39m] [1m[38;5;1margs=[2m[38;5;5m/home/runner/myproject [38;5;1mstore_log=[38;5;5mNone
+[0;2m[38;5;5m11-25 10:49:20 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      lc_tools ['git', 'fzf', 'jq', 'rg', 'fd', 'http', 'htop', 'tmux'] [38;5;1mstore_log=[38;5;5mNone
 [0m-ne 
 [38;5;240mEmpty environment created at prefix: /home/runner/micromamba/envs/lc_tools
 
@@ -1161,159 +1161,163 @@ Transaction
    - htop
    - tmux
 
-  Package                    Version  Build               Channel          Size
-─────────────────────────────────────────────────────────────────────────────────
+  Package                    Version  Build                 Channel          Size
+───────────────────────────────────────────────────────────────────────────────────
   Install:
-─────────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────────
 
-  [32m+ _libgcc_mutex     [39m           0.1  conda_forge         conda-forge       3kB
-  [32m+ _openmp_mutex     [39m           4.5  2_gnu               conda-forge      24kB
-  [32m+ brotli-python     [39m         1.1.0  py313h7033f15_4     conda-forge     354kB
-  [32m+ bzip2             [39m         1.0.8  hda65f42_8          conda-forge     260kB
-  [32m+ c-ares            [39m        1.34.5  hb9d3cd8_0          conda-forge     207kB
-  [32m+ ca-certificates   [39m      2025.8.3  hbd8a1cb_0          conda-forge     154kB
-  [32m+ certifi           [39m      2025.8.3  pyhd8ed1ab_0        conda-forge     159kB
-  [32m+ cffi              [39m        1.17.1  py313hf01b4d8_1     conda-forge     297kB
-  [32m+ charset-normalizer[39m         3.4.3  pyhd8ed1ab_0        conda-forge      51kB
-  [32m+ defusedxml        [39m         0.7.1  pyhd8ed1ab_0        conda-forge      24kB
-  [32m+ fd-find           [39m        10.3.0  hdab8a38_0          conda-forge       1MB
-  [32m+ fzf               [39m        0.65.2  h6138981_0          conda-forge       3MB
-  [32m+ git               [39m        2.51.0  pl5321h8305f47_1    conda-forge      11MB
-  [32m+ h2                [39m         4.3.0  pyhcf101f3_0        conda-forge      96kB
-  [32m+ hpack             [39m         4.1.0  pyhd8ed1ab_0        conda-forge      31kB
-  [32m+ htop              [39m         3.4.1  haa1a288_0          conda-forge     168kB
-  [32m+ httpie            [39m         3.2.4  pyh55f8243_1        conda-forge      94kB
-  [32m+ hyperframe        [39m         6.1.0  pyhd8ed1ab_0        conda-forge      17kB
-  [32m+ idna              [39m          3.10  pyhd8ed1ab_1        conda-forge      50kB
-  [32m+ jq                [39m         1.8.1  h73b1eb8_0          conda-forge     313kB
-  [32m+ keyutils          [39m         1.6.3  hb9d3cd8_0          conda-forge     134kB
-  [32m+ krb5              [39m        1.21.3  h659f571_0          conda-forge       1MB
-  [32m+ ld_impl_linux-64  [39m          2.44  h1423503_1          conda-forge     676kB
-  [32m+ libcurl           [39m        8.14.1  h332b0f4_0          conda-forge     450kB
-  [32m+ libedit           [39m  3.1.20250104  pl5321h7949ede_0    conda-forge     135kB
-  [32m+ libev             [39m          4.33  hd590300_2          conda-forge     113kB
-  [32m+ libevent          [39m        2.1.12  hf998b51_1          conda-forge     427kB
-  [32m+ libexpat          [39m         2.7.1  hecca717_0          conda-forge      75kB
-  [32m+ libffi            [39m         3.4.6  h2dba641_1          conda-forge      57kB
-  [32m+ libgcc            [39m        15.1.0  h767d61c_5          conda-forge     824kB
-  [32m+ libgcc-ng         [39m        15.1.0  h69a702a_5          conda-forge      29kB
-  [32m+ libgomp           [39m        15.1.0  h767d61c_5          conda-forge     447kB
-  [32m+ libiconv          [39m          1.18  h3b78370_2          conda-forge     790kB
-  [32m+ liblzma           [39m         5.8.1  hb9d3cd8_2          conda-forge     113kB
-  [32m+ libmpdec          [39m         4.0.0  hb9d3cd8_0          conda-forge      91kB
-  [32m+ libnghttp2        [39m        1.67.0  had1ee68_0          conda-forge     667kB
-  [32m+ libnl             [39m        3.11.0  hb9d3cd8_0          conda-forge     741kB
-  [32m+ libsqlite         [39m        3.50.4  h0c1763c_0          conda-forge     933kB
-  [32m+ libssh2           [39m        1.11.1  hcf80075_0          conda-forge     305kB
-  [32m+ libstdcxx         [39m        15.1.0  h8f9b012_5          conda-forge       4MB
-  [32m+ libstdcxx-ng      [39m        15.1.0  h4852527_5          conda-forge      29kB
-  [32m+ libuuid           [39m        2.41.1  he9a06e4_0          conda-forge      37kB
-  [32m+ libxcrypt         [39m        4.4.36  hd590300_1          conda-forge     100kB
-  [32m+ libzlib           [39m         1.3.1  hb9d3cd8_2          conda-forge      61kB
-  [32m+ markdown-it-py    [39m         4.0.0  pyhd8ed1ab_0        conda-forge      65kB
-  [32m+ mdurl             [39m         0.1.2  pyhd8ed1ab_1        conda-forge      14kB
-  [32m+ multidict         [39m         6.6.3  py313h8060acc_0     conda-forge      97kB
-  [32m+ ncurses           [39m           6.5  h2d0b736_3          conda-forge     892kB
-  [32m+ oniguruma         [39m        6.9.10  hb9d3cd8_0          conda-forge     249kB
-  [32m+ openssl           [39m         3.5.3  h26f9b46_0          conda-forge       3MB
-  [32m+ pcre2             [39m         10.46  h1321c63_0          conda-forge       1MB
-  [32m+ perl              [39m        5.32.1  7_hd590300_perl5    conda-forge      13MB
-  [32m+ pip               [39m          25.2  pyh145f28c_0        conda-forge       1MB
-  [32m+ pycparser         [39m          2.22  pyh29332c3_1        conda-forge     110kB
-  [32m+ pygments          [39m        2.19.2  pyhd8ed1ab_0        conda-forge     889kB
-  [32m+ pysocks           [39m         1.7.1  pyha55dd90_7        conda-forge      21kB
-  [32m+ python            [39m        3.13.7  h2b335a9_100_cp313  conda-forge      34MB
-  [32m+ python_abi        [39m          3.13  8_cp313             conda-forge       7kB
-  [32m+ readline          [39m           8.2  h8c095d6_2          conda-forge     282kB
-  [32m+ requests          [39m        2.32.5  pyhd8ed1ab_0        conda-forge      59kB
-  [32m+ requests-toolbelt [39m         1.0.0  pyhd8ed1ab_1        conda-forge      44kB
-  [32m+ rich              [39m        14.1.0  pyhe01879c_0        conda-forge     201kB
-  [32m+ ripgrep           [39m        14.1.1  h8fae777_1          conda-forge       2MB
-  [32m+ setuptools        [39m        80.9.0  pyhff2d567_0        conda-forge     749kB
-  [32m+ tk                [39m        8.6.13  noxft_hd72426e_102  conda-forge       3MB
-  [32m+ tmux              [39m           3.5  h4463017_0          conda-forge     469kB
-  [32m+ typing_extensions [39m        4.15.0  pyhcf101f3_0        conda-forge      52kB
-  [32m+ tzdata            [39m         2025b  h78e105d_0          conda-forge     123kB
-  [32m+ urllib3           [39m         2.5.0  pyhd8ed1ab_0        conda-forge     102kB
-  [32m+ zstandard         [39m        0.25.0  py313h54dd161_0     conda-forge     471kB
-  [32m+ zstd              [39m         1.5.7  hb8e6e7a_2          conda-forge     568kB
+  [32m+ _libgcc_mutex     [39m           0.1  conda_forge           conda-forge       3kB
+  [32m+ _openmp_mutex     [39m           4.5  2_gnu                 conda-forge      24kB
+  [32m+ brotli-python     [39m         1.2.0  py314h3de4e8d_1       conda-forge     367kB
+  [32m+ bzip2             [39m         1.0.8  hda65f42_8            conda-forge     260kB
+  [32m+ c-ares            [39m        1.34.5  hb9d3cd8_0            conda-forge     207kB
+  [32m+ ca-certificates   [39m    2025.11.12  hbd8a1cb_0            conda-forge     152kB
+  [32m+ certifi           [39m    2025.11.12  pyhd8ed1ab_0          conda-forge     157kB
+  [32m+ cffi              [39m         2.0.0  py314h4a8dc5f_1       conda-forge     300kB
+  [32m+ charset-normalizer[39m         3.4.4  pyhd8ed1ab_0          conda-forge      51kB
+  [32m+ defusedxml        [39m         0.7.1  pyhd8ed1ab_0          conda-forge      24kB
+  [32m+ fd-find           [39m        10.3.0  hdab8a38_0            conda-forge       1MB
+  [32m+ fzf               [39m        0.67.0  h6138981_0            conda-forge       3MB
+  [32m+ git               [39m        2.52.0  pl5321h6d3cee1_1      conda-forge      11MB
+  [32m+ h2                [39m         4.3.0  pyhcf101f3_0          conda-forge      96kB
+  [32m+ hpack             [39m         4.1.0  pyhd8ed1ab_0          conda-forge      31kB
+  [32m+ htop              [39m         3.4.1  haa1a288_0            conda-forge     168kB
+  [32m+ httpie            [39m         3.2.4  pyh55f8243_1          conda-forge      94kB
+  [32m+ hyperframe        [39m         6.1.0  pyhd8ed1ab_0          conda-forge      17kB
+  [32m+ icu               [39m          75.1  he02047a_0            conda-forge      12MB
+  [32m+ idna              [39m          3.11  pyhd8ed1ab_0          conda-forge      51kB
+  [32m+ jq                [39m         1.8.1  h73b1eb8_0            conda-forge     313kB
+  [32m+ keyutils          [39m         1.6.3  hb9d3cd8_0            conda-forge     134kB
+  [32m+ krb5              [39m        1.21.3  h659f571_0            conda-forge       1MB
+  [32m+ ld_impl_linux-64  [39m          2.45  default_hbd61a6d_104  conda-forge     726kB
+  [32m+ libcurl           [39m        8.17.0  h4e3cde8_0            conda-forge     460kB
+  [32m+ libedit           [39m  3.1.20250104  pl5321h7949ede_0      conda-forge     135kB
+  [32m+ libev             [39m          4.33  hd590300_2            conda-forge     113kB
+  [32m+ libevent          [39m        2.1.12  hf998b51_1            conda-forge     427kB
+  [32m+ libexpat          [39m         2.7.3  hecca717_0            conda-forge      77kB
+  [32m+ libffi            [39m         3.5.2  h9ec8514_0            conda-forge      58kB
+  [32m+ libgcc            [39m        15.2.0  he0feb66_12           conda-forge       1MB
+  [32m+ libgcc-ng         [39m        15.2.0  h69a702a_12           conda-forge      29kB
+  [32m+ libgomp           [39m        15.2.0  he0feb66_12           conda-forge     605kB
+  [32m+ libiconv          [39m          1.18  h3b78370_2            conda-forge     790kB
+  [32m+ liblzma           [39m         5.8.1  hb9d3cd8_2            conda-forge     113kB
+  [32m+ libmpdec          [39m         4.0.0  hb9d3cd8_0            conda-forge      91kB
+  [32m+ libnghttp2        [39m        1.67.0  had1ee68_0            conda-forge     667kB
+  [32m+ libnl             [39m        3.11.0  hb9d3cd8_0            conda-forge     741kB
+  [32m+ libsqlite         [39m        3.51.0  hee844dc_0            conda-forge     946kB
+  [32m+ libssh2           [39m        1.11.1  hcf80075_0            conda-forge     305kB
+  [32m+ libstdcxx         [39m        15.2.0  h934c35e_12           conda-forge       6MB
+  [32m+ libstdcxx-ng      [39m        15.2.0  hdf11a46_12           conda-forge      29kB
+  [32m+ libuuid           [39m        2.41.2  he9a06e4_0            conda-forge      37kB
+  [32m+ libxcrypt         [39m        4.4.36  hd590300_1            conda-forge     100kB
+  [32m+ libzlib           [39m         1.3.1  hb9d3cd8_2            conda-forge      61kB
+  [32m+ markdown-it-py    [39m         4.0.0  pyhd8ed1ab_0          conda-forge      65kB
+  [32m+ mdurl             [39m         0.1.2  pyhd8ed1ab_1          conda-forge      14kB
+  [32m+ multidict         [39m         6.6.3  pyh62beb40_0          conda-forge      37kB
+  [32m+ ncurses           [39m           6.5  h2d0b736_3            conda-forge     892kB
+  [32m+ oniguruma         [39m        6.9.10  hb9d3cd8_0            conda-forge     249kB
+  [32m+ openssl           [39m         3.6.0  h26f9b46_0            conda-forge       3MB
+  [32m+ pcre2             [39m         10.47  haa7fec5_0            conda-forge       1MB
+  [32m+ perl              [39m        5.32.1  7_hd590300_perl5      conda-forge      13MB
+  [32m+ pip               [39m          25.3  pyh145f28c_0          conda-forge       1MB
+  [32m+ pycparser         [39m          2.22  pyh29332c3_1          conda-forge     110kB
+  [32m+ pygments          [39m        2.19.2  pyhd8ed1ab_0          conda-forge     889kB
+  [32m+ pysocks           [39m         1.7.1  pyha55dd90_7          conda-forge      21kB
+  [32m+ python            [39m        3.14.0  h32b2ec7_102_cp314    conda-forge      37MB
+  [32m+ python_abi        [39m          3.14  8_cp314               conda-forge       7kB
+  [32m+ readline          [39m           8.2  h8c095d6_2            conda-forge     282kB
+  [32m+ requests          [39m        2.32.5  pyhd8ed1ab_0          conda-forge      59kB
+  [32m+ requests-toolbelt [39m         1.0.0  pyhd8ed1ab_1          conda-forge      44kB
+  [32m+ rich              [39m        14.2.0  pyhcf101f3_0          conda-forge     201kB
+  [32m+ ripgrep           [39m        15.1.0  hdab8a38_0            conda-forge       2MB
+  [32m+ setuptools        [39m        80.9.0  pyhff2d567_0          conda-forge     749kB
+  [32m+ tk                [39m        8.6.13  noxft_ha0e22de_103    conda-forge       3MB
+  [32m+ tmux              [39m           3.5  h4463017_0            conda-forge     469kB
+  [32m+ typing-extensions [39m        4.15.0  h396c80c_0            conda-forge      91kB
+  [32m+ typing_extensions [39m        4.15.0  pyhcf101f3_0          conda-forge      52kB
+  [32m+ tzdata            [39m         2025b  h78e105d_0            conda-forge     123kB
+  [32m+ urllib3           [39m         2.5.0  pyhd8ed1ab_0          conda-forge     102kB
+  [32m+ zstandard         [39m        0.25.0  py314h0f05182_1       conda-forge     474kB
+  [32m+ zstd              [39m         1.5.7  hb8e6e7a_2            conda-forge     568kB
 
   Summary:
 
-  Install: 71 packages
+  Install: 73 packages
 
-  Total download: 93MB
+  Total download: 111MB
 
-─────────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────────
 
 Transaction starting
-Linking fzf-0.65.2-h6138981_0
-Linking ld_impl_linux-64-2.44-h1423503_1
-Linking libgomp-15.1.0-h767d61c_5
+Linking fzf-0.67.0-h6138981_0
+Linking libgomp-15.2.0-he0feb66_12
 Linking _libgcc_mutex-0.1-conda_forge
 Linking _openmp_mutex-4.5-2_gnu
-Linking libgcc-15.1.0-h767d61c_5
+Linking libgcc-15.2.0-he0feb66_12
 Linking libmpdec-4.0.0-hb9d3cd8_0
 Linking libiconv-1.18-h3b78370_2
 Linking keyutils-1.6.3-hb9d3cd8_0
-Linking libstdcxx-15.1.0-h8f9b012_5
-Linking c-ares-1.34.5-hb9d3cd8_0
 Linking libzlib-1.3.1-hb9d3cd8_2
-Linking libuuid-2.41.1-he9a06e4_0
 Linking liblzma-5.8.1-hb9d3cd8_2
-Linking libffi-3.4.6-h2dba641_1
 Linking bzip2-1.0.8-hda65f42_8
 Linking ncurses-6.5-h2d0b736_3
-Linking libgcc-ng-15.1.0-h69a702a_5
-Linking ripgrep-14.1.1-h8fae777_1
+Linking libstdcxx-15.2.0-h934c35e_12
+Linking libgcc-ng-15.2.0-h69a702a_12
+Linking libuuid-2.41.2-he9a06e4_0
+Linking libffi-3.5.2-h9ec8514_0
+Linking ripgrep-15.1.0-hdab8a38_0
 Linking oniguruma-6.9.10-hb9d3cd8_0
 Linking libnl-3.11.0-hb9d3cd8_0
-Linking libexpat-2.7.1-hecca717_0
+Linking c-ares-1.34.5-hb9d3cd8_0
+Linking libexpat-2.7.3-hecca717_0
 Linking fd-find-10.3.0-hdab8a38_0
-Linking libstdcxx-ng-15.1.0-h4852527_5
-Linking libsqlite-3.50.4-h0c1763c_0
-Linking zstd-1.5.7-hb8e6e7a_2
-Linking tk-8.6.13-noxft_hd72426e_102
-Linking pcre2-10.46-h1321c63_0
+Linking tk-8.6.13-noxft_ha0e22de_103
+Linking pcre2-10.47-haa7fec5_0
 Linking libedit-3.1.20250104-pl5321h7949ede_0
 Linking readline-8.2-h8c095d6_2
-Linking libev-4.33-hd590300_2
+Linking zstd-1.5.7-hb8e6e7a_2
+Linking libstdcxx-ng-15.2.0-hdf11a46_12
 Linking libxcrypt-4.4.36-hd590300_1
+Linking libev-4.33-hd590300_2
 Linking jq-1.8.1-h73b1eb8_0
 Linking htop-3.4.1-haa1a288_0
+Linking ld_impl_linux-64-2.45-default_hbd61a6d_104
+Linking icu-75.1-he02047a_0
 Linking perl-5.32.1-7_hd590300_perl5
-Linking python_abi-3.13-8_cp313
+Linking libsqlite-3.51.0-hee844dc_0
+Linking python_abi-3.14-8_cp314
 Linking tzdata-2025b-h78e105d_0
-Linking ca-certificates-2025.8.3-hbd8a1cb_0
-Linking openssl-3.5.3-h26f9b46_0
+Linking ca-certificates-2025.11.12-hbd8a1cb_0
+Linking openssl-3.6.0-h26f9b46_0
 Linking libssh2-1.11.1-hcf80075_0
-Linking libnghttp2-1.67.0-had1ee68_0
 Linking libevent-2.1.12-hf998b51_1
-Linking python-3.13.7-h2b335a9_100_cp313
+Linking python-3.14.0-h32b2ec7_102_cp314
+Linking libnghttp2-1.67.0-had1ee68_0
 Linking krb5-1.21.3-h659f571_0
 Linking tmux-3.5-h4463017_0
-Linking libcurl-8.14.1-h332b0f4_0
-Linking git-2.51.0-pl5321h8305f47_1
-Linking pip-25.2-pyh145f28c_0
+Linking libcurl-8.17.0-h4e3cde8_0
+Linking git-2.52.0-pl5321h6d3cee1_1
+Linking pip-25.3-pyh145f28c_0
 Linking pycparser-2.22-pyh29332c3_1
 Linking pysocks-1.7.1-pyha55dd90_7
 Linking hyperframe-6.1.0-pyhd8ed1ab_0
 Linking hpack-4.1.0-pyhd8ed1ab_0
 Linking mdurl-0.1.2-pyhd8ed1ab_1
-Linking idna-3.10-pyhd8ed1ab_1
-Linking certifi-2025.8.3-pyhd8ed1ab_0
+Linking idna-3.11-pyhd8ed1ab_0
+Linking certifi-2025.11.12-pyhd8ed1ab_0
 Linking typing_extensions-4.15.0-pyhcf101f3_0
 Linking defusedxml-0.7.1-pyhd8ed1ab_0
 Linking pygments-2.19.2-pyhd8ed1ab_0
-Linking charset-normalizer-3.4.3-pyhd8ed1ab_0
+Linking charset-normalizer-3.4.4-pyhd8ed1ab_0
 Linking setuptools-80.9.0-pyhff2d567_0
 Linking h2-4.3.0-pyhcf101f3_0
 Linking markdown-it-py-4.0.0-pyhd8ed1ab_0
-Linking rich-14.1.0-pyhe01879c_0
-Linking brotli-python-1.1.0-py313h7033f15_4
-Linking multidict-6.6.3-py313h8060acc_0
-Linking cffi-1.17.1-py313hf01b4d8_1
-Linking zstandard-0.25.0-py313h54dd161_0
+Linking typing-extensions-4.15.0-h396c80c_0
+Linking rich-14.2.0-pyhcf101f3_0
+Linking multidict-6.6.3-pyh62beb40_0
+Linking brotli-python-1.2.0-py314h3de4e8d_1
+Linking cffi-2.0.0-py314h4a8dc5f_1
+Linking zstandard-0.25.0-py314h0f05182_1
 Linking urllib3-2.5.0-pyhd8ed1ab_0
 Linking requests-2.32.5-pyhd8ed1ab_0
 Linking requests-toolbelt-1.0.0-pyhd8ed1ab_1
@@ -1322,7 +1326,7 @@ Linking httpie-3.2.4-pyh55f8243_1
 Transaction finished
 
 -ne 
-[2m[38;5;5m09-20 14:57:53 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      lc_tools_kf ['rotatelogs'] [38;5;1mstore_log=[38;5;5mNone
+[2m[38;5;5m11-25 10:49:36 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      lc_tools_kf ['rotatelogs'] [38;5;1mstore_log=[38;5;5mNone
 [0m-ne 
 [38;5;240mEmpty environment created at prefix: /home/runner/micromamba/envs/lc_tools_kf
 conda-forge/linux-64                                        Using cache
@@ -1336,24 +1340,24 @@ Transaction
 
    - httpd
 
-  Package             Version  Build        Channel           Size
-────────────────────────────────────────────────────────────────────
+  Package               Version  Build        Channel           Size
+──────────────────────────────────────────────────────────────────────
   Install:
-────────────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────────────
 
-  [32m+ _libgcc_mutex  [39m       0.1  conda_forge  conda-forge[32m     Cached
-[39m  [32m+ _openmp_mutex  [39m       4.5  2_gnu        conda-forge[32m     Cached
-[39m  [32m+ ca-certificates[39m  2025.8.3  hbd8a1cb_0   conda-forge[32m     Cached
-[39m  [32m+ httpd          [39m    2.4.12  6            kalefranz          8MB
-  [32m+ libgcc         [39m    15.1.0  h767d61c_5   conda-forge[32m     Cached
-[39m  [32m+ libgcc-ng      [39m    15.1.0  h69a702a_5   conda-forge[32m     Cached
-[39m  [32m+ libgomp        [39m    15.1.0  h767d61c_5   conda-forge[32m     Cached
-[39m  [32m+ libstdcxx      [39m    15.1.0  h8f9b012_5   conda-forge[32m     Cached
-[39m  [32m+ libstdcxx-ng   [39m    15.1.0  h4852527_5   conda-forge[32m     Cached
-[39m  [32m+ libzlib        [39m     1.3.1  hb9d3cd8_2   conda-forge[32m     Cached
-[39m  [32m+ openssl        [39m     3.5.3  h26f9b46_0   conda-forge[32m     Cached
-[39m  [32m+ pcre           [39m      8.45  h9c3ff4c_0   conda-forge      259kB
-  [32m+ zlib           [39m     1.3.1  hb9d3cd8_2   conda-forge       92kB
+  [32m+ _libgcc_mutex  [39m         0.1  conda_forge  conda-forge[32m     Cached
+[39m  [32m+ _openmp_mutex  [39m         4.5  2_gnu        conda-forge[32m     Cached
+[39m  [32m+ ca-certificates[39m  2025.11.12  hbd8a1cb_0   conda-forge[32m     Cached
+[39m  [32m+ httpd          [39m      2.4.12  6            kalefranz          8MB
+  [32m+ libgcc         [39m      15.2.0  he0feb66_12  conda-forge[32m     Cached
+[39m  [32m+ libgcc-ng      [39m      15.2.0  h69a702a_12  conda-forge[32m     Cached
+[39m  [32m+ libgomp        [39m      15.2.0  he0feb66_12  conda-forge[32m     Cached
+[39m  [32m+ libstdcxx      [39m      15.2.0  h934c35e_12  conda-forge[32m     Cached
+[39m  [32m+ libstdcxx-ng   [39m      15.2.0  hdf11a46_12  conda-forge[32m     Cached
+[39m  [32m+ libzlib        [39m       1.3.1  hb9d3cd8_2   conda-forge[32m     Cached
+[39m  [32m+ openssl        [39m       3.6.0  h26f9b46_0   conda-forge[32m     Cached
+[39m  [32m+ pcre           [39m        8.45  h9c3ff4c_0   conda-forge      259kB
+  [32m+ zlib           [39m       1.3.1  hb9d3cd8_2   conda-forge       92kB
 
   Summary:
 
@@ -1361,19 +1365,19 @@ Transaction
 
   Total download: 8MB
 
-────────────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────────────
 
 Transaction starting
-Linking ca-certificates-2025.8.3-hbd8a1cb_0
-Linking libgomp-15.1.0-h767d61c_5
+Linking ca-certificates-2025.11.12-hbd8a1cb_0
+Linking libgomp-15.2.0-he0feb66_12
 Linking _libgcc_mutex-0.1-conda_forge
 Linking _openmp_mutex-4.5-2_gnu
-Linking libgcc-15.1.0-h767d61c_5
-Linking libstdcxx-15.1.0-h8f9b012_5
-Linking libgcc-ng-15.1.0-h69a702a_5
+Linking libgcc-15.2.0-he0feb66_12
+Linking libstdcxx-15.2.0-h934c35e_12
+Linking libgcc-ng-15.2.0-h69a702a_12
 Linking libzlib-1.3.1-hb9d3cd8_2
-Linking openssl-3.5.3-h26f9b46_0
-Linking libstdcxx-ng-15.1.0-h4852527_5
+Linking openssl-3.6.0-h26f9b46_0
+Linking libstdcxx-ng-15.2.0-hdf11a46_12
 Linking zlib-1.3.1-hb9d3cd8_2
 Linking pcre-8.45-h9c3ff4c_0
 Linking httpd-2.4.12-6
@@ -1381,7 +1385,7 @@ Linking httpd-2.4.12-6
 Transaction finished
 
 -ne 
-[2m[38;5;5m09-20 14:57:59 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5ms     redis-server ['redis-server', 'redis-cli'] [38;5;1mstore_log=[38;5;5mNone
+[2m[38;5;5m11-25 10:49:41 [[38;5;4minfo     ] [0mInstall.Conda.conda_env        [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5ms     redis-server ['redis-server', 'redis-cli'] [38;5;1mstore_log=[38;5;5mNone
 [0m-ne 
 [38;5;240mEmpty environment created at prefix: /home/runner/micromamba/envs/redis_server
 conda-forge/linux-64                                        Using cache
@@ -1395,19 +1399,19 @@ Transaction
 
    - redis-server
 
-  Package             Version  Build        Channel           Size
-────────────────────────────────────────────────────────────────────
+  Package               Version  Build        Channel           Size
+──────────────────────────────────────────────────────────────────────
   Install:
-────────────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────────────
 
-  [32m+ _libgcc_mutex  [39m       0.1  conda_forge  conda-forge[32m     Cached
-[39m  [32m+ _openmp_mutex  [39m       4.5  2_gnu        conda-forge[32m     Cached
-[39m  [32m+ ca-certificates[39m  2025.8.3  hbd8a1cb_0   conda-forge[32m     Cached
-[39m  [32m+ libgcc         [39m    15.1.0  h767d61c_5   conda-forge[32m     Cached
-[39m  [32m+ libgcc-ng      [39m    15.1.0  h69a702a_5   conda-forge[32m     Cached
-[39m  [32m+ libgomp        [39m    15.1.0  h767d61c_5   conda-forge[32m     Cached
-[39m  [32m+ openssl        [39m     3.5.3  h26f9b46_0   conda-forge[32m     Cached
-[39m  [32m+ redis-server   [39m     7.4.0  h3400bea_0   conda-forge        9MB
+  [32m+ _libgcc_mutex  [39m         0.1  conda_forge  conda-forge[32m     Cached
+[39m  [32m+ _openmp_mutex  [39m         4.5  2_gnu        conda-forge[32m     Cached
+[39m  [32m+ ca-certificates[39m  2025.11.12  hbd8a1cb_0   conda-forge[32m     Cached
+[39m  [32m+ libgcc         [39m      15.2.0  he0feb66_12  conda-forge[32m     Cached
+[39m  [32m+ libgcc-ng      [39m      15.2.0  h69a702a_12  conda-forge[32m     Cached
+[39m  [32m+ libgomp        [39m      15.2.0  he0feb66_12  conda-forge[32m     Cached
+[39m  [32m+ openssl        [39m       3.6.0  h26f9b46_0   conda-forge[32m     Cached
+[39m  [32m+ redis-server   [39m       7.4.0  h3400bea_0   conda-forge        9MB
 
   Summary:
 
@@ -1415,28 +1419,29 @@ Transaction
 
   Total download: 9MB
 
-────────────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────────────
 
 Transaction starting
-Linking ca-certificates-2025.8.3-hbd8a1cb_0
-Linking libgomp-15.1.0-h767d61c_5
+Linking ca-certificates-2025.11.12-hbd8a1cb_0
+Linking libgomp-15.2.0-he0feb66_12
 Linking _libgcc_mutex-0.1-conda_forge
 Linking _openmp_mutex-4.5-2_gnu
-Linking libgcc-15.1.0-h767d61c_5
-Linking openssl-3.5.3-h26f9b46_0
-Linking libgcc-ng-15.1.0-h69a702a_5
+Linking libgcc-15.2.0-he0feb66_12
+Linking openssl-3.6.0-h26f9b46_0
+Linking libgcc-ng-15.2.0-h69a702a_12
 Linking redis-server-7.4.0-h3400bea_0
 
 Transaction finished
 
 -ne 
-[2m[38;5;5m09-20 14:58:02 [[38;5;4minfo     ] [0mInstall.no_pkg                 [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      slc  [38;5;1mstore_log=[38;5;5mNone
-[0;2m[38;5;5m09-20 14:58:02 [[38;5;4minfo     ] [0mNo package resource - no install [[38;5;5mproject[39m]
-[2m[38;5;5m09-20 14:58:02 [[38;5;4minfo     ] [0mgit_init                       [[38;5;5mproject[39m] [1m[38;5;1mstore_log=[2m[38;5;5mNone
+[2m[38;5;5m11-25 10:49:44 [[38;5;4minfo     ] [0mInstall.no_pkg                 [[38;5;5mproject[39m] [1m[38;5;1mrsc=[2m[38;5;5m      slc  [38;5;1mstore_log=[38;5;5mNone
+[0;2m[38;5;5m11-25 10:49:44 [[38;5;4minfo     ] [0mNo package resource - no install [[38;5;5mproject[39m]
+[2m[38;5;5m11-25 10:49:44 [[38;5;4minfo     ] [0mgit_init                       [[38;5;5mproject[39m] [1m[38;5;1mstore_log=[2m[38;5;5mNone
 [0m-ne 
 [33mhint: Using 'master' as the name for the initial branch. This default branch name
-hint: is subject to change. To configure the initial branch name to use in all
-hint: of your new repositories, which will suppress this warning, call:
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
 hint:
 hint: [39m  [33mgit config --global init.defaultBranch &lt;name&gt;
 hint:
@@ -1605,18 +1610,18 @@ Try <code>ops p -hf log_level</code>, <code>ops p -hf port</code> (...)</p>
 <p>In the example above, a <code>--port_offset=2000</code> flag was given, determining the start parameters written into the redis wrapper:</p>
 <p><!-- id: dfb9ed5f3d9468406462d07976eab52c -->
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>bin/redis-server
-<span class="m">4493</span>:C<span class="w"> </span><span class="m">20</span><span class="w"> </span>Sep<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">14</span>:58:03.785<span class="w"> </span><span class="c1"># WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add &#39;vm.overcommit_memory = 1&#39; to /etc/sysctl.conf and then reboot or run the command &#39;sysctl vm.overcommit_memory=1&#39; for this to take effect.</span>
-<span class="m">4493</span>:C<span class="w"> </span><span class="m">20</span><span class="w"> </span>Sep<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">14</span>:58:03.786<span class="w"> </span>*<span class="w"> </span>oO0OoO0OoO0Oo<span class="w"> </span>Redis<span class="w"> </span>is<span class="w"> </span>starting<span class="w"> </span>oO0OoO0OoO0Oo
-<span class="m">4493</span>:C<span class="w"> </span><span class="m">20</span><span class="w"> </span>Sep<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">14</span>:58:03.786<span class="w"> </span>*<span class="w"> </span>Redis<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">7</span>.4.0,<span class="w"> </span><span class="nv">bits</span><span class="o">=</span><span class="m">64</span>,<span class="w"> </span><span class="nv">commit</span><span class="o">=</span>abcd3ea3,<span class="w"> </span><span class="nv">modified</span><span class="o">=</span><span class="m">0</span>,<span class="w"> </span><span class="nv">pid</span><span class="o">=</span><span class="m">4493</span>,<span class="w"> </span>just<span class="w"> </span>started
-<span class="m">4493</span>:C<span class="w"> </span><span class="m">20</span><span class="w"> </span>Sep<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">14</span>:58:03.786<span class="w"> </span>*<span class="w"> </span>Configuration<span class="w"> </span>loaded
-<span class="m">4493</span>:M<span class="w"> </span><span class="m">20</span><span class="w"> </span>Sep<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">14</span>:58:03.786<span class="w"> </span>*<span class="w"> </span>monotonic<span class="w"> </span>clock:<span class="w"> </span>POSIX<span class="w"> </span>clock_gettime
+<span class="m">3952</span>:C<span class="w"> </span><span class="m">25</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">10</span>:49:49.296<span class="w"> </span><span class="c1"># WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add &#39;vm.overcommit_memory = 1&#39; to /etc/sysctl.conf and then reboot or run the command &#39;sysctl vm.overcommit_memory=1&#39; for this to take effect.</span>
+<span class="m">3952</span>:C<span class="w"> </span><span class="m">25</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">10</span>:49:49.296<span class="w"> </span>*<span class="w"> </span>oO0OoO0OoO0Oo<span class="w"> </span>Redis<span class="w"> </span>is<span class="w"> </span>starting<span class="w"> </span>oO0OoO0OoO0Oo
+<span class="m">3952</span>:C<span class="w"> </span><span class="m">25</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">10</span>:49:49.296<span class="w"> </span>*<span class="w"> </span>Redis<span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="m">7</span>.4.0,<span class="w"> </span><span class="nv">bits</span><span class="o">=</span><span class="m">64</span>,<span class="w"> </span><span class="nv">commit</span><span class="o">=</span>abcd3ea3,<span class="w"> </span><span class="nv">modified</span><span class="o">=</span><span class="m">0</span>,<span class="w"> </span><span class="nv">pid</span><span class="o">=</span><span class="m">3952</span>,<span class="w"> </span>just<span class="w"> </span>started
+<span class="m">3952</span>:C<span class="w"> </span><span class="m">25</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">10</span>:49:49.296<span class="w"> </span>*<span class="w"> </span>Configuration<span class="w"> </span>loaded
+<span class="m">3952</span>:M<span class="w"> </span><span class="m">25</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">10</span>:49:49.296<span class="w"> </span>*<span class="w"> </span>monotonic<span class="w"> </span>clock:<span class="w"> </span>POSIX<span class="w"> </span>clock_gettime
 <span class="w">                </span>_._<span class="w">                                                  </span>
 <span class="w">           </span>_.-<span class="sb">``</span>__<span class="w"> </span><span class="s1">&#39;&#39;</span>-._<span class="w">                                             </span>
 <span class="w">      </span>_.-<span class="sb">``</span><span class="w">    </span><span class="sb">`</span>.<span class="w">  </span><span class="sb">`</span>_.<span class="w">  </span><span class="s1">&#39;&#39;</span>-._<span class="w">           </span>Redis<span class="w"> </span>Community<span class="w"> </span>Edition<span class="w">      </span>
 <span class="w">  </span>.-<span class="sb">``</span><span class="w"> </span>.-<span class="sb">```</span>.<span class="w">  </span><span class="sb">```</span><span class="se">\/</span><span class="w">    </span>_.,_<span class="w"> </span><span class="s1">&#39;&#39;</span>-._<span class="w">     </span><span class="m">7</span>.4.0<span class="w"> </span><span class="o">(</span>abcd3ea3/0<span class="o">)</span><span class="w"> </span><span class="m">64</span><span class="w"> </span>bit
 <span class="w"> </span><span class="o">(</span><span class="w">    </span><span class="s1">&#39;      ,       .-`  | `,    )     Running in standalone mode</span>
 <span class="s1"> |`-._`-...-` __...-.``-._|&#39;</span><span class="sb">`</span><span class="w"> </span>_.-<span class="s1">&#39;|     Port: 8379</span>
-<span class="s1"> |    `-._   `._    /     _.-&#39;</span><span class="w">    </span><span class="p">|</span><span class="w">     </span>PID:<span class="w"> </span><span class="m">4493</span>
+<span class="s1"> |    `-._   `._    /     _.-&#39;</span><span class="w">    </span><span class="p">|</span><span class="w">     </span>PID:<span class="w"> </span><span class="m">3952</span>
 <span class="w">  </span><span class="sb">`</span>-._<span class="w">    </span><span class="sb">`</span>-._<span class="w">  </span><span class="sb">`</span>-./<span class="w">  </span>_.-<span class="s1">&#39;    _.-&#39;</span><span class="w">                                   </span>
 <span class="w"> </span><span class="p">|</span><span class="sb">`</span>-._<span class="sb">`</span>-._<span class="w">    </span><span class="sb">`</span>-.__.-<span class="s1">&#39;    _.-&#39;</span>_.-<span class="s1">&#39;|                                  </span>
 <span class="s1"> |    `-._`-._        _.-&#39;</span>_.-<span class="s1">&#39;    |           https://redis.io       </span>
@@ -1628,8 +1633,8 @@ Try <code>ops p -hf log_level</code>, <code>ops p -hf port</code> (...)</p>
 <span class="w">          </span><span class="sb">`</span>-._<span class="w">        </span>_.-<span class="s1">&#39;                                           </span>
 <span class="s1">              `-.__.-&#39;</span><span class="w">                                               </span>
 
-<span class="m">4493</span>:M<span class="w"> </span><span class="m">20</span><span class="w"> </span>Sep<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">14</span>:58:03.787<span class="w"> </span>*<span class="w"> </span>Server<span class="w"> </span>initialized
-<span class="m">4493</span>:M<span class="w"> </span><span class="m">20</span><span class="w"> </span>Sep<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">14</span>:58:03.787<span class="w"> </span>*<span class="w"> </span>Ready<span class="w"> </span>to<span class="w"> </span>accept<span class="w"> </span>connections<span class="w"> </span>tcp
+<span class="m">3952</span>:M<span class="w"> </span><span class="m">25</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">10</span>:49:49.297<span class="w"> </span>*<span class="w"> </span>Server<span class="w"> </span>initialized
+<span class="m">3952</span>:M<span class="w"> </span><span class="m">25</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">2025</span><span class="w"> </span><span class="m">10</span>:49:49.297<span class="w"> </span>*<span class="w"> </span>Ready<span class="w"> </span>to<span class="w"> </span>accept<span class="w"> </span>connections<span class="w"> </span>tcp
 </code></pre></div>
 <!-- id: dfb9ed5f3d9468406462d07976eab52c --></p>
 </details>
@@ -1842,21 +1847,21 @@ ops project --init_at=. --init_create_unit_files=redis-server --force
     
       <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
       
-        <script src="../../lcd/lp/javascript/tables.js"></script>
-      
-        <script src="../../lcd/lp/javascript/fa_all.js"></script>
+        <script src="../../lcd/lp/javascript/lc.js"></script>
       
         <script src="../../lcd/lp/javascript/Rx.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/xterm-addon-fit.min.js"></script>
+      
+        <script src="../../lcd/lp/javascript/fa_all.js"></script>
       
         <script src="../../lcd/lp/javascript/xterm-addon-search.min.js"></script>
       
         <script src="../../lcd/lp/javascript/xterm.4.9.0.min.js"></script>
       
-        <script src="../../lcd/lp/javascript/xterm-addon-fit.min.js"></script>
-      
         <script src="../../lcd/lp/javascript/tablesort.min.js"></script>
       
-        <script src="../../lcd/lp/javascript/lc.js"></script>
+        <script src="../../lcd/lp/javascript/tables.js"></script>
       
     
   </body>
