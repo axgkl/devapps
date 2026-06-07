@@ -1481,7 +1481,7 @@ class project:
             return
 
         d = os.getcwd()
-        while len(d) > 3:
+        while len(d) > 2:
             for fn in 'pyproject.toml', 'setup.py', '.git':
                 if os.path.exists(d + '/' + fn):
                     return d
